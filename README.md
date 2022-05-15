@@ -19,7 +19,7 @@ Pyjamas provides the following tags:
 <link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/> 
 <script src="https://codemirror.net/lib/codemirror.js"></script> 
 <style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
-<script src="./pyjamas.js"></script>
+<script src="https://modularizer.github.io/pyjamas/pyjamas.js"></script>
 
 <pyjamas-editor>
     import js # provides interface to WebAPIs such as document
