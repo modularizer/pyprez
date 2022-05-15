@@ -396,8 +396,8 @@ class PyjamasRepl extends HTMLElement{
     attachStd(){
         this.oldstdout = pyjamas.stdout
         this.oldstderr = pyjamas.stderr
-        pyjamas.stdout = this.appendLine
-        pyjamas.stderr = this.appendLine
+        pyjamas.stdout = this.appendLine.bind(this)
+        pyjamas.stderr = this.appendLine.bind(this)
     }
     detachStd(r){
         pyjamas.stdout = this.oldstdout
