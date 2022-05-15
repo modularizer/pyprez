@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pyjamas</title>
+
+    <!-- load Pyodide which provides core functionality -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
+
+    <!-- load CodeMirror to make pyjamas-editor elements prettier -->
+    <link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/>
+    <script src="https://codemirror.net/lib/codemirror.js"></script>
+    <script defer src="https://codemirror.net/mode/python/python.js"></script>
+    <style>
+        .CodeMirror {
+          border: 1px solid #eee;
+          height: auto;
+        }
+    </style>
+    <script src="./pyjamas.js"></script>
+</head>
+<body>
+    <!-- pre-load libraries if you wish -->
+    <pyjamas-env>
+        -numpy
+    </pyjamas-env>
+
+    <!-- play around with a simple terminal emulator -->
+    <pyjamas-repl></pyjamas-repl>
+
+    <!-- edit and test python code -->
+    <pyjamas-editor>
+        import js
+        import numpy as np
+        x = np.arange(10)
+        for v in x:
+            print(v)
+        x
+    </pyjamas-editor>
+
+    <!-- edit and test python code from a file -->
+    <pyjamas-editor src="./sample_front_end_python.py"></pyjamas-editor>
+
+    <!-- this script will run as soon as possible once the page loads and pyodide loads -->
+    <pyjamas-script src="./sample_front_end_python.py"></pyjamas-script>
+
+    <!-- this script will run as soon as possible once the page loads and pyodide loads -->
+    <pyjamas-script>
+        from js import document
+        el = document.createElement("div");
+        el.innerText = "Hello, World"
+        document.body.append(el);
+        print("this should print in the console");
+    </pyjamas-script>
+</body>
+</html>
