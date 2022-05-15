@@ -35,7 +35,7 @@ Pyjamas provides the following tags:
     
     x
 </pyjamas-editor>
-<pyjamas-repl></pyjamas-repl>
+<pyjamas-repl rows="10", cols="100"></pyjamas-repl>
 
 ## The Code
 ```html
