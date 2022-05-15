@@ -35,7 +35,7 @@ Pyjamas provides the following tags:
     
     x
 </pyjamas-editor>
-<pyjamas-repl rows="10", cols="100"></pyjamas-repl>
+<pyjamas-repl rows="8" cols="80"></pyjamas-repl>
 
 ## The Code
 ```html
@@ -53,7 +53,7 @@ Pyjamas provides the following tags:
     
     x
 </pyjamas-editor>
-<pyjamas-repl></pyjamas-repl>
+<pyjamas-repl rows="8" cols="80"></pyjamas-repl>
 ```
 
 ## Import
@@ -146,9 +146,9 @@ The package names are selected from the text using the [regular expression](http
 <pyjamas-repl></pyjamas-repl>
 ```
 ```html
-<pyjamas-repl rows="10" cols="80" style="background-color:dark green; color:#fff"></pyjamas-repl>
+<pyjamas-repl rows="10" cols="80"></pyjamas-repl>
 ```
-<pyjamas-repl rows="10" cols="80" style="background-color:dark green; color:#fff"></pyjamas-repl>
+<pyjamas-repl rows="10" cols="80"></pyjamas-repl>
 
 
 ## Pyodide
