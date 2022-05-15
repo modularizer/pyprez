@@ -241,7 +241,7 @@ class PyjamasEditor extends HTMLElement{
             if (src.endswith('.js')){
                 this.language = "javascript"
             }
-            fetch(src)).then(r=>r.text()).then(code =>{
+            fetch(src).then(r=>r.text()).then(code =>{
                 this.innerHTML = code;
                 this.loadEl();
             })
