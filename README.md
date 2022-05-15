@@ -16,7 +16,7 @@ Pyjamas provides the following tags:
 ## Try It
 <div style="display:flex">
     <div id="left" style="flex:50%">
-```html
+<pre>
 <!DOCTYPE html>
 <html lang="en">
     <head>  
@@ -59,7 +59,7 @@ Pyjamas provides the following tags:
         <pyjamas-repl></pyjamas-repl>
     </body>
 </html>
- ```
+ </pre>
     </div>
     <div id="right" style="flex:50%">
        <script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
