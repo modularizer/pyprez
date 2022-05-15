@@ -403,8 +403,8 @@ class PyjamasRepl extends HTMLElement{
         return r
     }
     eval(code){
-        let r = this.attachStd()
-        .then(r=>pyjamas.loadAndRunAsync(code))
+        this.attachStd()
+        let r = pyjamas.loadAndRunAsync(code)
         .then(this.detachStd, this.detachStd)
         .then(this.printResult)
         return r
