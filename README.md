@@ -150,7 +150,7 @@ When `pyjamas.js` loads, the `pyjamas` object (available at `window.pyjamas`) cr
 `pyjamas.then` and `pyjamas.catch` are simply shortcuts to `pyjamas.promise.then` and `pyjamas.promise.catch`. Therefore, `pyjamas.then` can be use be sure that pyodide has finished loading, then use it as soon as possible.
 
 #### example
-```js
+```html
 pyjamas.then(pyodide => pyodide.runPythonAsync(`
 	from js import alert
 	alert("pyodide object has loaded and is available at window.pyodide")
@@ -166,7 +166,7 @@ evaluated as soon as possible. It works by doing does three things:
 - runs python in pyodide's [CPython interpreter](https://en.wikipedia.org/wiki/CPython) using [WebAssembly](https://webassembly.org/) via [`pyodide.runPythonAsync`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=runPythonAsync#pyodide.runPythonAsync)
 
 #### example
-```js
+```html
 pyjamas.loadAndRunAsync(`
 	from js import alert
 	alert("pyodide object has loaded and is available at window.pyodide")
@@ -179,7 +179,7 @@ Pyjamas automatically set up `stdout` to be handled by `console.log` and `stderr
 However, `pyjamas.stdout` and `pyjamas.stderr` functions can be set to whatever handler you want.
 
 ### example
-```js
+```html
 function appendText(m, color="#000"){
 	let el = document.createElement("div")
 	el.innerText = m
