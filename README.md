@@ -72,7 +72,7 @@ Pyjamas' only dependency is [**Pyodide**](#pyodide).
  By default, the `<pyjamas-editor>` tag evaulates Python in pyodide's CPython interpreter, but if the `language` attribute is set to "javascript" or if the src
  address ends with `.js`, the editor will run the code in javascript instead.
  
- #### examples
+ #### python example
  ```html
  <pyjamas-editor>
 	 import numpy as np
@@ -81,6 +81,7 @@ Pyjamas' only dependency is [**Pyodide**](#pyodide).
 ```
 <div id="editorContainer"></div>
 
+ #### javascript example
 ```html
 pyjamas.loadAndRunAsync(`
 	from js import alert
