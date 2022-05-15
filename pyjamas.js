@@ -351,6 +351,8 @@ class PyjamasRepl extends HTMLElement{
     */
     constructor(){
         super();
+        this.attachStd = this.attachStd.bind(this)
+        this.detachStd = this.detachStd.bind(this)
         this.id = 'repl' + Math.floor(10000*Math.random())
         let cols = this.hasAttribute("cols")?this.getAttribute("cols"):120
         let rows = this.hasAttribute("rows")?this.getAttribute("rows"):20
