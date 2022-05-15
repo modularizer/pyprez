@@ -22,13 +22,14 @@ Pyjamas provides the following tags:
 <script src="./pyjamas.js"></script>
 
 <pyjamas-editor>
-    import js # provides interface to WebAPIs such as document, window, alert, etc
+    import js # provides interface to WebAPIs such as document
 
-    import time # import Python builitins
+    import time
+    import numpy as np
     
-    import numpy as np # import packages from standard library
-    
-    print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
+    print("this will show up in the Developer Console"
+    "because `stdout` has been piped to `console.log`"
+    "via `pyjamas.stdout = console.log`")
     
     x = np.random.rand(5)
     js.alert(x.tolist())
