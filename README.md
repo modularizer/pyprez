@@ -256,7 +256,7 @@ x = np.random.rand(5)
 js.alert(x.tolist())
 
 x
-`
+`,
 	"editorContainer": `
 import numpy as np
 np.random.rand(5)		
