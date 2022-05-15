@@ -16,50 +16,50 @@ Pyjamas provides the following tags:
 ## Try It
 <div style="display:flex">
     <div id="left" style="flex:50%">
-<pre>
-<!DOCTYPE html>
-<html lang="en">
-    <head>  
-        <!-- import Pyodide-->
-        <script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
-        
-        <!-- import CodeMirror to make pyjamas-editor prettier (not necessary-->
-        <script defer src="https://codemirror.net/mode/python/python.js"></script>  
-        <link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/> 
-        <script src="https://codemirror.net/lib/codemirror.js"></script> 
-        <style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
-    
-        <!-- import Pyjamas -->
-        <script src="./pyjamas.js"></script>
-    </head>
-    <body>
-        <pyjamas-script>
-            from js import document
-            from datetime import datetime
-            document.getElementByID("date").innerHTML = datetime.now().isoformat()
-        </pyjamas-script>
-        <div id="date"></div>
-        <pyjamas-editor>
-            import js # provides interface to WebAPIs such as document, window, alert, etc
-            
-            import time # import Python builitins
-            
-            import numpy as np # import packages from standard library
-            
-            print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
-            
-            js.document.body.style["background-color"] = "green"
-            time.sleep(1)
-            js.document.body.style["background-color"] = ""
-            
-            x = np.random.rand(5)
-            
-            x
-        </pyjamas-editor>
-        <pyjamas-repl></pyjamas-repl>
-    </body>
-</html>
- </pre>
+        <pre>
+            &lt;!DOCTYPE html&gt;
+            &lt;html lang="en"&gt;
+                &lt;head&gt;  
+                    &lt;!-- import Pyodide--&gt;
+                    &lt;script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"&gt;&lt;/script&gt; 
+                    
+                    &lt;!-- import CodeMirror to make pyjamas-editor prettier (not necessary--&gt;
+                    &lt;script defer src="https://codemirror.net/mode/python/python.js"&gt;&lt;/script&gt;  
+                    &lt;link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/&gt; 
+                    &lt;script src="https://codemirror.net/lib/codemirror.js"&gt;&lt;/script&gt; 
+                    &lt;style&gt; .CodeMirror { border: 1px solid #eee; height: auto; } &lt;/style&gt;  
+                
+                    &lt;!-- import Pyjamas --&gt;
+                    &lt;script src="./pyjamas.js"&gt;&lt;/script&gt;
+                &lt;/head&gt;
+                &lt;body&gt;
+                    &lt;pyjamas-script&gt;
+                        from js import document
+                        from datetime import datetime
+                        document.getElementByID("date").innerHTML = datetime.now().isoformat()
+                    &lt;/pyjamas-script&gt;
+                    &lt;div id="date"&gt;&lt;/div&gt;
+                    &lt;pyjamas-editor&gt;
+                        import js # provides interface to WebAPIs such as document, window, alert, etc
+                        
+                        import time # import Python builitins
+                        
+                        import numpy as np # import packages from standard library
+                        
+                        print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
+                        
+                        js.document.body.style["background-color"] = "green"
+                        time.sleep(1)
+                        js.document.body.style["background-color"] = ""
+                        
+                        x = np.random.rand(5)
+                        
+                        x
+                    &lt;/pyjamas-editor&gt;
+                    &lt;pyjamas-repl&gt;&lt;/pyjamas-repl&gt;
+                &lt;/body&gt;
+            &lt;/html&gt;
+         </pre>
     </div>
     <div id="right" style="flex:50%">
        <script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
