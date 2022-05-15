@@ -1,3 +1,12 @@
+<head style="display:none">
+    <script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
+    <script defer src="https://codemirror.net/mode/python/python.js"></script>  
+    <link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/> 
+    <script src="https://codemirror.net/lib/codemirror.js"></script> 
+    <style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
+    <script src="https://modularizer.github.io/pyjamas/pyjamas.js"></script>
+</head>
+
 # Welcome to **Pyjamas!**
   
  **Pyjamas** is a minimal script to help you get started playing around with [**Pyodide**](#pyodide), which allows you to run front-end Python and easily interact between Python, javascript and HTML.  In fact, >99% of the functionaly of **Pyjamas** comes directly from pyodide object, which is made available at `window.pyodide`.
@@ -13,14 +22,6 @@ Pyjamas provides the following tags:
  - [`<pyjamas-repl>`](#pyjamas-repl)
 
 ## Try It
-
-<script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
-<script defer src="https://codemirror.net/mode/python/python.js"></script>  
-<link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/> 
-<script src="https://codemirror.net/lib/codemirror.js"></script> 
-<style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
-<script src="https://modularizer.github.io/pyjamas/pyjamas.js"></script>
-
 <pyjamas-editor>
     import js # provides interface to WebAPIs such as document
 
