@@ -80,6 +80,13 @@ Pyjamas' only dependency is [**Pyodide**](#pyodide).
 </pyjamas-editor>
 ```
 <div id="editorContainer"></div>
+
+```html
+pyjamas.loadAndRunAsync(`
+	from js import alert
+	alert('pyodide object has loaded and is available at window.pyodide')
+`)
+```
 <div id="jseditor0"></div>
 
 
