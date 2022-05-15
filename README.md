@@ -1,5 +1,4 @@
-# Pyjamas
-Welcome to **Pyjamas!**
+# Welcome to **Pyjamas!**
   
  **Pyjamas** is a minimal script to help you get started playing around with [**Pyodide**](#pyodide), which allows you to run front-end Python and easily interact between Python, javascript and HTML.  In fact, >99% of the functionaly of **Pyjamas** comes directly from pyodide object, which is made available at `window.pyodide`.
 
