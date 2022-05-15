@@ -15,35 +15,35 @@ Pyjamas provides the following tags:
 
 ## Try It
 <script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
-       <script defer src="https://codemirror.net/mode/python/python.js"></script>  
-        <link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/> 
-        <script src="https://codemirror.net/lib/codemirror.js"></script> 
-        <style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
-        <script src="./pyjamas.js"></script>
-        <pyjamas-script>
-            from js import document
-            from datetime import datetime
-            document.getElementByID("date").innerHTML = datetime.now().isoformat()
-        </pyjamas-script>
-        <div id="date"></div>
-        <pyjamas-editor>
-            import js # provides interface to WebAPIs such as document, window, alert, etc
-            
-            import time # import Python builitins
-            
-            import numpy as np # import packages from standard library
-            
-            print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
-            
-            js.document.body.style["background-color"] = "green"
-            time.sleep(1)
-            js.document.body.style["background-color"] = ""
-            
-            x = np.random.rand(5)
-            
-            x
-        </pyjamas-editor>
-        <pyjamas-repl></pyjamas-repl>
+<script defer src="https://codemirror.net/mode/python/python.js"></script>  
+<link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/> 
+<script src="https://codemirror.net/lib/codemirror.js"></script> 
+<style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
+<script src="./pyjamas.js"></script>
+<pyjamas-script>
+    from js import document
+    from datetime import datetime
+    document.getElementByID("date").innerHTML = datetime.now().isoformat()
+</pyjamas-script>
+<div id="date"></div>
+<pyjamas-editor>
+    import js # provides interface to WebAPIs such as document, window, alert, etc
+    
+    import time # import Python builitins
+    
+    import numpy as np # import packages from standard library
+    
+    print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
+    
+    js.document.body.style["background-color"] = "green"
+    time.sleep(1)
+    js.document.body.style["background-color"] = ""
+    
+    x = np.random.rand(5)
+    
+    x
+</pyjamas-editor>
+<pyjamas-repl></pyjamas-repl>
 
 ## The Code
 ```html
