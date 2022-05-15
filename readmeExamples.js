@@ -70,7 +70,7 @@ let jsEditors = {
 "pyjamas.loadAndRunAsync(`\n"+
 "for i in range(10):\n"+
 "	print(10)\n"+
-"raise Exception("testing stderr")\n"+
+"raise Exception('testing stderr')\n"+
 "`)"
 }
 
