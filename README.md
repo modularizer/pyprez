@@ -69,6 +69,9 @@ Pyjamas' only dependency is [**Pyodide**](#pyodide).
 ## Pyjamas-Editor
  The `<pyjamas-editor>` tag is similar to the  `<pyjamas-script>` tag, except instead of executing as soon as possible when the page is loaded, the tag provides a [CodeMirror](https://codemirror.net/6/) text editor element and does not execute until the gutter start button has been pressed. Then, the editor runs the code, streaming STDOUT and STDERR to the console, and the displays the result as a string in the editor. Additionally, the element can be reset and the code can be modified and rerun.
  
+ By default, the `<pyjamas-editor>` tag evaulates Python in pyodide's CPython interpreter, but if the `language` attribute is set to "javascript" or if the src
+ address ends with `.js`, the editor will run the code in javascript instead.
+ 
  #### examples
  ```html
  <pyjamas-editor>
@@ -77,6 +80,8 @@ Pyjamas' only dependency is [**Pyodide**](#pyodide).
 </pyjamas-editor>
 ```
 <div id="editorContainer"></div>
+<div id="jseditor0"></div>
+
 
 ## Pyjamas-Repl
  The `<pyjamas-repl>` tag provides a minimal terminal emulator to play around with `pyodide`. It does the very basics and nothing more (no special color strings, no plots, etc.). It can be styled, but that is about it.
@@ -245,7 +250,7 @@ import time # import Python builitins
 
 import numpy as np # import packages from standard library
 
-print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
+print("this will show up in the Developer Console because 'stdout' has been piped to 'console.log' via 'pyjamas.stdout = console.log'")
 
 x = np.random.rand(5)
 js.alert(x.tolist())
@@ -260,6 +265,46 @@ np.random.rand(5)
 		for (let [id, code] of Object.entries(editors)){
 			let el = document.createElement("pyjamas-editor")
 			el.innerHTML = code
+			document.getElementById(id).append(el);
+		}
+		
+	let jsEditors = {
+	"jseditor0": 
+"pyjamas.loadAndRunAsync(`\n"+
+"	from js import alert\n"+
+"	alert("pyodide object has loaded and is available at window.pyodide")\n"+
+"`)",
+	"thencatch": 
+"pyjamas.then(pyodide => pyodide.runPythonAsync(`\n"+
+"	from js import alert\n"+
+"	alert("pyodide object has loaded and is available at window.pyodide")\n"+
+"`))",
+	"loadandrunasync": 
+"pyjamas.loadAndRunAsync(`\n"+
+"	from js import alert\n"+
+"	alert("pyodide object has loaded and is available at window.pyodide")\n"+
+"`)",
+	"stdoutstderr": 
+"function appendText(m, color="#000"){\n"+
+"	let el = document.createElement("div")\n"+
+"	el.innerText = m\n"+
+"	el.style.color = color\n"+
+"	document.body.append(el)\n"+
+"}\n"+
+"pyjamas.stdout = appendText\n"+
+"pyjamas.stderr = m => appendText(m, "red")\n"+
+"\n"+
+"pyjamas.loadAndRunAsync(`\n"+
+"for i in range(10):\n"+
+"	print(10)\n"+
+"raise Exception("testing stderr")\n"+
+"`)"
+		
+}
+		for (let [id, code] of Object.entries(jsEditors)){
+			let el = document.createElement("pyjamas-editor")
+			el.innerHTML = code
+			el.setAttribute("language", "javascript")
 			document.getElementById(id).append(el);
 		}
 				
