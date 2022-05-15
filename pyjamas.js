@@ -223,10 +223,25 @@ class PyjamasEditor extends HTMLElement{
         super();
         this.loadEl = this.loadEl.bind(this);
         this.loadEditor = this.loadEditor.bind(this);
+        this.language = "python"
+        if (this.hasAttribute("language") && this.getAttribute("language")){
+            this.language = this.getAttribute("language").toLowerCase()
+        }
+        let aliases = {
+            "py": "python",
+            "js": "javascript"
+        }
+        if (aliases[this.language]){
+            this.language = aliases[this.language]
+        }
 
         if (this.hasAttribute("src") && this.getAttribute("src")){
-            pyjamasDebug("fetching script for pyjamas-editor src", this.getAttribute("src"))
-            fetch(this.getAttribute("src")).then(r=>r.text()).then(code =>{
+            let src = this.getAttribute("src")
+            pyjamasDebug("fetching script for pyjamas-editor src", src)
+            if (src.endswith('.js')){
+                this.language = "javascript"
+            }
+            fetch(src)).then(r=>r.text()).then(code =>{
                 this.innerHTML = code;
                 this.loadEl();
             })
@@ -279,7 +294,7 @@ class PyjamasEditor extends HTMLElement{
     _loadCodeMirror(){
         this.editor = CodeMirror.fromTextArea(this.textarea, {
             lineNumbers: true,
-            mode: "python",
+            mode: this.language,
             viewportMargin: Infinity,
             gutters: ["Codemirror-linenumbers", "start"],
         });
@@ -318,14 +333,22 @@ class PyjamasEditor extends HTMLElement{
         if (this.code && !this.executed){
             this.executed = this.code;
             let code = this.code;
-            let promise = pyjamas.loadAndRunAsync(code);
-            this.start.style.color = "yellow"
-            promise.then(r=>{
-                this.code = code + "\n>>> " + (r?r.toString():"");
+            let promise;
+            if (this.language == "python"){
+                promise = pyjamas.loadAndRunAsync(code);
+                promise.then(r=>{
+                    this.code = code + "\n>>> " + (r?r.toString():"");
+                    this.start.style.color = "red";
+                    this.start.innerHTML = "↻";
+                    return r
+                })
+            }else if (this.language == "javascript"){
+                let r = eval(code)
+                this.code = code + "\n>>> " + JSON.stringify(r, null, 2);
                 this.start.style.color = "red";
                 this.start.innerHTML = "↻";
                 return r
-            })
+            }
         }
 
     }
