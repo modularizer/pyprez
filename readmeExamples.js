@@ -58,8 +58,8 @@ let jsEditors = {
 "	alert('pyodide object has loaded and is available at window.pyodide')\n"+
 "`)",
 	stdoutstderr:
-"function appendText(m, color="#000"){\n"+
-"	let el = document.createElement("div")\n"+
+'function appendText(m, color="#000"){\n'+
+'	let el = document.createElement("div")\n'+
 "	el.innerText = m\n"+
 "	el.style.color = color\n"+
 "	document.body.append(el)\n"+
