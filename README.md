@@ -13,6 +13,91 @@ Pyjamas provides the following tags:
  - [`<pyjamas-editor>`](#pyjamas-editor)
  - [`<pyjamas-repl>`](#pyjamas-repl)
 
+## Try It
+<div style="display:flex">
+    <div id="left" style="flex:50%">
+```html
+<!DOCTYPE html>
+<html lang="en">
+    <head>  
+        <!-- import Pyodide-->
+        <script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
+        
+        <!-- import CodeMirror to make pyjamas-editor prettier (not necessary-->
+        <script defer src="https://codemirror.net/mode/python/python.js"></script>  
+        <link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/> 
+        <script src="https://codemirror.net/lib/codemirror.js"></script> 
+        <style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
+    
+        <!-- import Pyjamas -->
+        <script src="./pyjamas.js"></script>
+    </head>
+    <body>
+        <pyjamas-script>
+            from js import document
+            from datetime import datetime
+            document.getElementByID("date").innerHTML = datetime.now().isoformat()
+        </pyjamas-script>
+        <div id="date"></div>
+        <pyjamas-editor>
+            import js # provides interface to WebAPIs such as document, window, alert, etc
+            
+            import time # import Python builitins
+            
+            import numpy as np # import packages from standard library
+            
+            print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
+            
+            js.document.body.style["background-color"] = "green"
+            time.sleep(1)
+            js.document.body.style["background-color"] = ""
+            
+            x = np.random.rand(5)
+            
+            x
+        </pyjamas-editor>
+        <pyjamas-repl></pyjamas-repl>
+    </body>
+</html>
+ ```
+    </div>
+    <div id="right" style="flex:50%">
+       <script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
+       <script defer src="https://codemirror.net/mode/python/python.js"></script>  
+        <link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/> 
+        <script src="https://codemirror.net/lib/codemirror.js"></script> 
+        <style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
+        <script src="./pyjamas.js"></script>
+        <pyjamas-script>
+            from js import document
+            from datetime import datetime
+            document.getElementByID("date").innerHTML = datetime.now().isoformat()
+        </pyjamas-script>
+        <div id="date"></div>
+        <pyjamas-editor>
+            import js # provides interface to WebAPIs such as document, window, alert, etc
+            
+            import time # import Python builitins
+            
+            import numpy as np # import packages from standard library
+            
+            print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
+            
+            js.document.body.style["background-color"] = "green"
+            time.sleep(1)
+            js.document.body.style["background-color"] = ""
+            
+            x = np.random.rand(5)
+            
+            x
+        </pyjamas-editor>
+        <pyjamas-repl></pyjamas-repl>
+    </div>
+</div>
+
+
+
+
 ## Import
 Pyjamas is dependant on **Pyodide**. 
 **CodeMirror** is also used for styling the editor, but is not necessary.
@@ -68,14 +153,13 @@ The package names are selected from the text using the [regular expression](http
 	 el.innerText = str(datetime.datetime.now().isoformat())
 </pyjamas-script>
 ```
-
- <pyjamas-script id="testScript">
-	 from js import document
-	 import datetime
+<pyjamas-script id="testScript" style="display:none">
+  from js import document
+  import datetime
 	 
-	el = document.getElementById("testScript")
-	el.style.display = "block"
-	el.innerText = str(datetime.datetime.now().isoformat())
+  el = document.getElementById("testScript")
+  el.style.display = "block"
+  el.innerText = str(datetime.datetime.now().isoformat())
 </pyjamas-script>
 
 ## Pyjamas-Editor
@@ -88,8 +172,8 @@ The package names are selected from the text using the [regular expression](http
 	np.random.rand(5)
 </pyjamas-editor>
 ```
-  <pyjamas-editor>
-	 import numpy as np
+<pyjamas-editor>
+    import numpy as np
 	np.random.rand(5)
 </pyjamas-editor>
 
