@@ -1,84 +1,100 @@
-<head style="display:none">
-    <script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
-    <script defer src="https://codemirror.net/mode/python/python.js"></script>  
-    <link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/> 
-    <script src="https://codemirror.net/lib/codemirror.js"></script> 
-    <style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
-    <script src="https://modularizer.github.io/pyjamas/pyjamas.js"></script>
-</head>
-
 # Welcome to **Pyjamas!**
   
  **Pyjamas** is a minimal script to help you get started playing around with [**Pyodide**](#pyodide), which allows you to run front-end Python and easily interact between Python, javascript and HTML.  In fact, >99% of the functionaly of **Pyjamas** comes directly from pyodide object, which is made available at `window.pyodide`.
 
-Pyjamas is inspired [**Pyscript**](#pyscript), a project backed by Anaconda which provided a useful interface for pyodide also but introduced a [list of drawbacks](#pyscript-drawbacks) in the process.
+Pyjamas is inspired [**Pyscript**](#pyscript), a project backed by Anaconda which provided a useful interface for pyodide also but introduced a #[list of drawbacks](#pyscript-drawbacks) in the process.
 
 Similarly to PyScripts [`<py-env>`](https://anaconda.cloud/api/files/803653a5-9b1e-41d4-a9ee-76c64b8d6cb4), [`<py-script>`](https://anaconda.cloud/api/files/c57a6ef0-dbb7-43da-acd9-94a781ef2673) and [`<py-repl>`](https://pyscript.net/examples/repl.html) tags, 
-Pyjamas provides the following tags:
 
- - [`<pyjamas-env>`](#pyjamas-env)
- - [`<pyjamas-script>`](#pyjamas-script)
- - [`<pyjamas-editor>`](#pyjamas-editor)
- - [`<pyjamas-repl>`](#pyjamas-repl)
+
+QuickLinks:
+- [Try It @ https://modularizer.github.io/pyjamas/](https://modularizer.github.io/pyjamas/#try-it)
+- [The Code](#the-code)
+- [Pyjamas Tags](#pyjamas-tags):
+ 	- [`<pyjamas-editor>`](#pyjamas-editor)
+ 	- [`<pyjamas-repl>`](#pyjamas-repl)
+ 	- [`<pyjamas-env>`](#pyjamas-env)
+ 	- [`<pyjamas-script>`](#pyjamas-script)
+ - [Pyjamas API](#pyjamas-api)
+ 	- [`pyjamas.then/catch`](#thencatch)
+ 	- [`pyjamas.loadAndRunAsync`](#loadandrunasync)
+ 	- [`pyjamas.stdout/stderr`](#stdoutstderr)
+ - [About Pyodide](#pyodide)
+ - [About PyScript](#pyscript)
+
 
 ## Try It
-<pyjamas-editor>
-    import js # provides interface to WebAPIs such as document
-
-    import time
-    import numpy as np
-    
-    print("this will show up in the Developer Console"
-    "because `stdout` has been piped to `console.log`"
-    "via `pyjamas.stdout = console.log`")
-    
-    x = np.random.rand(5)
-    js.alert(x.tolist())
-    
-    x
-</pyjamas-editor>
+[View in GitHub Pages](https://modularizer.github.io/pyjamas/)
+<div id="tryitContainer0"></div>
 <pyjamas-repl rows="8" cols="80"></pyjamas-repl>
 
 ## The Code
-```html
-<pyjamas-editor>
-    import js # provides interface to WebAPIs such as document, window, alert, etc
+Pyjamas' only dependency is [**Pyodide**](#pyodide). 
+[CodeMirror](https://codemirror.net/6/) is also used for styling the editor, but is not entirely necessary and all features will still function if it is not included.
 
-    import time # import Python builitins
-    
-    import numpy as np # import packages from standard library
-    
-    print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
-    
-    x = np.random.rand(5)
-    js.alert(x.tolist())
-    
-    x
-</pyjamas-editor>
-<pyjamas-repl rows="8" cols="80"></pyjamas-repl>
-```
-
-## Import
-Pyjamas is dependant on **Pyodide**. 
-**CodeMirror** is also used for styling the editor, but is not necessary.
 ```html
 <head>  
 	<!-- import Pyodide-->
 	<script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
+	
+	<!-- import Pyjamas -->
+	<script src="https://modularizer.github.io/pyjamas//pyjamas.js"></script>
 	
 	<!-- import CodeMirror to make pyjamas-editor prettier (not necessary-->
 	<script defer src="https://codemirror.net/mode/python/python.js"></script>  
 	<link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/> 
 	<script src="https://codemirror.net/lib/codemirror.js"></script> 
 	<style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
-
-	<!-- import Pyjamas -->
-	<script src="./pyjamas.js"></script>
 </head>
- ```
+<body>
+	<pyjamas-editor>
+	    import js # provides interface to WebAPIs such as document, window, alert, etc
+
+	    import time # import Python builitins
+
+	    import numpy as np # import packages from standard library
+
+	    print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
+
+	    x = np.random.rand(5)
+	    js.alert(x.tolist())
+
+	    x
+	</pyjamas-editor>
+	<pyjamas-repl rows="8" cols="80"></pyjamas-repl>
+</body>
+```
+
+# Pyjamas Tags
+## Pyjamas-Editor
+ The `<pyjamas-editor>` tag is similar to the  `<pyjamas-script>` tag, except instead of executing as soon as possible when the page is loaded, the tag provides a [CodeMirror](https://codemirror.net/6/) text editor element and does not execute until the gutter start button has been pressed. Then, the editor runs the code, streaming STDOUT and STDERR to the console, and the displays the result as a string in the editor. Additionally, the element can be reset and the code can be modified and rerun.
+ 
+ #### examples
+ ```html
+ <pyjamas-editor>
+	 import numpy as np
+	np.random.rand(5)
+</pyjamas-editor>
+```
+<div id="editorContainer"></div>
+
+## Pyjamas-Repl
+ The `<pyjamas-repl>` tag provides a minimal terminal emulator to play around with `pyodide`. It does the very basics and nothing more (no special color strings, no plots, etc.). It can be styled, but that is about it.
+ 
+ [Pyodide's own console](https://pyodide.org/en/stable/console.html)  has much more support.
+
+#### examples
+```html
+<pyjamas-repl></pyjamas-repl>
+```
+```html
+<pyjamas-repl rows="10" cols="80"></pyjamas-repl>
+```
+<pyjamas-repl rows="10" cols="80"></pyjamas-repl>
+
  
 ## Pyjamas-Env
-The `<pyjamas-env>` tag allows you to load libraries using [pyodide.loadPackage](https://pyodide.org/en/stable/usage/api/js-api.html#pyodide.loadPackage) function. Accepted inputs are either innerHTML or a `src` attribute linking to a file like a `requirements.txt`. 
+The `<pyjamas-env>` tag allows you to load libraries using [pyodide.loadPackage](https://pyodide.org/en/stable/usage/api/js-api.html#pyodide.loadPackage) function. Accepted inputs are either innerHTML or a `src` attribute linking to a file like a `requirements.txt`. This tag is not totally necessary because the `pyjamas.loadAndRunAsync` function handles loading package dependencies via [`pyodide.loadPackageFromImports`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpac#pyodide.loadPackagesFromImports).
 
 The package names are selected from the text using the [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions) `/\s*-?\s*(.*?)\s*[==[0-9|.]*]?\s*[,|;|\n]/g`
 
@@ -95,10 +111,9 @@ The package names are selected from the text using the [regular expression](http
 ```html
  <pyjamas-env src="./requirements.txt"></pyjamas-env>
  ```
- 
 
  ## Pyjamas-Script
- The `<pyjamas-script>` tag allows you to run Python code using [`pyodide.loadPackageFromImports`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpac#pyodide.loadPackagesFromImports) followed by [`pyodide.runPythonAsync`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=runpythona#pyodide.runPythonAsync). Accepted inputs are either innerHTML or a `src` attribute linking to a python file.
+ The `<pyjamas-script>` tag allows you to run Python code using `pyjamas.loadAndRunAsync`, which uses [`pyodide.loadPackageFromImports`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpac#pyodide.loadPackagesFromImports) followed by [`pyodide.runPythonAsync`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=runpythona#pyodide.runPythonAsync). Accepted inputs are either innerHTML or a `src` attribute linking to a python file.
 
 #### examples
  ```html
@@ -114,43 +129,61 @@ The package names are selected from the text using the [regular expression](http
 	 el.innerText = str(datetime.datetime.now().isoformat())
 </pyjamas-script>
 ```
-<pyjamas-script id="testScript" style="display:none">
-  from js import document
-  import datetime
-	 
-  el = document.getElementById("testScript")
-  el.style.display = "block"
-  el.innerText = str(datetime.datetime.now().isoformat())
-</pyjamas-script>
+<div id="scriptContainer"></div>
 
-## Pyjamas-Editor
- The `<pyjamas-editor>` tag is similar to the  `<pyjamas-script>` tag, except instead of executing as soon as possible when the page is loaded, the tag provides a [CodeMirror](https://codemirror.net/6/) text editor element and does not execute until the gutter start button has been pressed. Then, the editor runs the code, streaming STDOUT and STDERR to the console, and the displays the result as a string in the editor. Additionally, the element can be reset and the code can be modified and rerun.
- 
- #### examples
- ```html
- <pyjamas-editor>
-	 import numpy as np
-	np.random.rand(5)
-</pyjamas-editor>
-```
-<pyjamas-editor>
-    import numpy as np
-	np.random.rand(5)
-</pyjamas-editor>
+# Pyjamas API
+## then/catch
+When `pyjamas.js` loads, the `pyjamas` object (available at `window.pyjamas`) creates a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) at `pyjamas.promise`, which then resolves with the `pyodide` object when [`loadPyodide`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadPyodide#globalThis.loadPyodide) finishes loading the `pyodide` object.
 
-## Pyjamas-Repl
- The `<pyjamas-repl>` tag provides a minimal terminal emulator to play around with `pyodide`. It does the very basics and nothing more (no special color strings, no plots, etc.). It can be styled, but that is about it.
- 
- [Pyodide's own console](https://pyodide.org/en/stable/console.html)  has much more support.
+`pyjamas.then` and `pyjamas.catch` are simply shortcuts to `pyjamas.promise.then` and `pyjamas.promise.catch`. Therefore, `pyjamas.then` can be use be sure that pyodide has finished loading, then use it as soon as possible.
 
-#### examples
-```html
-<pyjamas-repl></pyjamas-repl>
+#### example
+```js
+pyjamas.then(pyodide => pyodide.runPythonAsync(`
+	from js import alert
+	alert("pyodide object has loaded and is available at window.pyodide")
+`))
 ```
-```html
-<pyjamas-repl rows="10" cols="80"></pyjamas-repl>
+<div id="thencatch"></div>
+
+## loadAndRunAsync
+The `pyjamas.loadAndRunAsync` function is an asynchronous utility function which immediately returns a PRomise to the result of some Python code, which gets
+evaluated as soon as possible. It works by doing does three things:
+- waits for pyodide to finish loading by using [`pyjamas.then`](#then/catch)
+- loads any packages the code snippet requires, by using [`pyodide.loadPackagesFromImports`](#https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpackagesfromimports#pyodide.loadPackagesFromImports)
+- runs python in pyodide's [CPython interpreter](https://en.wikipedia.org/wiki/CPython) using [WebAssembly](https://webassembly.org/) via [`pyodide.runPythonAsync`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=runPythonAsync#pyodide.runPythonAsync)
+
+#### example
+```js
+pyjamas.loadAndRunAsync(`
+	from js import alert
+	alert("pyodide object has loaded and is available at window.pyodide")
+`)
 ```
-<pyjamas-repl rows="10" cols="80"></pyjamas-repl>
+<div id="loadandrunasync"></div>
+
+## stdout/stderr
+Pyjamas automatically set up `stdout` to be handled by `console.log` and `stderr` to be handled by `console.err` by setting configuration options in `loadPyodide`.
+However, `pyjamas.stdout` and `pyjamas.stderr` functions can be set to whatever handler you want.
+
+### example
+```js
+function appendText(m, color="#000"){
+	let el = document.createElement("div")
+	el.innerText = m
+	el.style.color = color
+	document.body.append(el)
+}
+pyjamas.stdout = appendText
+pyjamas.stderr = m => appendText(m, "red")
+
+pyjamas.loadAndRunAsync(`
+for i in range(10):
+	print(10)
+raise Exception("testing stderr")
+`)
+```
+<div id="stdoutstderr"></div>
 
 
 ## Pyodide
@@ -179,5 +212,57 @@ Unfortunately, [**PyScript**](https://pyscript.net/) has more drawbacks than fea
 Pyscript seems to be so focused on making web development "accessible" to Python developers, that they ended up removing most of the Pyodide functionality developers are looking for and instead made a **slow, bulky, buggy, front-end version of a [Jupyter notebook](https://jupyter.org/).**
 
 
- 
+ <details style="display:none">
+	<summary>Scripts which make GitHub Pages page interactive</summary>
+	<script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
+	<script defer src="https://codemirror.net/mode/python/python.js"></script>  
+	<link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/> 
+	<script src="https://codemirror.net/lib/codemirror.js"></script> 
+	<style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
+	<script src="https://modularizer.github.io/pyjamas/pyjamas.js"></script>
+	<script>
+		// add examples that normal github markdown blocks
+		
+		let el = document.createElement("pyjamas-script")
+		el.id = "testScript"
+		el.innerHTML = `
+from js import document
+import datetime
+
+el = document.getElementById("testScript")
+el.style.display = "block"
+el.innerText = str(datetime.datetime.now().isoformat())
+		`
+		document.getElementById("scriptContainer").append(el)
+		
+		
+	
+let editors = {
+	"tryitContainer0": `		
+import js # provides interface to WebAPIs such as document, window, alert, etc
+
+import time # import Python builitins
+
+import numpy as np # import packages from standard library
+
+print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
+
+x = np.random.rand(5)
+js.alert(x.tolist())
+
+x
+`
+	"editorContainer": `
+import numpy as np
+np.random.rand(5)		
+`		
+}
+		for (let [id, code] of Object.entries(editors)){
+			let el = document.createElement("pyjamas-editor")
+			el.innerHTML = code
+			document.getElementById(id).append(el);
+		}
+				
+	</script>
+</details>
  
