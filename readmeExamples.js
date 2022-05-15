@@ -65,7 +65,7 @@ let jsEditors = {
 "	document.body.append(el)\n"+
 "}\n"+
 "pyjamas.stdout = appendText\n"+
-"pyjamas.stderr = m => appendText(m, "red")\n"+
+'pyjamas.stderr = m => appendText(m, "red")\n'+
 "\n"+
 "pyjamas.loadAndRunAsync(`\n"+
 "for i in range(10):\n"+
