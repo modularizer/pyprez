@@ -14,18 +14,14 @@ Pyjamas provides the following tags:
  - [`<pyjamas-repl>`](#pyjamas-repl)
 
 ## Try It
+
 <script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
 <script defer src="https://codemirror.net/mode/python/python.js"></script>  
 <link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/> 
 <script src="https://codemirror.net/lib/codemirror.js"></script> 
 <style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
 <script src="./pyjamas.js"></script>
-<pyjamas-script>
-    from js import document
-    from datetime import datetime
-    document.getElementByID("date").innerHTML = datetime.now().isoformat()
-</pyjamas-script>
-<div id="date"></div>
+
 <pyjamas-editor>
     import js # provides interface to WebAPIs such as document, window, alert, etc
     
@@ -47,48 +43,24 @@ Pyjamas provides the following tags:
 
 ## The Code
 ```html
-<!DOCTYPE html>
-<html lang="en">
-    <head>  
-        <!-- import Pyodide-->
-        <script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
-        
-        <!-- import CodeMirror to make pyjamas-editor prettier (not necessary-->
-        <script defer src="https://codemirror.net/mode/python/python.js"></script>  
-        <link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/> 
-        <script src="https://codemirror.net/lib/codemirror.js"></script> 
-        <style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
+<pyjamas-editor>
+    import js # provides interface to WebAPIs such as document, window, alert, etc
     
-        <!-- import Pyjamas -->
-        <script src="./pyjamas.js"></script>
-    </head>
-    <body>
-        <pyjamas-script>
-            from js import document
-            from datetime import datetime
-            document.getElementByID("date").innerHTML = datetime.now().isoformat()
-        </pyjamas-script>
-        <div id="date"></div>
-        <pyjamas-editor>
-            import js # provides interface to WebAPIs such as document, window, alert, etc
-            
-            import time # import Python builitins
-            
-            import numpy as np # import packages from standard library
-            
-            print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
-            
-            js.document.body.style["background-color"] = "green"
-            time.sleep(1)
-            js.document.body.style["background-color"] = ""
-            
-            x = np.random.rand(5)
-            
-            x
-        </pyjamas-editor>
-        <pyjamas-repl></pyjamas-repl>
-    </body>
-</html>
+    import time # import Python builitins
+    
+    import numpy as np # import packages from standard library
+    
+    print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
+    
+    js.document.body.style["background-color"] = "green"
+    time.sleep(1)
+    js.document.body.style["background-color"] = ""
+    
+    x = np.random.rand(5)
+    
+    x
+</pyjamas-editor>
+<pyjamas-repl></pyjamas-repl>
 ```
 
 
