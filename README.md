@@ -24,18 +24,15 @@ Pyjamas provides the following tags:
 
 <pyjamas-editor>
     import js # provides interface to WebAPIs such as document, window, alert, etc
-    
+
     import time # import Python builitins
     
     import numpy as np # import packages from standard library
     
     print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
     
-    js.document.body.style["background-color"] = "green"
-    time.sleep(1)
-    js.document.body.style["background-color"] = ""
-    
     x = np.random.rand(5)
+    js.alert(x.tolist())
     
     x
 </pyjamas-editor>
@@ -45,25 +42,20 @@ Pyjamas provides the following tags:
 ```html
 <pyjamas-editor>
     import js # provides interface to WebAPIs such as document, window, alert, etc
-    
+
     import time # import Python builitins
     
     import numpy as np # import packages from standard library
     
     print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyjamas.stdout = console.log`")
     
-    js.document.body.style["background-color"] = "green"
-    time.sleep(1)
-    js.document.body.style["background-color"] = ""
-    
     x = np.random.rand(5)
+    js.alert(x.tolist())
     
     x
 </pyjamas-editor>
 <pyjamas-repl></pyjamas-repl>
 ```
-
-
 
 ## Import
 Pyjamas is dependant on **Pyodide**. 
@@ -103,6 +95,7 @@ The package names are selected from the text using the [regular expression](http
  <pyjamas-env src="./requirements.txt"></pyjamas-env>
  ```
  
+
  ## Pyjamas-Script
  The `<pyjamas-script>` tag allows you to run Python code using [`pyodide.loadPackageFromImports`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpac#pyodide.loadPackagesFromImports) followed by [`pyodide.runPythonAsync`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=runpythona#pyodide.runPythonAsync). Accepted inputs are either innerHTML or a `src` attribute linking to a python file.
 
