@@ -62,14 +62,14 @@ let jsEditors = {
 '	let el = document.createElement("div")\n'+
 "	el.innerText = m\n"+
 "	el.style.color = color\n"+
-"	document.body.append(el)\n"+
+"	document.getElementById('stdouttarget').append(el)\n"+
 "}\n"+
 "pyjamas.stdout = appendText\n"+
 'pyjamas.stderr = m => appendText(m, "red")\n'+
 "\n"+
 "pyjamas.loadAndRunAsync(`\n"+
 "for i in range(10):\n"+
-"	print(10)\n"+
+"	print(i)\n"+
 "raise Exception('testing stderr')\n"+
 "`)"
 }

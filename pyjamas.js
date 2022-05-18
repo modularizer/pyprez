@@ -381,16 +381,36 @@ class PyjamasRepl extends HTMLElement{
         let rows = this.hasAttribute("rows")?this.getAttribute("rows"):20
         let bg = this.style["background-color"]?this.style["background-color"]:"#000"
         let c = this.style["color"]?this.style["color"]:"#fff"
+
+
+        this.language = "python"
+        if (this.hasAttribute("language") && this.getAttribute("language")){
+            this.language = this.getAttribute("language").toLowerCase()
+        }
+        let aliases = {
+            "py": "python",
+            "js": "javascript"
+        }
+        if (aliases[this.language]){
+            this.language = aliases[this.language]
+        }
+
         this.innerHTML = `<textarea cols="${cols}" rows="${rows}" style="background-color:${bg};color:${c};height:100%;"></textarea>`
         this.textarea = this.children[0]
         this.printResult = this.printResult.bind(this);
         this.eval = this.eval.bind(this);
-        pyjamas.loadAndRunAsync(`
-            import sys
-            s = f"""Python{sys.version}
-            Type "help", "copyright", "credits" or "license" for more information."""
-            s
-        `).then(v=>{this.text = v + "\n>>> "})
+
+        if (this.language === "python"){
+            pyjamas.loadAndRunAsync(`
+                import sys
+                s = f"""Python{sys.version}
+                Type "help", "copyright", "credits" or "license" for more information."""
+                s
+            `).then(v=>{this.text = v + "\n>>> "})
+        }else if (this.language === "javascript"){
+            this.text += "Simple Javascript Console\n>>> "
+        }
+
         this.textarea.addEventListener("keydown", this.keydown.bind(this))
     }
     startup(){
@@ -412,9 +432,15 @@ class PyjamasRepl extends HTMLElement{
         this.appendLine(">>> ");
     }
     printResult(r){
-        let res = r?r.toString():""
+        let res;
+        if (this.language === "python"){
+            res = r?r.toString():""
+        }else{
+             res = JSON.stringigy(r, null, 2)
+        }
         if (!this.text.endsWith("\n")){this.text += "\n"}
         this.print("[Out] " + res)
+        return res
     }
     attachStd(){
         this.oldstdout = pyjamas.stdout
@@ -428,11 +454,17 @@ class PyjamasRepl extends HTMLElement{
         return r
     }
     eval(code){
-        this.attachStd()
-        let r = pyjamas.loadAndRunAsync(code)
-        .then(this.detachStd, this.detachStd)
-        .then(this.printResult)
-        return r
+        if (this.language === "python"){
+            this.attachStd()
+            let r = pyjamas.loadAndRunAsync(code)
+            .then(this.detachStd, this.detachStd)
+            .then(this.printResult)
+            return r
+        }else if (this.language === "javascript"){
+            let r = eval(code)
+            return this.printResult(r)
+        }
+
     }
     keydown(e){
       let k = e.key;
