@@ -1,3 +1,4 @@
+"""this script can be used to launch a basic tornado static file handler to serve files for your project"""
 import asyncio
 import sys
 
@@ -16,3 +17,5 @@ if __name__ == "__main__":
         tornado.ioloop.IOLoop.current().start()
     except KeyboardInterrupt:
         tornado.ioloop.IOLoop.current().stop()
+
+    print("go to http://localhost/pyjamas.html in your browser")

@@ -26,6 +26,7 @@ QuickLinks:
 ## Try It
 [View in GitHub Pages](https://modularizer.github.io/pyjamas/)
 <div id="tryitContainer0"></div>
+
 <pyjamas-repl rows="8" cols="80"></pyjamas-repl>
 
 ## The Code
@@ -80,6 +81,7 @@ Pyjamas' only dependency is [**Pyodide**](#pyodide).
 	np.random.rand(5)
 </pyjamas-editor>
 ```
+
 <div id="editorContainer"></div>
 
  ### javascript example
@@ -90,6 +92,7 @@ pyjamas.loadAndRunAsync(`
 	alert('pyodide object has loaded and is available at window.pyodide')
 `)
 ```
+
 <div id="jseditor0"></div>
 
 
@@ -99,12 +102,15 @@ pyjamas.loadAndRunAsync(`
  [Pyodide's own console](https://pyodide.org/en/stable/console.html)  has much more support.
 
 #### examples
+
 ```html
 <pyjamas-repl></pyjamas-repl>
 ```
+
 ```html
 <pyjamas-repl rows="10" cols="80"></pyjamas-repl>
 ```
+
 <pyjamas-repl rows="10" cols="80"></pyjamas-repl>
 
  
@@ -123,6 +129,7 @@ The package names are selected from the text using the [regular expression](http
 	- datetime
 </pyjamas-env>
 ```
+
 ```html
  <pyjamas-env src="./requirements.txt"></pyjamas-env>
  ```
@@ -131,9 +138,11 @@ The package names are selected from the text using the [regular expression](http
  The `<pyjamas-script>` tag allows you to run Python code using `pyjamas.loadAndRunAsync`, which uses [`pyodide.loadPackageFromImports`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpac#pyodide.loadPackagesFromImports) followed by [`pyodide.runPythonAsync`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=runpythona#pyodide.runPythonAsync). Accepted inputs are either innerHTML or a `src` attribute linking to a python file.
 
 #### examples
+
  ```html
  <pyjamas-script src="./my-script.py"></pyjamas-script>
 ```
+
 ```html
  <pyjamas-script id="testScript">
 	 from js import document
@@ -144,6 +153,7 @@ The package names are selected from the text using the [regular expression](http
 	 el.innerText = str(datetime.datetime.now().isoformat())
 </pyjamas-script>
 ```
+
 <div id="scriptContainer"></div>
 
 # Pyjamas API
@@ -153,12 +163,14 @@ When `pyjamas.js` loads, the `pyjamas` object (available at `window.pyjamas`) cr
 `pyjamas.then` and `pyjamas.catch` are simply shortcuts to `pyjamas.promise.then` and `pyjamas.promise.catch`. Therefore, `pyjamas.then` can be use be sure that pyodide has finished loading, then use it as soon as possible.
 
 #### example
+
 ```html
 pyjamas.then(pyodide => pyodide.runPythonAsync(`
 	from js import alert
 	alert("pyodide object has loaded and is available at window.pyodide")
 `))
 ```
+
 <div id="thencatch"></div>
 
 ## loadAndRunAsync
@@ -169,12 +181,14 @@ evaluated as soon as possible. It works by doing does three things:
 - runs python in pyodide's [CPython interpreter](https://en.wikipedia.org/wiki/CPython) using [WebAssembly](https://webassembly.org/) via [`pyodide.runPythonAsync`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=runPythonAsync#pyodide.runPythonAsync)
 
 #### example
+
 ```html
 pyjamas.loadAndRunAsync(`
 	from js import alert
 	alert("pyodide object has loaded and is available at window.pyodide")
 `)
 ```
+
 <div id="loadandrunasync"></div>
 
 ## stdout/stderr
@@ -182,6 +196,7 @@ Pyjamas automatically set up `stdout` to be handled by `console.log` and `stderr
 However, `pyjamas.stdout` and `pyjamas.stderr` functions can be set to whatever handler you want.
 
 ### example
+
 ```html
 function appendText(m, color="#000"){
 	let el = document.createElement("div")
@@ -198,6 +213,7 @@ for i in range(10):
 raise Exception("testing stderr")
 `)
 ```
+
 <div id="stdoutstderr"></div>
 <div id="stdouttarget"></div>
 
