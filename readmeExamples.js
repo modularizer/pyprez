@@ -1,4 +1,9 @@
 // add examples that normal github markdown blocks
+let link = document.createElement("link")
+link.setAttribute("rel", "icon")
+link.setAttribute("type", "image/x-icon")
+link.setAttribute("href", "https://modularizer.github.io/pyjamas/favicon.ico")
+document.head.append(link)
 
 let el = document.createElement("pyjamas-script")
 el.id = "testScript"
