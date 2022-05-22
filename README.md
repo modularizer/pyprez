@@ -1,5 +1,5 @@
 # Welcome to **Pyjamas!**
-  
+
  **Pyjamas** is a minimal script to help you get started playing around with [**Pyodide**](#pyodide), which allows you to run **front-end Python** through **WebAssembly** and easily interact between Python, javascript and HTML.  In fact, >99% of the functionaly of **Pyjamas** comes directly from pyodide object, which is made available at `window.pyodide`.
 
 Pyjamas is inspired [**Pyscript**](#pyscript), a project backed by Anaconda which provided a useful interface for pyodide also but introduced a [list of drawbacks](#pyscript-drawbacks) in the process.
@@ -21,6 +21,10 @@ QuickLinks:
  	- [`pyjamas.stdout/stderr`](#stdoutstderr)
  - [About Pyodide](#pyodide)
  - [About PyScript](#pyscript)
+
+
+**Note:** This library has no affiliation with [PyJs](http://pyjs.org/), a Python to Javascript compiler which we recently
+learned was formerly named Pyjamas as well.
 
 
 ## Try It
