@@ -23,7 +23,6 @@ if (document.currentScript.innerHTML){
     let a = document.createElement("a");
     a.href="https://modularizer.github.io/pyprez"
     a.innerHTML = `<img src="https://github.com/favicon.ico" height="15px"/>`
-    document.body.append(a);
 
     // add a real pyprez custom-element
     let mode = document.currentScript.getAttribute("mode")
@@ -35,7 +34,11 @@ if (document.currentScript.innerHTML){
         el.setAttribute("theme", document.currentScript.getAttribute("theme"))
     }
 
-    document.currentScript.after(el);
+    let div = document.createElement("div");
+    div.append(a);
+    div.append(el);
+
+    document.currentScript.after(div);
 
     // remove script content
     document.currentScript.innerHTML = ""
@@ -46,21 +49,31 @@ if (location.hash.includes("skipdep") || location.search.includes("skipdep") || 
     dependenciesEnabled = false;
 }
 
-// list dependencies
-let criticalJsDependencies = [["https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js", ()=>window.loadPyodide]]
 let cmVersion = "6.65.7"
 let cmBase = "https://cdnjs.cloudflare.com/ajax/libs/codemirror/" + cmVersion + "/"
-let jsDependencies = [
-[cmBase + "codemirror.min.js", ()=>window.CodeMirror],
-[cmBase + "mode/python/python.min.js",
-()=>{
-    if (!window.CodeMirror){return false}
-    if (!window.CodeMirror.modes){return false}
-    if (!window.CodeMirror.modes.python){return false}
-    return true
-}]
-]
-let cssDependencies = [["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.css", ()=>false]]
+// list dependencies
+let jsDependencies = {
+    codemirror: {
+        src: cmBase + "codemirror.min.js",
+        check: ()=>{
+            if (!window.CodeMirror){return false}
+            if (!window.CodeMirror.modes){return false}
+            if (!window.CodeMirror.modes.python){return false}
+            return true
+        },
+        then: {
+            codemirrorPython: {
+                src: cmBase + "mode/python/python.min.js",
+                check: ()=>window.loadPyodide
+            }
+        }
+    },
+    pyodide: {
+        src: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
+        check: ()=>window.loadPyodide
+    },
+}
+let cssDependencies = [cmBase + "codemirror.min.css"]
 
 // tool to add css to document
 let addStyle = s=> {
@@ -70,18 +83,15 @@ let addStyle = s=> {
 }
 
 // tools to import js dependencies
-function importScript(url, complete=()=>false){
+function importScript(url, ){
+    console.log("attempting to import ", url)
     let el = document.createElement("script");
     el.src = url;
     return new Promise((resolve, reject)=>{
-        if (!complete()){
-            document.addEventListener('DOMContentLoaded', ()=>{
-                document.body.appendChild(el)
-                el.addEventListener("load", ()=>resolve(url))
-            })
-        }else{
-            resolve(url)
-        }
+        document.addEventListener('DOMContentLoaded', ()=>{
+            document.body.appendChild(el)
+            el.addEventListener("load", ()=>resolve(url))
+        })
     })
 }
 
@@ -93,38 +103,47 @@ let importStyle = (url)=>{
     return get(src).then(addStyle)
 }
 
+
+function _loadDependencies(tree, res){
+    for (let [k, v] of Object.entries(tree)){
+       if (!v.check()){
+            importScript(v.src).then(()=>{
+                if (v.tree){
+                    _loadDependencies(tree, res)
+                }else{
+                    res(k);
+                }
+            })
+       }else{
+            if (v.tree){
+                _loadDependencies(tree, res)
+            }else{
+                res(k);
+            }
+       }
+    }
+}
+
 function loadDependencies(){
     return new Promise((resolve, reject)=>{
+        // if not enabled don't bother trying to load dependencies
         if (!dependenciesEnabled){
             resolve();
             return
         }
 
-        let numCriticalComplete = 0;
-        let numComplete = 0;
-        let resolved = 0;
-        let res = ()=>{
-            if (!resolved){
+        let res = (k)=>{
+            console.log("loaded dependency: ", k)
+            if (k == "pyodide"){
                 addStyle(".CodeMirror { border: 1px solid #eee; height: auto; width: auto;}")
-                resolve();
+                setTimeout(resolve, 1000)
             }
         }
-        let finished = (url)=>{
-            console.warn(url)
-            numComplete +=1;
-            if (criticalJsDependencies.includes(url)){
-                numCriticalComplete += 1;
-                if (numCriticalComplete == (criticalJsDependencies.length)){
-                    setTimeout(res, 2000);
-                }
-            }
-            if (numComplete === (criticalJsDependencies.length + jsDependencies.length + cssDependencies.length)){
-                setTimeout(res, 1000)
-            }
-        }
-        criticalJsDependencies.map(([src, complete])=>importScript(src, complete).then(finished))
-        jsDependencies.map(([src, complete])=>importScript(src, complete).then(finished))
-        cssDependencies.map(([src, complete]) => get(src).then(addStyle).then(()=>finished(src)))
+
+        // try to load css dependencies but don't wait on them
+        cssDependencies.map(src => get(src).then(addStyle).then(()=>res(src)))
+
+        _loadDependencies(jsDependencies, res)
     })
 }
 
