@@ -35,7 +35,7 @@ if (document.currentScript.innerHTML){
         el.setAttribute("theme", document.currentScript.getAttribute("theme"))
     }
 
-    document.body.append(el);
+    document.currentScript.after(el);
 
     // remove script content
     document.currentScript.innerHTML = ""

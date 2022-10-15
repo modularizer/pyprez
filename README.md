@@ -41,13 +41,6 @@ This will import all the needed packages and then convert your script tag into a
     np.random.rand(5)
 </script>
 ```
-<details style="display:none">
-	<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
-		import numpy as np
-		print("testing")
-		np.random.rand(5)
-	</script>
-</details>
 
 QuickLinks:
 - [Pyprez Tags](#pyprez-tags):
@@ -91,30 +84,15 @@ a Python to Javascript compiler, was formerly named Pyjamas as well.
 	np.random.rand(5)
 </pyprez-editor>
 ```
-<details style="display:none">
-	<pyprez-editor>
-	 import numpy as np
-	 np.random.rand(5)
-	</pyprez-editor>
-</details>
 
 ### javascript example
 
-```html
+```javascript
 pyprez.loadAndRunAsync(`
 	from js import alert
 	alert('pyodide object has loaded and is available at window.pyodide')
 `)
 ```
-
-<details style="display:none">
-	<pyprez-editor language="js">
-	 pyprez.loadAndRunAsync(`
-		from js import alert
-		alert('pyodide object has loaded and is available at window.pyodide')
-	`)
-	</pyprez-editor>
-</details>
 
 
 ## pyprez-console
@@ -129,13 +107,10 @@ pyprez.loadAndRunAsync(`
 ```html
 <pyprez-console></pyprez-console>
 ```
-<pyprez-console></pyprez-console>
 
 ```html
 <pyprez-console rows="10" cols="80"></pyprez-console>
 ```
-
-<pyprez-console rows="10" cols="80"></pyprez-console>
 
  
 ## pyprez-import
@@ -176,7 +151,6 @@ because this is not supported by pyodide*
  ```html
  <pyprez-script src="./sample_front_end_python.py"></pyprez-script>
 ```
-<pyprez-script src="./sample_front_end_python.py"></pyprez-script>
 ```html
  <pyprez-script id="testScript">
 	 from js import document
@@ -187,16 +161,6 @@ because this is not supported by pyodide*
 	 el.innerText = str(datetime.datetime.now().isoformat())
 </pyprez-script>
 ```
-<details style="display:none">
- <pyprez-script id="testScript">
-	 from js import document
-	 import datetime
-	 
-	 el = document.getElementById("testScript")
-	 el.style.display = "block"
-	 el.innerText = str(datetime.datetime.now().isoformat())
-</pyprez-script>
-</details>
 
 # CodeMirror Themes
 set the `theme` attribute of the `script` import element or `pyprez-editor` element to use a special CodeMirror theme, 
@@ -212,12 +176,6 @@ see available themes at https://codemirror.net/5/demo/theme.html
 	 np.random.rand(5)
 </pyprez-editor>
 ```
-<details style="display:none">
- <pyprez-editor theme="darcula">
-	 import numpy as np
-	 np.random.rand(5)
-</pyprez-editor>
-</details>
 
 # Using On Stack Overflow
 Theoretically this could be used on StackOverflow for python debugging. 
@@ -255,20 +213,12 @@ Therefore, `pyprez.then` can be use be sure that pyodide has finished loading, t
 
 #### example
 
-```html
+```javascript
 pyprez.then(pyodide => pyodide.runPythonAsync(`
 	from js import alert
 	alert("pyodide object has loaded and is available at window.pyodide")
 `))
 ```
-<details style="display:none">
- <pyprez-editor theme="darcula" language="js">
-pyprez.then(pyodide => pyodide.runPythonAsync(`
-	from js import alert
-	alert("pyodide object has loaded and is available at window.pyodide")
-`))
-</pyprez-editor>
-</details>
 
 ## loadAndRunAsync
 The `pyprez.loadAndRunAsync` function is an asynchronous utility function which immediately returns a 
@@ -280,21 +230,12 @@ It works by doing does three things:
 
 #### example
 
-```html
+```javascript
 pyprez.loadAndRunAsync(`
 	from js import alert
 	alert("pyodide object has loaded and is available at window.pyodide")
 `)
 ```
-
-<details style="display:none">
- <pyprez-editor theme="eclipse" language="js">
-pyprez.loadAndRunAsync(`
-	from js import alert
-	alert("pyodide object has loaded and is available at window.pyodide")
-`)
-</pyprez-editor>
-</details>
 
 ## stdout/stderr
 Pyprez automatically set up `stdout` to be handled by `console.log` and `stderr` to be handled by `console.err` by setting configuration options in `loadPyodide`.
@@ -302,7 +243,7 @@ However, `pyprez.stdout` and `pyprez.stderr` functions can be set to whatever ha
 
 ### example
 
-```html
+```javascript
 function appendText(m, color="#000"){
 	let el = document.createElement("div")
 	el.innerText = m
@@ -319,23 +260,6 @@ raise Exception("testing stderr")
 `)
 ```
 
-<details style="display:none">
- <pyprez-editor theme="eclipse" language="js">
-function appendText(m, color="#000"){
-	let el = document.createElement("div")
-	el.innerText = m
-	el.style.color = color
-	document.getElementById("stdouttarget").append(el)
-}
-pyprez.stdout = appendText
-pyprez.stderr = m => appendText(m, "red")
-
-pyprez.loadAndRunAsync(`
-for i in range(10):
-	print(i)
-raise Exception("testing stderr")
-</pyprez-editor>
-</details>
 <div id="stdoutstderr"></div>
 <div id="stdouttarget"></div>
 
@@ -370,7 +294,12 @@ Pyscript seems to be so focused on making web development "accessible" to Python
 	<summary>Scripts which make GitHub Pages page interactive</summary>
 	<script src="https://modularizer.github.io/pyprez/pyprez.js"></script>
 	<script>
-		Array.from(document.getElementsByTagName('details')).map(el=>{el.style.display="block"})
+        let scripts = Array.from(document.querySelectorAll('.language-html'));
+        scripts.map(el=>{
+            let parent = document.createElement("div");
+            parent.innerHTML = el.innerText.replaceAll("\x3C","<");
+            el.after(parent);
+        })
 	</script>
 </details>
  
