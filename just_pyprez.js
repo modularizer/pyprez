@@ -4,6 +4,8 @@ easy to develop on, and is not really necessary seeing as 95+% of its utility co
 99.9+% of utility comes from Pyodide. We're not claiming to do anything better, its just a simple script to get you
 started with exploring Pyodide's capabilities.
 
+This script provides the functionality of pyprez.js but assumes you have already imported pyodide and codemirror.
+
 To use...
 PLEASE INCLUDE THE ELEMENTS BELOW IN <head> to get allow pyprez to function
 
@@ -12,9 +14,11 @@ PLEASE INCLUDE THE ELEMENTS BELOW IN <head> to get allow pyprez to function
 	<script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
 
 	<!-- import CodeMirror to display pyprez-editor tag-->
-	<script defer src="https://codemirror.net/mode/python/python.js"></script>
-	<link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/>
-	<script src="https://codemirror.net/lib/codemirror.js"></script>
+	<script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.js"></script>
+	<script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
+	<link rel="stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.css"/>
+
+	<!-- set custom codemirror styles -->
 	<style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>
 
 	<!-- import Pyprez -->
@@ -22,6 +26,7 @@ PLEASE INCLUDE THE ELEMENTS BELOW IN <head> to get allow pyprez to function
 </head>
 
 */
+/* ___________________________________________ CONFIGURE DEBUG ______________________________________________________ */
 var PYPREZ_DEBUG = true // whether to log to console.debug or not
 function pyprezDebug(){
     if (PYPREZ_DEBUG){
@@ -33,8 +38,8 @@ if (PYPREZ_DEBUG){ // if debugging, start some timers
     console.time("pyodide load") // time how long it takes the pyodide object to load(relative to when this script is run)
 }
 
-/* ___________________________________________________ LOADER ___________________________________________________ */
-class Pyprez{
+/* _______________________________________ LOAD AND EXTEND PYODIDE FUNCTIONALITY ____________________________________ */
+class PyPrez{
     /*class which loads pyoidide and provides utility to allow user to load packages and run code as soon as possible
     examples:
         var pyprez = new Pyprez();
@@ -66,7 +71,7 @@ class Pyprez{
         // load pyodide and resolve the promise
         this._loadPyodide(config);
     }
-    
+
     // set the functions that will handle stdout, stderr from the python interpreter
     stdout = console.log
     stderr = console.error
@@ -113,16 +118,18 @@ class Pyprez{
 
     _loadPyodide(config={}){
         /*load pyodide object once pyodide*/
+        loaded.then((()=>{
+            // setup the special config options to load pyodide with
+            let defaultConfig = {
+                stdout: (t=>{this.stdout(t)}).bind(this),
+                stderr: (t=>{this.stderr(t)}).bind(this),
+            }
+            config = Object.assign(defaultConfig, config)
 
-        // setup the special config options to load pyodide with
-        let defaultConfig = {
-            stdout: (t=>{this.stdout(t)}).bind(this),
-            stderr: (t=>{this.stderr(t)}).bind(this),
-        }
-        config = Object.assign(defaultConfig, config)
+            // load pyodide then resolve or reject this.promise
+            loadPyodide(config).then(this._resolvePromise).catch(this._rejectPromise);
+        }).bind(this))
 
-        // load pyodide then resolve or reject this.promise
-        loadPyodide(config).then(this._resolvePromise).catch(this._rejectPromise);
 
         this.then(this._onload.bind(this));
         return this._pyodidePromise
@@ -136,7 +143,7 @@ class Pyprez{
         this.pyodide = pyodide;
     }
 }
-var pyprez = new Pyprez();
+var pyprez = new PyPrez();
 
 /* ___________________________________________________ ENV ___________________________________________________ */
 class PyprezEnv extends HTMLElement{
@@ -156,6 +163,7 @@ class PyprezEnv extends HTMLElement{
     */
     constructor(){
         super();
+        this.classList.add("pyprez");
         this.style.display = "none";
         let requirements = [...this.innerText.matchAll(this.re)].map(v=>v[1]);
         if (requirements.length){
@@ -186,6 +194,7 @@ class PyprezScript extends HTMLElement{
     */
     constructor(){
         super();
+        this.classList.add("pyprez");
         this.style.display = "none";
         this.run = this.run.bind(this);
         if (this.hasAttribute("src") && this.getAttribute("src")){
@@ -221,6 +230,7 @@ class PyprezEditor extends HTMLElement{
     */
     constructor(){
         super();
+        this.classList.add("pyprez");
         this.loadEl = this.loadEl.bind(this);
         this.loadEditor = this.loadEditor.bind(this);
         this.language = "python"
@@ -247,6 +257,13 @@ class PyprezEditor extends HTMLElement{
             })
         }else{
             this.loadEl();
+        }
+        this.addEventListener("keydown", this.keypressed.bind(this))
+    }
+    keypressed(e){
+        if (e.shiftKey){
+            if (e.key == "Enter"){this.run(); e.preventDefault();}
+            else if (e.key == "Backspace"){this.reset(); e.preventDefault();}
         }
     }
     loadEl(){
@@ -335,22 +352,39 @@ class PyprezEditor extends HTMLElement{
             let code = this.code;
             let promise;
             if (this.language == "python"){
+                this.code += "____________________________________\n";
+                this.attachStd();
                 promise = pyprez.loadAndRunAsync(code);
                 promise.then(r=>{
-                    this.code = code + "\n>>> " + (r?r.toString():"");
+                    this.code += "\n>>> " + (r?r.toString():"");
                     this.start.style.color = "red";
                     this.start.innerHTML = "↻";
+                    this.detachStd();
                     return r
                 })
             }else if (this.language == "javascript"){
                 let r = eval(code)
-                this.code = code + "\n>>> " + JSON.stringify(r, null, 2);
+                this.code += "\n>>> " + JSON.stringify(r, null, 2);
                 this.start.style.color = "red";
                 this.start.innerHTML = "↻";
                 return r
             }
         }
 
+    }
+    appendLine(v){
+        this.code += "\n" + v
+    }
+    attachStd(){
+        this.oldstdout = pyprez.stdout
+        this.oldstderr = pyprez.stderr
+        pyprez.stdout = this.appendLine.bind(this)
+        pyprez.stderr = this.appendLine.bind(this)
+    }
+    detachStd(r){
+        pyprez.stdout = this.oldstdout
+        pyprez.stderr = this.oldstderr
+        return r
     }
     reload(){
         this.start.innerHTML = "➤";
@@ -374,6 +408,7 @@ class PyprezRepl extends HTMLElement{
     */
     constructor(){
         super();
+        this.classList.add("pyprez");
         this.attachStd = this.attachStd.bind(this)
         this.detachStd = this.detachStd.bind(this)
         this.id = 'repl' + Math.floor(10000*Math.random())

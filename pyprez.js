@@ -4,33 +4,58 @@ easy to develop on, and is not really necessary seeing as 95+% of its utility co
 99.9+% of utility comes from Pyodide. We're not claiming to do anything better, its just a simple script to get you
 started with exploring Pyodide's capabilities.
 
-To use...
-PLEASE INCLUDE THE ELEMENTS BELOW IN <head> to get allow pyprez to function
-
-<head>
-	<!-- import Pyodide-->
-	<script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
-
-	<!-- import CodeMirror to display pyprez-editor tag-->
-	<script defer src="https://codemirror.net/mode/python/python.js"></script>
-	<link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/>
-	<script src="https://codemirror.net/lib/codemirror.js"></script>
-	<style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>
-
-	<!-- import Pyprez -->
-	<script src="./pyprez.js"></script>
-</head>
-
+This js file will import pyodide and codemirror dependencies for you, so all you need to do is import this
+<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
+    import numpy as np
+    print("testing")
+    np.random.rand(5)
+</script>
 */
+/* ___________________________________________ INTERPRET SCRIPT TAG _________________________________________________ */
+// first manipulate the contents of the script tag
+
+// first hide the innerHTML of the <script> tag
 document.currentScript.display = "none";
 
+// if the user is using the script tag as a code block, add a real code block to the document
+if (document.currentScript.innerHTML){
+    // add a github link
+    let a = document.createElement("a");
+    a.href="https://modularizer.github.io/pyprez"
+    a.innerHTML = `<img src="https://github.com/favicon.ico" height="15px"></a>`
+    document.body.append(a);
+
+    // add a real pyprez custom-element
+    let mode = document.currentScript.getAttribute("mode")
+    mode = mode?mode:"editor";
+    let el = document.createElement("pyprez-" + mode);
+    el.innerHTML = document.currentScript.innerHTML;
+    document.body.append(el);
+
+    // remove script content
+    document.currentScript.innerHTML = ""
+}
+/* ___________________________________________ LOAD DEPENDENCIES ____________________________________________________ */
+// list dependencies
 let jsDependencies = [
 "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
-"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.js"
+"https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js",
+"https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js",
 ]
-let cssDependencies = ["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.css"]
-let get = src => fetch(src).then(r=>r.text())
-Array.from(document.querySelectorAll('.pyprez')).map(el=>{el.opacity=0})
+let cssDependencies = ["https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css"]
+// TODO: import custom codemirror themes and allow selecting theme
+
+// tool to add css to document
+let addStyle = s=> {
+    let style = document.createElement("style");
+    style.innerHTML = s;
+    document.head.appendChild(style);
+}
+
+// add our custom style
+addStyle(".CodeMirror { border: 1px solid #eee !important; height: auto !important; }")
+
+// tools to import js dependencies
 function importScript(url){
     let el = document.createElement("script")
     el.src = url;
@@ -39,23 +64,11 @@ function importScript(url){
         el.addEventListener("load", resolve(url))
     })
 }
-let addStyle = s=> {
-    let style = document.createElement("style");
-    style.innerHTML = s;
-    document.head.appendChild(style);
-}
-addStyle(".CodeMirror { border: 1px solid #eee; height: auto; }")
-if (document.currentScript.innerHTML){
-    let mode = document.currentScript.getAttribute("mode")
-    mode = mode?mode:"editor";
-    let a = document.createElement("a");
-    a.href="https://modularizer.github.io/pyprez"
-    a.innerHTML = `<img src="https://github.com/favicon.ico" height="15px"></a>`
-    document.body.append(a)
-    let el = document.createElement("pyprez-" + mode);
-    el.innerHTML = document.currentScript.innerHTML;
-    document.body.append(el)
-}
+
+// function to get the text of css dependencies
+let get = src => fetch(src).then(r=>r.text())
+
+
 function loadDependencies(){
     return new Promise((resolve, reject)=>{
         let numComplete = 0;
@@ -69,11 +82,10 @@ function loadDependencies(){
         jsDependencies.map(src=>importScript(src).then(finished))
         cssDependencies.map(src => get(src).then(addStyle).then(()=>finished(src)))
     })
-
-
 }
 var loaded = loadDependencies();
 
+/* ___________________________________________ CONFIGURE DEBUG ______________________________________________________ */
 var PYPREZ_DEBUG = true // whether to log to console.debug or not
 function pyprezDebug(){
     if (PYPREZ_DEBUG){
@@ -85,8 +97,8 @@ if (PYPREZ_DEBUG){ // if debugging, start some timers
     console.time("pyodide load") // time how long it takes the pyodide object to load(relative to when this script is run)
 }
 
-/* ___________________________________________________ LOADER ___________________________________________________ */
-class Pyprez{
+/* _______________________________________ LOAD AND EXTEND PYODIDE FUNCTIONALITY ____________________________________ */
+class PyPrez{
     /*class which loads pyoidide and provides utility to allow user to load packages and run code as soon as possible
     examples:
         var pyprez = new Pyprez();
@@ -174,7 +186,7 @@ class Pyprez{
             config = Object.assign(defaultConfig, config)
 
             // load pyodide then resolve or reject this.promise
-            loadPyodide(config).then(this._resolvePromise).then(r=>Array.from(document.querySelectorAll('.pyprez')).map(el=>{el.opacity=1})).catch(this._rejectPromise);
+            loadPyodide(config).then(this._resolvePromise).catch(this._rejectPromise);
         }).bind(this))
 
 
@@ -190,7 +202,7 @@ class Pyprez{
         this.pyodide = pyodide;
     }
 }
-var pyprez = new Pyprez();
+var pyprez = new PyPrez();
 
 /* ___________________________________________________ ENV ___________________________________________________ */
 class PyprezEnv extends HTMLElement{
@@ -399,7 +411,7 @@ class PyprezEditor extends HTMLElement{
             let code = this.code;
             let promise;
             if (this.language == "python"){
-                this.code += "\n";
+                this.code += "____________________________________\n";
                 this.attachStd();
                 promise = pyprez.loadAndRunAsync(code);
                 promise.then(r=>{
