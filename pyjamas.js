@@ -46,7 +46,9 @@ let addStyle = s=> {
 }
 addStyle(".CodeMirror { border: 1px solid #eee; height: auto; }")
 if (document.currentScript.innerHTML){
-    let el = document.createElement("pyjamas-editor");
+    let mode = document.currentScript.getAttribute("mode")
+    mode = mode?mode:"editor";
+    let el = document.createElement("pyjamas-" + mode);
     el.innerHTML = document.currentScript.innerHTML;
     document.body.append(el)
 }
