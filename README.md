@@ -22,8 +22,9 @@ work on GitHub Pages, so if you click the static image it will take you to the w
     </pre>
 </div>
 
+<a href="https://modularizer.github.io/pyprez/#gettingstarted"><img src="https://github.com/favicon.ico" height="15px"/></a>
+<a href="https://modularizer.github.io/pyprez/#gettingstarted">Try on live page</a>
 <a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered">
-<a>Try on live page</a>
 <img src="./sample_imgs/getting-started-editor.png" />
 </a>
 
