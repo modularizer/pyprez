@@ -14,7 +14,7 @@
     np.random.rand(5)
 </script>
 ```
-<a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered"><img src="./sample_imgs/getting-started-editor.png" height="30px"/></a>
+<a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered"><img src="./sample_imgs/getting-started-editor.png" /></a>
 
 attributes:
 * mode: `"editor"(default),"console","script","import"`
@@ -85,7 +85,7 @@ a Python to Javascript compiler, was formerly named Pyjamas as well.
 	np.random.rand(5)
 </pyprez-editor>
 ```
-<a href="https://modularizer.github.io/pyprez/#pyprez-editor-example" class="nonrendered"><img src="./sample_imgs/editor-2.png" height="30px"/></a>
+<a href="https://modularizer.github.io/pyprez/#pyprez-editor-example" class="nonrendered"><img src="./sample_imgs/editor-2.png" /></a>
 
  ```html
  <pyprez-editor src="./sample_front_end_python.py"></pyprez-editor>
@@ -113,11 +113,11 @@ pyprez.loadAndRunAsync(`
 ```html
 <pyprez-console></pyprez-console>
 ```
-<a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered"><img src="./sample_imgs/console-1.png" height="30px"/></a>
+<a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered"><img src="./sample_imgs/console-1.png" /></a>
 ```html
 <pyprez-console rows="10" cols="80"></pyprez-console>
 ```
-<a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered"><img src="./sample_imgs/console-2.png" height="30px"/></a>
+<a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered"><img src="./sample_imgs/console-2.png" /></a>
  
 ## pyprez-import
 The `<pyprez-import>` tag allows you to load libraries using 
@@ -180,7 +180,7 @@ see available themes at https://codemirror.net/5/demo/theme.html
 	 np.random.rand(5)
 </pyprez-editor>
 ```
-<a href="https://modularizer.github.io/pyprez/#codemirror-themes" class="nonrendered"><img src="./sample_imgs/editor-dark.png" height="30px"/></a>
+<a href="https://modularizer.github.io/pyprez/#codemirror-themes" class="nonrendered"><img src="./sample_imgs/editor-dark.png" /></a>
  
 
 # Using On Stack Overflow
@@ -203,7 +203,7 @@ until the viewer clicks `Run Code Snippet` to see and interact with the editable
 <!-- end snippet -->
 ```
 
-<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="./sample_imgs/stack-overflow.png" height="30px"/></a>
+<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="./sample_imgs/stack-overflow.png"/></a>
 
 # Pyprez API
 ## elements
