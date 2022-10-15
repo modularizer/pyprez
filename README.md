@@ -16,14 +16,14 @@
 ```
 <div class="nonrendered">
     <b>NOTE:</b>
-    <pre>
+    <p>
 Some markdown flavors, github included, disable javascript, so these examples will not work on GitHub. Luckily, they
 work on GitHub Pages, so if you click the static image it will take you to the working example.
-    </pre>
+    </p>
 </div>
 
-<a href="https://modularizer.github.io/pyprez/#gettingstarted"><img src="./favicon.ico" height="15px"/></a>
-<a href="https://modularizer.github.io/pyprez/#gettingstarted">Try on live page</a>
+<a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
+<a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered">Try on live page</a>
 <a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered">
 <img src="./sample_imgs/getting-started-editor.png" />
 </a>
@@ -90,15 +90,15 @@ a Python to Javascript compiler, was formerly named Pyjamas as well.
  the editor will run the code in javascript instead.
  
 ### pyprez-editor example
-[View in GitHub Pages](https://modularizer.github.io/pyprez#pyprez-editorexample)
  ```html
  <pyprez-editor>
     import numpy as np
 	np.random.rand(5)
 </pyprez-editor>
 ```
+<a href="https://modularizer.github.io/pyprez/#pyprez-editor-example" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
+<a href="https://modularizer.github.io/pyprez/#pyprez-editor-example" class="nonrendered">Try on live page</a>
 <a href="https://modularizer.github.io/pyprez/#pyprez-editor-example" class="nonrendered">
-<a>Try on live page</a>
 <img src="./sample_imgs/editor-2.png" />
 </a>
 
@@ -128,15 +128,17 @@ pyprez.loadAndRunAsync(`
 ```html
 <pyprez-console></pyprez-console>
 ```
+<a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
+<a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered">Try on live page</a>
 <a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered">
-<a>Try on live page</a>
 <img src="./sample_imgs/console-1.png" />
 </a>
 ```html
 <pyprez-console rows="10" cols="80"></pyprez-console>
 ```
+<a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
+<a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered">Try on live page</a>
 <a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered">
-<a>Try on live page</a>
 <img src="./sample_imgs/console-2.png" />
 </a>
  
@@ -174,7 +176,6 @@ because this is not supported by pyodide*
  Accepted inputs are either innerHTML or a `src` attribute linking to a python file.
 
 #### pyprez-script example
-[View in GitHub Pages](https://modularizer.github.io/pyprez#pyprez-scriptexample)
 ```html
  <pyprez-script id="testScript">
 	 from js import document
@@ -185,8 +186,9 @@ because this is not supported by pyodide*
 	 el.innerText = str(datetime.datetime.now().isoformat())
 </pyprez-script>
 ```
+<a href="https://modularizer.github.io/pyprez/#pyprez-script-example" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
+<a href="https://modularizer.github.io/pyprez/#pyprez-script-example" class="nonrendered">Try on live page</a>
 <div class="nonrendered">
-<a>Try on live page</a>
 2022-10-15T13:31:46.386000
 </div>
 
@@ -204,8 +206,9 @@ see available themes at https://codemirror.net/5/demo/theme.html
 	 np.random.rand(5)
 </pyprez-editor>
 ```
+<a href="https://modularizer.github.io/pyprez/#codemirror-themes" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
+<a href="https://modularizer.github.io/pyprez/#codemirror-themes" class="nonrendered">Try on live page</a>
 <a href="https://modularizer.github.io/pyprez/#codemirror-themes" class="nonrendered">
-<a>Try on live page</a>
 <img src="./sample_imgs/editor-dark.png" />
 </a>
  
@@ -230,6 +233,8 @@ until the viewer clicks `Run Code Snippet` to see and interact with the editable
 <!-- end snippet -->
 ```
 
+<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
+<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered">View on StackOverflow</a>
 <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534">
 <a>Try on live page</a>
 <img src="./sample_imgs/stack-overflow.png"/>
