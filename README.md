@@ -185,7 +185,7 @@ The package names are selected from the text using the [regular expression](http
 # Using On Stack Overflow
 Theoretically this could be used on StackOverflow for python debugging.
 ```markdown
-<!-- begin snippet: js hide: false console: true babel: false -->
+<!-- begin snippet: js hide: false console: false babel: false -->
 
 <!-- language: lang-html -->
 

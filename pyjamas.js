@@ -301,6 +301,13 @@ class PyjamasEditor extends HTMLElement{
         }else{
             this.loadEl();
         }
+        this.addEventListener("keydown", this.keypressed.bind(this))
+    }
+    keypressed(e){
+        if (e.shiftKey){
+            if (e.key == "Enter"){this.run(); e.preventDefault();}
+            else if (e.key == "Backspace"){this.reset(); e.preventDefault();}
+        }
     }
     loadEl(){
         let lines = this.innerHTML.replaceAll("\t","    ").split("\n")
