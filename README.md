@@ -7,6 +7,27 @@ Pyjamas is inspired [**Pyscript**](#pyscript), a project backed by Anaconda whic
 Similarly to PyScript's [`<py-env>`](https://anaconda.cloud/api/files/803653a5-9b1e-41d4-a9ee-76c64b8d6cb4), [`<py-script>`](https://anaconda.cloud/api/files/c57a6ef0-dbb7-43da-acd9-94a781ef2673) and [`<py-repl>`](https://pyscript.net/examples/repl.html) tags, 
 
 
+## Getting Started
+`<script src="https://modularizer.github.io/pyjamas/pyjamas.js">` is all you need! <br/>
+Set `mode="editor"` (default), or `mode="repl"` or `mode="script"`. This will import all the needed packages and then convert your script tag into a `<pyjamas-editor>` tag (or another tag based on the mode you selected).
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="https://modularizer.github.io/pyjamas/pyjamas.js" mode="editor">
+    import numpy as np
+    print("testing")
+    np.random.rand(5)
+</script>
+</body>
+</html>
+```
+
 QuickLinks:
 - [Try It @ https://modularizer.github.io/pyjamas/](https://modularizer.github.io/pyjamas/#try-it)
 - [The Code](#the-code)
@@ -15,6 +36,7 @@ QuickLinks:
  	- [`<pyjamas-repl>`](#pyjamas-repl)
  	- [`<pyjamas-env>`](#pyjamas-env)
  	- [`<pyjamas-script>`](#pyjamas-script)
+- [Using on StackOverflow](#usingonstackoverflow)
  - [Pyjamas API](#pyjamas-api)
  	- [`pyjamas.then/catch`](#thencatch)
  	- [`pyjamas.loadAndRunAsync`](#loadandrunasync)
@@ -159,6 +181,22 @@ The package names are selected from the text using the [regular expression](http
 ```
 
 <div id="scriptContainer"></div>
+
+# Using On Stack Overflow
+Theoretically this could be used on StackOverflow for python debugging.
+```markdown
+<!-- begin snippet: js hide: false console: true babel: false -->
+
+<!-- language: lang-html -->
+
+    <script src="https://modularizer.github.io/pyjamas/pyjamas.js" mode="editor">
+        import numpy as np
+        print("testing")
+        np.random.rand(5)
+    </script>
+
+<!-- end snippet -->
+```
 
 # Pyjamas API
 ## then/catch
