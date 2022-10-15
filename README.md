@@ -1,11 +1,15 @@
-# Welcome to **Pyprez!**
+# Welcome to **pyprez!**
 
- **Pyprez** is a minimal script to help you get started playing around with [**Pyodide**](#pyodide), which allows you to run **front-end Python** through **WebAssembly** and easily interact between Python, javascript and HTML.  In fact, >99% of the functionaly of **Pyprez** comes directly from pyodide object, which is made available at `window.pyodide`.
+ **pyprez** is a minimal javascript package which allows you to **present** runnable python samples in the browser.
+ 
+The functionality of the pyprez comes primarily from [**Pyodide**](#pyodide), which allows you to run **front-end Python** through **WebAssembly** and easily interact between Python, javascript and HTML.
+In fact, 100% of the __computational__ functionality of **Pyprez** comes directly from pyodide object, which is made available at `window.pyodide`.
+Meanwhile some of its visual style provided by [CodeMirror](https://codemirror.net/) (accessible at `window.CodeMirror`).
 
 Pyprez is inspired [**Pyscript**](#pyscript), a project backed by Anaconda which provided a useful interface for pyodide also but introduced a [list of drawbacks](#pyscript-drawbacks) in the process.
 
 Similarly to PyScript's [`<py-env>`](https://anaconda.cloud/api/files/803653a5-9b1e-41d4-a9ee-76c64b8d6cb4), [`<py-script>`](https://anaconda.cloud/api/files/c57a6ef0-dbb7-43da-acd9-94a781ef2673) and [`<py-repl>`](https://pyscript.net/examples/repl.html) tags, 
-
+Pyrez provides [`<pyprez-editor>`](#pyprez-editor), [`<pyprez-repl>`](#pyprez-repl), [`<pyprez-env>`](#pyprez-env), [`<pyprez-script>`](#pyprez-script) tags.
 
 ## Getting Started
 `<script src="https://modularizer.github.io/pyprez/pyprez.js">` is all you need! <br/>
