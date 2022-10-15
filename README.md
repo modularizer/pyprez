@@ -14,7 +14,18 @@
     np.random.rand(5)
 </script>
 ```
-<a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered"><img src="./sample_imgs/getting-started-editor.png" /></a>
+<div class="nonrendered">
+    <b>NOTE:</b>
+    <pre>
+Some markdown flavors, github included, disable javascript, so these examples will not work on GitHub. Luckily, they
+work on GitHub Pages, so if you click the static image it will take you to the working example.
+    </pre>
+</div>
+
+<a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered">
+<a>Try on live page</a>
+<img src="./sample_imgs/getting-started-editor.png" />
+</a>
 
 attributes:
 * mode: `"editor"(default),"console","script","import"`
@@ -85,7 +96,10 @@ a Python to Javascript compiler, was formerly named Pyjamas as well.
 	np.random.rand(5)
 </pyprez-editor>
 ```
-<a href="https://modularizer.github.io/pyprez/#pyprez-editor-example" class="nonrendered"><img src="./sample_imgs/editor-2.png" /></a>
+<a href="https://modularizer.github.io/pyprez/#pyprez-editor-example" class="nonrendered">
+<a>Try on live page</a>
+<img src="./sample_imgs/editor-2.png" />
+</a>
 
  ```html
  <pyprez-editor src="./sample_front_end_python.py"></pyprez-editor>
@@ -113,11 +127,17 @@ pyprez.loadAndRunAsync(`
 ```html
 <pyprez-console></pyprez-console>
 ```
-<a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered"><img src="./sample_imgs/console-1.png" /></a>
+<a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered">
+<a>Try on live page</a>
+<img src="./sample_imgs/console-1.png" />
+</a>
 ```html
 <pyprez-console rows="10" cols="80"></pyprez-console>
 ```
-<a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered"><img src="./sample_imgs/console-2.png" /></a>
+<a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered">
+<a>Try on live page</a>
+<img src="./sample_imgs/console-2.png" />
+</a>
  
 ## pyprez-import
 The `<pyprez-import>` tag allows you to load libraries using 
@@ -164,7 +184,10 @@ because this is not supported by pyodide*
 	 el.innerText = str(datetime.datetime.now().isoformat())
 </pyprez-script>
 ```
-<div class="nonrendered">2022-10-15T13:31:46.386000</div>
+<div class="nonrendered">
+<a>Try on live page</a>
+2022-10-15T13:31:46.386000
+</div>
 
 # CodeMirror Themes
 set the `theme` attribute of the `script` import element or `pyprez-editor` element to use a special CodeMirror theme, 
@@ -180,7 +203,10 @@ see available themes at https://codemirror.net/5/demo/theme.html
 	 np.random.rand(5)
 </pyprez-editor>
 ```
-<a href="https://modularizer.github.io/pyprez/#codemirror-themes" class="nonrendered"><img src="./sample_imgs/editor-dark.png" /></a>
+<a href="https://modularizer.github.io/pyprez/#codemirror-themes" class="nonrendered">
+<a>Try on live page</a>
+<img src="./sample_imgs/editor-dark.png" />
+</a>
  
 
 # Using On Stack Overflow
@@ -203,7 +229,10 @@ until the viewer clicks `Run Code Snippet` to see and interact with the editable
 <!-- end snippet -->
 ```
 
-<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="./sample_imgs/stack-overflow.png"/></a>
+<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534">
+<a>Try on live page</a>
+<img src="./sample_imgs/stack-overflow.png"/>
+</a>
 
 # Pyprez API
 ## elements
