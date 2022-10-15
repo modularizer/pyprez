@@ -7,9 +7,9 @@
 
 ## Getting Started
 ```html
-<!-- mode options="editor"(default),"console","script","import" -->
-<!-- extra options: stdout="false" -->
 <script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor"> 
+    <!-- mode options="editor"(default),"console","script","import" -->
+    <!-- extra options: stdout="false" -->
     import numpy as np
     print("testing")
     np.random.rand(5)
@@ -136,7 +136,7 @@ because this is not supported by pyodide*
  <pyprez-import src="./requirements.txt"></pyprez-import>
  ```
 
- ## Pyprez-Script
+## Pyprez-Script
  The `<pyprez-script>` tag allows you to run Python code using `pyprez.loadAndRunAsync`, which uses 
  [`pyodide.loadPackageFromImports`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpac#pyodide.loadPackagesFromImports) 
  followed by [`pyodide.runPythonAsync`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=runpythona#pyodide.runPythonAsync). 
@@ -207,7 +207,7 @@ finishes loading the `pyodide` object.
 `pyprez.then` and `pyprez.catch` are simply shortcuts to `pyprez.promise.then` and `pyprez.promise.catch`. 
 Therefore, `pyprez.then` can be use be sure that pyodide has finished loading, then use it as soon as possible.
 
-#### example
+#### javascript example
 
 ```javascript
 pyprez.then(pyodide => pyodide.runPythonAsync(`
@@ -224,7 +224,7 @@ It works by doing does three things:
 - loads any packages the code snippet requires, by using [`pyodide.loadPackagesFromImports`](#https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpackagesfromimports#pyodide.loadPackagesFromImports)
 - runs python in pyodide's [CPython interpreter](https://en.wikipedia.org/wiki/CPython) using [WebAssembly](https://webassembly.org/) via [`pyodide.runPythonAsync`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=runPythonAsync#pyodide.runPythonAsync)
 
-#### example
+#### javascript example
 
 ```javascript
 pyprez.loadAndRunAsync(`
@@ -237,7 +237,7 @@ pyprez.loadAndRunAsync(`
 Pyprez automatically set up `stdout` to be handled by `console.log` and `stderr` to be handled by `console.err` by setting configuration options in `loadPyodide`.
 However, `pyprez.stdout` and `pyprez.stderr` functions can be set to whatever handler you want.
 
-### example
+#### javascript example
 
 ```javascript
 function appendText(m, color="#000"){
