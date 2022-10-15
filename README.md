@@ -121,7 +121,10 @@ Pyprez' only dependency is [**Pyodide**](#pyodide).
 </pyprez-editor>
 ```
 
-<div id="editorContainer"></div>
+ <pyprez-editor>
+	 import numpy as np
+	np.random.rand(5)
+</pyprez-editor>
 
  ### javascript example
 
@@ -193,7 +196,14 @@ The package names are selected from the text using the [regular expression](http
 </pyprez-script>
 ```
 
-<div id="scriptContainer"></div>
+ <pyprez-script id="testScript">
+	 from js import document
+	 import datetime
+	 
+	 el = document.getElementById("testScript")
+	 el.style.display = "block"
+	 el.innerText = str(datetime.datetime.now().isoformat())
+</pyprez-script>
 
 # CodeMirror Themes
 set the `theme` attribute of the `script` import element or `pyprez-editor` element to use a special CodeMirror theme, e.g. `theme="darcula"`.
@@ -208,7 +218,10 @@ see available themes at https://codemirror.net/5/demo/theme.html
 </pyprez-editor>
 ```
 
-<div id="darculaEditorContainer"></div>
+ <pyprez-editor theme="darcula">
+	 import numpy as np
+	 np.random.rand(5)
+</pyprez-editor>
 
 # Using On Stack Overflow
 Theoretically this could be used on StackOverflow for python debugging.
