@@ -48,6 +48,10 @@ addStyle(".CodeMirror { border: 1px solid #eee; height: auto; }")
 if (document.currentScript.innerHTML){
     let mode = document.currentScript.getAttribute("mode")
     mode = mode?mode:"editor";
+    let a = document.createElement("a");
+    a.href="https://modularizer.github.io/pyjamas"
+    a.innerHTML = `<img src="https://github.com/favicon.ico" height="15px"></a>`
+    document.body.append(a)
     let el = document.createElement("pyjamas-" + mode);
     el.innerHTML = document.currentScript.innerHTML;
     document.body.append(el)
