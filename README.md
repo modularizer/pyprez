@@ -1,4 +1,9 @@
 # Welcome to **pyprez!**
+<a href="https://github.com/modularizer/pyprez"><img src="https://github.com/favicon.ico" height="15px"/></a>
+[GitHub](https://github.com/modularizer/pyprez) <br/>
+
+<a href="https://modularizer.github.io/pyprez"><img src="https://modularizer.github.io/pyprez/favicon.ico" height="15px"/></a>
+[GitHubPages](https://modularizer.github.io/pyprez) <br/>
 
  **pyprez** is a minimal javascript package which allows you to **present** runnable python samples in the browser.
  

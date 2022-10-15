@@ -22,7 +22,7 @@ if (document.currentScript.innerHTML){
     // add a github link
     let a = document.createElement("a");
     a.href="https://modularizer.github.io/pyprez"
-    a.innerHTML = `<img src="https://github.com/favicon.ico" height="15px"></a>`
+    a.innerHTML = `<img src="https://github.com/favicon.ico" height="15px"/>`
     document.body.append(a);
 
     // add a real pyprez custom-element
