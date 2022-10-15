@@ -7,7 +7,7 @@ Run **client-side python** in your browser to demo code.
 <a href="https://modularizer.github.io/pyprez"><img src="./favicon.ico" height="30px"/></a>
 [GitHubPages](https://modularizer.github.io/pyprez) (interactive README)<br/>
 
-<a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments"><img href="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" height="30px"/></a><a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments">Contact</a> I'd love to here feedback on ideas on how to make this better!
+<a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments"><img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" height="30px"/></a><a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments">Contact</a> I'd love to here feedback on ideas on how to make this better!
 
 # Getting Started
 ```html
