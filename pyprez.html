@@ -4,20 +4,7 @@
     <meta charset="UTF-8">
     <title>Pyprez</title>
 
-    <!-- load Pyodide which provides core functionality -->
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
-
-    <!-- load CodeMirror to make pyprez-editor elements prettier -->
-    <link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/>
-    <script src="https://codemirror.net/lib/codemirror.js"></script>
-    <script defer src="https://codemirror.net/mode/python/python.js"></script>
-    <style>
-        .CodeMirror {
-          border: 1px solid #eee;
-          height: auto;
-        }
-    </style>
-    <script src="./just_pyprez.js"></script>
+    <script src="./pyprez.js"></script>
 </head>
 <body>
     <!-- pre-load libraries if you wish -->
@@ -26,7 +13,7 @@
     </pyprez-env>
 
     <!-- play around with a simple terminal emulator -->
-    <pyprez-repl style="background-color:yellow;color:#000"></pyprez-repl>
+    <pyprez-repl></pyprez-repl>
 
     <!-- edit and test python code -->
     <pyprez-editor>

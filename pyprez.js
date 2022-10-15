@@ -36,13 +36,24 @@ if (document.currentScript.innerHTML){
     document.currentScript.innerHTML = ""
 }
 /* ___________________________________________ LOAD DEPENDENCIES ____________________________________________________ */
+var dependenciesEnabled = true;
+if (location.hash.includes("skipdep") || location.search.includes("skipdep") || document.currentScript.hasAttribute("skipdep")){
+    dependenciesEnabled = false;
+}
+
 // list dependencies
+let criticalJsDependencies = [["https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js", ()=>window.loadPyodide]]
 let jsDependencies = [
-"https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
-"https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js",
-"https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js",
+["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.js", ()=>window.CodeMirror],
+["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/mode/python/python.min.js",
+()=>{
+    if (!window.CodeMirror){return false}
+    if (!window.CodeMirror.modes){return false}
+    if (!window.CodeMirror.modes.python){return false}
+    return true
+}]
 ]
-let cssDependencies = ["https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css"]
+let cssDependencies = [["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.css", ()=>false]]
 // TODO: import custom codemirror themes and allow selecting theme
 
 // tool to add css to document
@@ -52,37 +63,62 @@ let addStyle = s=> {
     document.head.appendChild(style);
 }
 
-// add our custom style
-addStyle(".CodeMirror { border: 1px solid #eee !important; height: auto !important; }")
-
 // tools to import js dependencies
-function importScript(url){
-    let el = document.createElement("script")
+function importScript(url, complete=()=>false){
+    let el = document.createElement("script");
     el.src = url;
-    document.body.appendChild(el);
     return new Promise((resolve, reject)=>{
-        el.addEventListener("load", resolve(url))
+        if (!complete()){
+            document.addEventListener('DOMContentLoaded', ()=>{
+                document.body.appendChild(el)
+                el.addEventListener("load", ()=>resolve(url))
+            })
+        }else{
+            resolve(url)
+        }
     })
 }
 
 // function to get the text of css dependencies
 let get = src => fetch(src).then(r=>r.text())
 
+// add our custom style
+addStyle(".CodeMirror { border: 1px solid #eee !important; height: auto !important; }")
 
 function loadDependencies(){
     return new Promise((resolve, reject)=>{
+        if (!dependenciesEnabled){
+            resolve();
+            return
+        }
+
+        let numCriticalComplete = 0;
         let numComplete = 0;
+        let resolved = 0;
+        let res = ()=>{
+            if (!resolved){
+                resolve();
+            }
+        }
         let finished = (url)=>{
             console.warn(url)
             numComplete +=1;
-            if (numComplete === (jsDependencies.length + cssDependencies.length)){
-                setTimeout(resolve, 1000)
+            if (criticalJsDependencies.includes(url)){
+                numCriticalComplete += 1;
+                if (numCriticalComplete == (criticalJsDependencies.length)){
+                    setTimeout(res, 2000);
+                }
+            }
+            if (numComplete === (criticalJsDependencies.length + jsDependencies.length + cssDependencies.length)){
+                setTimeout(res, 1000)
             }
         }
-        jsDependencies.map(src=>importScript(src).then(finished))
-        cssDependencies.map(src => get(src).then(addStyle).then(()=>finished(src)))
+        criticalJsDependencies.map(([src, complete])=>importScript(src, complete).then(finished))
+        jsDependencies.map(([src, complete])=>importScript(src, complete).then(finished))
+        cssDependencies.map(([src, complete]) => get(src).then(addStyle).then(()=>finished(src)))
     })
 }
+
 var loaded = loadDependencies();
 
 /* ___________________________________________ CONFIGURE DEBUG ______________________________________________________ */
@@ -296,6 +332,9 @@ class PyprezEditor extends HTMLElement{
         if (this.hasAttribute("language") && this.getAttribute("language")){
             this.language = this.getAttribute("language").toLowerCase()
         }
+        if (!this.hasAttribute("stdout")){
+            this.setAttribute("stdout", "true")
+        }
         let aliases = {
             "py": "python",
             "js": "javascript"
@@ -307,7 +346,7 @@ class PyprezEditor extends HTMLElement{
         if (this.hasAttribute("src") && this.getAttribute("src")){
             let src = this.getAttribute("src")
             pyprezDebug("fetching script for pyprez-editor src", src)
-            if (src.endswith('.js')){
+            if (src.endsWith('.js')){
                 this.language = "javascript"
             }
             fetch(src).then(r=>r.text()).then(code =>{
@@ -412,13 +451,18 @@ class PyprezEditor extends HTMLElement{
             let promise;
             if (this.language == "python"){
                 this.code += "____________________________________\n";
-                this.attachStd();
+                if (this.getAttribute("stdout") === "true"){
+                    this.attachStd();
+                }
+
                 promise = pyprez.loadAndRunAsync(code);
                 promise.then(r=>{
                     this.code += "\n>>> " + (r?r.toString():"");
                     this.start.style.color = "red";
                     this.start.innerHTML = "↻";
-                    this.detachStd();
+                    if (this.getAttribute("stdout") === "true"){
+                        this.detachStd();
+                    }
                     return r
                 })
             }else if (this.language == "javascript"){
