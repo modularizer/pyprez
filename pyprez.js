@@ -14,12 +14,12 @@ This js file will import pyodide and codemirror dependencies for you, so all you
 /* ___________________________________________ INTERPRET SCRIPT TAG _________________________________________________ */
 // first manipulate the contents of the script tag
 
-// first hide the innerHTML of the <script> tag
+// first hide the innerHTML of the <script> tag if any is present
 document.currentScript.display = "none";
 
 // if the user is using the script tag as a code block, add a real code block to the document
 if (document.currentScript.innerHTML){
-    // add a github link
+    // make a github img link
     let a = document.createElement("a");
     a.href="https://modularizer.github.io/pyprez"
     a.innerHTML = `<img src="https://github.com/favicon.ico" height="15px"/>`
@@ -34,29 +34,33 @@ if (document.currentScript.innerHTML){
         el.setAttribute("theme", document.currentScript.getAttribute("theme"))
     }
 
+    // add to container
     let div = document.createElement("div");
     div.append(a);
     div.append(el);
 
+    // insert into document after script
     document.currentScript.after(div);
 
     // remove script content
     document.currentScript.innerHTML = ""
 }
 
-if (!window.pyprezInitStarted){
+// allow importing this script multiple times without raising an error
+if (!window.pyprezInitStarted){ // if this script has not already run
+var pyprezInitStarted = true;// save this window variable to signal that this script has run
 
-
-var pyprezInitStarted = true;
 /* ___________________________________________ LOAD DEPENDENCIES ____________________________________________________ */
-var dependenciesEnabled = true;
+// allow disabling dependency import if desired (people may want to do their own imports for clarity, speed, or to
+//  use another version of pyodide or codemirror
+let dependenciesEnabled = true;
 if (location.hash.includes("skipdep") || location.search.includes("skipdep") || document.currentScript.hasAttribute("skipdep")){
     dependenciesEnabled = false;
 }
 
+// list dependencies
 let cmVersion = "6.65.7"
 let cmBase = "https://cdnjs.cloudflare.com/ajax/libs/codemirror/" + cmVersion + "/"
-// list dependencies
 let jsDependencies = {
     codemirror: {
         src: cmBase + "codemirror.min.js",
@@ -103,12 +107,13 @@ function importScript(url, ){
 // function to get the text of css dependencies
 let get = src => fetch(src).then(r=>r.text())
 
+// function to load an external .css document into the page
 let importStyle = (url)=>{
     console.log("importing", url)
     return get(src).then(addStyle)
 }
 
-
+// recursively load dependency tree
 function _loadDependencies(tree, res){
     for (let [k, v] of Object.entries(tree)){
        if (!v.check()){
@@ -129,6 +134,7 @@ function _loadDependencies(tree, res){
     }
 }
 
+// recursively load dependency tree
 function loadDependencies(){
     return new Promise((resolve, reject)=>{
         // if not enabled don't bother trying to load dependencies
@@ -152,7 +158,7 @@ function loadDependencies(){
     })
 }
 
-var loaded = loadDependencies();
+var loaded = loadDependencies(); // promise which resolves 1 second after pyodide is loaded
 var loadedCMStyles = ["default"];
 
 /* ___________________________________________ CONFIGURE DEBUG ______________________________________________________ */
@@ -284,8 +290,7 @@ class PyPrez{
 }
 var pyprez = new PyPrez();
 
-
-/* ___________________________________________________ ENV ___________________________________________________ */
+/* ___________________________________________________ IMPORT ___________________________________________________ */
 class PyPrezImport extends HTMLElement{
     /*
     custom element with the <pyprez-import></pyprez-import> tag which is used to load required packages into pyodide
@@ -559,7 +564,7 @@ window.addEventListener("load", ()=>{
     customElements.define("pyprez-editor", PyPrezEditor);
 })
 
-/* ___________________________________________________ Console ___________________________________________________ */
+/* ___________________________________________________ CONSOLE ___________________________________________________ */
 class PyPrezConsole extends HTMLElement{
     /*
     simple and customizable Python REPL terminal emulator
