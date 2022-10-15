@@ -343,7 +343,7 @@ Pyscript seems to be so focused on making web development "accessible" to Python
     <script src="https://modularizer.github.io/pyprez/pyprez.js"></script>
 	<script>
         let samples = Array.from(document.querySelectorAll('.nonrendered'));
-        samples.map(el=>{el.display="none"});
+        samples.map(el=>{el.style.display="none"});
 
         let fav = document.createElement("link");
         fav.setAttribute("rel","icon");
