@@ -7,13 +7,6 @@
 [GitHubPages](https://modularizer.github.io/pyprez) (interactive README)<br/>
 
 ## Getting Started
-```html
-<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
-    import numpy as np
-    print("testing")
-    np.random.rand(5)
-</script>
-```
 <div class="nonrendered">
     <b>NOTE:</b>
     <p>
@@ -22,6 +15,13 @@ work on GitHub Pages, so if you click the static image it will take you to the w
     </p>
 </div>
 
+```html
+<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
+    import numpy as np
+    print("testing")
+    np.random.rand(5)
+</script>
+```
 <a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
 <a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered">Try on live page</a>
 <a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered">
