@@ -1,20 +1,13 @@
 # Welcome to **pyprez!**
+Run **client-side python** in your browser to demo code.
+
 <a href="https://github.com/modularizer/pyprez"><img src="https://github.com/favicon.ico" height="30px"/></a>
 [GitHub](https://github.com/modularizer/pyprez) (view source code)<br/>
-
 
 <a href="https://modularizer.github.io/pyprez"><img src="./favicon.ico" height="30px"/></a>
 [GitHubPages](https://modularizer.github.io/pyprez) (interactive README)<br/>
 
 # Getting Started
-<div class="nonrendered">
-    <b>NOTE:</b>
-    <p>
-Some markdown flavors, github included, disable javascript, so these examples will not work on GitHub. Luckily, they
-work on GitHub Pages, so if you click the static image it will take you to the working example.
-    </p>
-</div>
-
 ```html
 <script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
     import numpy as np
@@ -30,6 +23,14 @@ work on GitHub Pages, so if you click the static image it will take you to the w
 
 * `mode="editor"(default),"console","script","import"`
 * `stdout="true"(default)(logs to textbox), or "false"(logs to console)`
+
+<div class="nonrendered">
+    <b>NOTE:</b>
+    <p>
+Some markdown flavors, github included, disable javascript, so these examples will not work on GitHub. Luckily, they
+work on GitHub Pages, so if you click the static image it will take you to the working example.
+    </p>
+</div>
 
 # Use On Stack Overflow
 One of the best uses of this package may be to use it on stack overflow for debugging Python questions, especially
