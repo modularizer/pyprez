@@ -28,74 +28,18 @@ work on GitHub Pages, so if you click the static image it will take you to the w
 <img src="./sample_imgs/getting-started-editor.png" />
 </a>
 
-attributes:
-* mode: `"editor"(default),"console","script","import"`
-* stdout: `"true"(default), or "false"` true prints to text box, false prints to console
+* `mode="editor"(default),"console","script","import"`
+* `stdout="true"(default)(logs to textbox), or "false"(logs to console)`
 
+# Use On Stack Overflow
+One of the best uses of this package may be to use it on stack overflow for debugging Python questions, especially
+questions which don't require a lot of slow imports.
 
-## About
-**pyprez** is a minimal javascript package which allows you to **present** runnable python samples in the browser.
- 
-The functionality comes primarily from [**Pyodide**](#pyodide), 
-which allows you to run **front-end Python** through **WebAssembly** and easily interact between Python, javascript and HTML.
-In fact, 100% of the __computational__ functionality of **pyprez** comes directly from pyodide object, 
-which is made available at `window.pyodide`.
-Meanwhile much of the visual style is provided by [CodeMirror](https://codemirror.net/) (accessible at `window.CodeMirror`).
-
-**pyprez** is inspired [**Pyscript**](#pyscript), a project backed by Anaconda which provided a useful interface for 
-pyodide also but introduced a [list of drawbacks](#pyscript-drawbacks) in the process.
-
-Similarly to PyScript's 
-[`<py-env>`](https://anaconda.cloud/api/files/803653a5-9b1e-41d4-a9ee-76c64b8d6cb4), 
-[`<py-script>`](https://anaconda.cloud/api/files/c57a6ef0-dbb7-43da-acd9-94a781ef2673) and 
-[`<py-repl>`](https://pyscript.net/examples/repl.html) tags, 
-Pyrez provides 
-[`<pyprez-editor>`](#pyprez-editor), 
-[`<pyprez-console>`](#pyprez-console), 
-[`<pyprez-import>`](#pyprez-import), 
-[`<pyprez-script>`](#pyprez-script) tags.
-
-## Quick Links:
-- [Use Cases](#usecases)
-  - [StackOverflow](#usingonstackoverflow)
-- [Tags](#pyprez-tags):
- 	- [`<pyprez-editor>`](#pyprez-editor)
- 	- [`<pyprez-console>`](#pyprez-console)
- 	- [`<pyprez-import>`](#pyprez-import)
- 	- [`<pyprez-script>`](#pyprez-script)
-- [Themes](#codemirrorthemes)
-- [API](#pyprez-api)
-    - [`pyprez.elements`](#elements)
- 	- [`pyprez.then/catch`](#thencatch)
- 	- [`pyprez.loadAndRunAsync`](#loadandrunasync)
- 	- [`pyprez.stdout/stderr`](#stdoutstderr)
-- [Pyodide](#pyodide)
-- [PyScript](#pyscript)
-
-**Note:** 
-This library was formerly called **PyJamas** but we changed it's name when we learned that [PyJs](http://pyjs.org/), 
-a Python to Javascript compiler, was formerly named Pyjamas as well.
-
-# Use Cases
-Some cool things about **pyodide** which **pyprez** takes advantage of are:
-* it runs a real python interpreter
-* a webpage visitor running python uses no server-side computational resources
-* no server is even needed, it will work if you open a `.html` document in your browser
-* code execution is sandboxed in the webpage visitor's browsers, making it _relatively safer_ for a webpage host to 
-  allow users to write and run their own code (because it runs on the client's machine it doesn't pose a security risk to the server)
-* allows combining python computations with pretty `HTML/JS/CSS`
-
-Front-end Python will never replace back-end computations, but may be useful for:
-* making Python tutorials (similar to `jupyter` of `CoLab`)
-* distributing results of scientific studies and allowing users to play around with data
-* troubleshooting of forums such as stackoverflow <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a><a href="https://stackoverflow.com">StackOverflow</a>
-
-# Using On Stack Overflow
-Theoretically this could be used on StackOverflow for python debugging. 
-In fact, I think this may just be the best usage of the package. Unfortunately, adding it to stack overflow does take a
-few clicks and copy pasting or memorizing a url. Additionally, the code snippet first shows up as javascript (because it is javascript)
+Unfortunately, adding it to stack overflow does take a few clicks and copy pasting or memorizing a url. 
+Additionally, the code snippet first shows up as javascript (because it is javascript)
 until the viewer clicks `Run Code Snippet` to see and interact with the editable and runnable python.
 
+To add to a StackOverflow question or answer, copy-paste the markdown below into your answer...
 ```markdown
 <!-- begin snippet: js hide: false console: false babel: false -->
 
@@ -115,6 +59,60 @@ until the viewer clicks `Run Code Snippet` to see and interact with the editable
 <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534">
 <img src="./sample_imgs/stack-overflow.png"/>
 </a>
+
+## About
+**pyprez** is a minimal _javascript_ package which allows you to **present** runnable python samples in the browser.
+ 
+The functionality comes primarily from [**Pyodide**](#pyodide), 
+which allows you to run **front-end Python** through **WebAssembly** and easily interact between Python, javascript and HTML.
+The pyodide object is made available at `window.pyodide`.
+Meanwhile much of the visual style is provided by [CodeMirror](https://codemirror.net/) (accessible at `window.CodeMirror`).
+
+**pyprez** is inspired [**Pyscript**](#pyscript), a project backed by Anaconda which provided a useful interface for 
+pyodide also but introduced a [list of drawbacks](#pyscript-drawbacks) in the process.
+
+Similarly to PyScript's 
+[`<py-env>`](https://anaconda.cloud/api/files/803653a5-9b1e-41d4-a9ee-76c64b8d6cb4), 
+[`<py-script>`](https://anaconda.cloud/api/files/c57a6ef0-dbb7-43da-acd9-94a781ef2673) and 
+[`<py-repl>`](https://pyscript.net/examples/repl.html) tags, 
+Pyrez provides 
+[`<pyprez-editor>`](#pyprez-editor), 
+[`<pyprez-console>`](#pyprez-console), 
+[`<pyprez-import>`](#pyprez-import), 
+[`<pyprez-script>`](#pyprez-script) tags.
+
+## Quick Links:
+- [Getting Started](#getting-started)
+- [About](#about)
+- [StackOverflow](#useonstackoverflow)
+- [Use Cases](#usecases)
+- [Tags](#pyprez-tags):
+ 	- [`<pyprez-editor>`](#pyprez-editor)
+ 	- [`<pyprez-console>`](#pyprez-console)
+ 	- [`<pyprez-import>`](#pyprez-import)
+ 	- [`<pyprez-script>`](#pyprez-script)
+- [Themes](#codemirrorthemes)
+- [API](#pyprez-api)
+    - [`pyprez.elements`](#elements)
+ 	- [`pyprez.then/catch`](#thencatch)
+ 	- [`pyprez.loadAndRunAsync`](#loadandrunasync)
+ 	- [`pyprez.stdout/stderr`](#stdoutstderr)
+- [Pyodide](#pyodide)
+- [PyScript](#pyscript)
+
+# Use Cases
+Some cool things about **pyodide** which **pyprez** takes advantage of are:
+* it runs a real python interpreter
+* a webpage visitor running python uses no server-side computational resources
+* no server is even needed, it will work if you open a `.html` document in your browser
+* code execution is sandboxed in the webpage visitor's browsers, making it _relatively safer_ for a webpage host to 
+  allow users to write and run their own code (because it runs on the client's machine it doesn't pose a security risk to the server)
+* allows combining python computations with pretty `HTML/JS/CSS`
+
+Front-end Python will never replace back-end computations, but may be useful for:
+* making Python tutorials (similar to `jupyter` of `CoLab`)
+* distributing results of scientific studies and allowing users to play around with data
+* troubleshooting of forums such as stackoverflow <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a><a href="https://stackoverflow.com">StackOverflow</a>
 
 # Pyprez Tags
 ## Pyprez-Editor
