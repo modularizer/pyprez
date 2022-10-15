@@ -5,6 +5,16 @@
 <a href="https://modularizer.github.io/pyprez"><img src="https://modularizer.github.io/pyprez/favicon.ico" height="15px"/></a>
 [GitHubPages](https://modularizer.github.io/pyprez) (interactive README)<br/>
 
+## Getting Started
+```html
+<!-- mode options="editor"(default),"console","script","import" -->
+<!-- extra options: stdout="false" -->
+<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor"> 
+    import numpy as np
+    print("testing")
+    np.random.rand(5)
+</script>
+```
 
 ## About
 **pyprez** is a minimal javascript package which allows you to **present** runnable python samples in the browser.
@@ -28,20 +38,6 @@ Pyrez provides
 [`<pyprez-import>`](#pyprez-import), 
 [`<pyprez-script>`](#pyprez-script) tags.
 
-## Getting Started
-`<script src="https://modularizer.github.io/pyprez/pyprez.js">` is all you need! <br/>
-Set `mode="editor"` (default),`mode="console"`, `mode="script"`, or `mode="import"`. 
-This will import all the needed packages and then convert your script tag into a `<pyprez-editor>` tag 
-(or another tag based on the mode).
-
-```html
-<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
-    import numpy as np
-    print("testing")
-    np.random.rand(5)
-</script>
-```
-
 QuickLinks:
 - [Pyprez Tags](#pyprez-tags):
  	- [`<pyprez-editor>`](#pyprez-editor)
@@ -50,12 +46,12 @@ QuickLinks:
  	- [`<pyprez-script>`](#pyprez-script)
 - [CodeMirror Themes](#codemirrorthemes)
 - [Using on StackOverflow](#usingonstackoverflow)
- - [Pyprez API](#pyprez-api)
+- [Pyprez API](#pyprez-api)
  	- [`pyprez.then/catch`](#thencatch)
  	- [`pyprez.loadAndRunAsync`](#loadandrunasync)
  	- [`pyprez.stdout/stderr`](#stdoutstderr)
- - [About Pyodide](#pyodide)
- - [About PyScript](#pyscript)
+- [About Pyodide](#pyodide)
+- [About PyScript](#pyscript)
 
 
 **Note:** 
