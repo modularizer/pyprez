@@ -23,25 +23,20 @@ Pyrez provides [`<pyprez-editor>`](#pyprez-editor), [`<pyprez-console>`](#pyprez
 Set `mode="editor"` (default),`mode="console"`, `mode="script"`, or `mode="import"`. This will import all the needed packages and then convert your script tag into a `<pyprez-editor>` tag (or another tag based on the mode you selected).
 
 ```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
 <script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
     import numpy as np
     print("testing")
     np.random.rand(5)
 </script>
-</body>
-</html>
 ```
+<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
+    import numpy as np
+    print("testing")
+    np.random.rand(5)
+</script>
 
 QuickLinks:
 - [Try It @ https://modularizer.github.io/pyprez/](https://modularizer.github.io/pyprez/#try-it)
-- [The Code](#the-code)
 - [Pyprez Tags](#pyprez-tags):
  	- [`<pyprez-editor>`](#pyprez-editor)
  	- [`<pyprez-console>`](#pyprez-console)
@@ -68,42 +63,6 @@ a Python to Javascript compiler, was formerly named Pyjamas as well.
 
 <pyprez-console rows="8" cols="80"></pyprez-console>
 
-## The Code
-Pyprez' only dependency is [**Pyodide**](#pyodide). 
-[CodeMirror](https://codemirror.net/6/) is also used for styling the editor, but is not entirely necessary and all features will still function if it is not included.
-
-```html
-<head>  
-	<!-- import Pyodide-->
-	<script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
-	
-	<!-- import Pyprez -->
-	<script src="https://modularizer.github.io/pyprez//pyprez.js"></script>
-	
-	<!-- import CodeMirror to make pyprez-editor prettier (not necessary-->
-	<script defer src="https://codemirror.net/mode/python/python.js"></script>  
-	<link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/> 
-	<script src="https://codemirror.net/lib/codemirror.js"></script> 
-	<style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
-</head>
-<body>
-	<pyprez-editor>
-	    import js # provides interface to WebAPIs such as document, window, alert, etc
-
-	    import time # import Python builitins
-
-	    import numpy as np # import packages from standard library
-
-	    print("this will show up in the Developer Console because `stdout` has been piped to `console.log` via `pyprez.stdout = console.log`")
-
-	    x = np.random.rand(5)
-	    js.alert(x.tolist())
-
-	    x
-	</pyprez-editor>
-	<pyprez-console rows="8" cols="80"></pyprez-console>
-</body>
-```
 
 # Pyprez Tags
 ## Pyprez-Editor
