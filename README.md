@@ -1,8 +1,11 @@
+<link rel="icon" type="image/x-icon" href="https://modularizer.github.io/pyprez/favicon.ico">
+<script src="https://modularizer.github.io/pyprez/pyprez.js"></script>
+
 # Welcome to **pyprez!**
 <a href="https://github.com/modularizer/pyprez"><img src="https://github.com/favicon.ico" height="15px"/></a>
 [GitHub](https://github.com/modularizer/pyprez) (view source code)<br/>
 
-<link rel="icon" type="image/x-icon" href="https://modularizer.github.io/pyprez/favicon.ico">
+
 <a href="https://modularizer.github.io/pyprez"><img src="https://modularizer.github.io/pyprez/favicon.ico" height="15px"/></a>
 [GitHubPages](https://modularizer.github.io/pyprez) (interactive README)<br/>
 

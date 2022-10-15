@@ -43,6 +43,11 @@ if (document.currentScript.innerHTML){
     // remove script content
     document.currentScript.innerHTML = ""
 }
+
+if (!window.pyprezInitStarted){
+
+
+var pyprezInitStarted = true;
 /* ___________________________________________ LOAD DEPENDENCIES ____________________________________________________ */
 var dependenciesEnabled = true;
 if (location.hash.includes("skipdep") || location.search.includes("skipdep") || document.currentScript.hasAttribute("skipdep")){
@@ -687,3 +692,4 @@ window.addEventListener("load", ()=>{
     customElements.define("pyprez-console", PyPrezConsole);
 })
 
+}
