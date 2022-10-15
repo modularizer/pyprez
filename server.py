@@ -1,4 +1,7 @@
-"""this script can be used to launch a basic tornado static file handler to serve files for your project"""
+"""this script can be used to launch a basic tornado static file handler to serve files for your project
+if you want to locally host the pyprez.js file instead of retrieving it from
+https://modularizer.github.io/pyprez/pyprez.js
+"""
 import asyncio
 import sys
 

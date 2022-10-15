@@ -1,20 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
     <title>PyPrez</title>
 </head>
 <body>
-<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
-    import numpy as np
-    print("testing")
-    np.random.rand(5)
+<!-- shortest pyprez example possible -->
+<script src="https://modularizer.github.io/pyprez/pyprez.js">
+    import random
+    random.random()
 </script>
-<pyprez-editor language="js">
-pyprez.loadAndRunAsync(`
-	from js import alert
-	alert("pyodide object has loaded and is available at window.pyodide")
-`)
-</pyprez-editor>
 </body>
 </html>
