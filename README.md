@@ -1,6 +1,3 @@
-<link rel="icon" type="image/x-icon" href="https://modularizer.github.io/pyprez/favicon.ico">
-<script src="https://modularizer.github.io/pyprez/pyprez.js"></script>
-
 # Welcome to **pyprez!**
 <a href="https://github.com/modularizer/pyprez"><img src="https://github.com/favicon.ico" height="15px"/></a>
 [GitHub](https://github.com/modularizer/pyprez) (view source code)<br/>
@@ -300,7 +297,15 @@ Pyscript seems to be so focused on making web development "accessible" to Python
 
 <details style="display:none">
 	<summary>Scripts which make GitHub Pages page interactive</summary>
+    <script src="https://modularizer.github.io/pyprez/pyprez.js"></script>
 	<script>
+        let fav = document.createElement("link");
+        fav.setAttribute("rel","icon");
+        fav.setAttribute("type","image/x-icon");
+        fav.setAttribute("href", "https://modularizer.github.io/pyprez/favicon.ico");
+        document.head.appendChild(fav);
+
+
         let scripts = Array.from(document.querySelectorAll('.language-html'));
         scripts.map(el=>{
             let parent = document.createElement("div");
