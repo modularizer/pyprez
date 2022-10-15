@@ -7,14 +7,17 @@
 
 ## Getting Started
 ```html
-<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor"> 
-    <!-- mode options="editor"(default),"console","script","import" -->
-    <!-- extra options: stdout="false" -->
+<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
     import numpy as np
     print("testing")
     np.random.rand(5)
 </script>
 ```
+
+attributes:
+* mode: `"editor"(default),"console","script","import"`
+* stdout: `"true"(default), or "false"` true prints to text box, false prints to console
+
 
 ## About
 **pyprez** is a minimal javascript package which allows you to **present** runnable python samples in the browser.
