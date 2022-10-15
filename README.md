@@ -16,11 +16,11 @@ Meanwhile some of its visual style provided by [CodeMirror](https://codemirror.n
 Pyprez is inspired [**Pyscript**](#pyscript), a project backed by Anaconda which provided a useful interface for pyodide also but introduced a [list of drawbacks](#pyscript-drawbacks) in the process.
 
 Similarly to PyScript's [`<py-env>`](https://anaconda.cloud/api/files/803653a5-9b1e-41d4-a9ee-76c64b8d6cb4), [`<py-script>`](https://anaconda.cloud/api/files/c57a6ef0-dbb7-43da-acd9-94a781ef2673) and [`<py-repl>`](https://pyscript.net/examples/repl.html) tags, 
-Pyrez provides [`<pyprez-editor>`](#pyprez-editor), [`<pyprez-repl>`](#pyprez-repl), [`<pyprez-env>`](#pyprez-env), [`<pyprez-script>`](#pyprez-script) tags.
+Pyrez provides [`<pyprez-editor>`](#pyprez-editor), [`<pyprez-console>`](#pyprez-console), [`<pyprez-import>`](#pyprez-import), [`<pyprez-script>`](#pyprez-script) tags.
 
 ## Getting Started
 `<script src="https://modularizer.github.io/pyprez/pyprez.js">` is all you need! <br/>
-Set `mode="editor"` (default), or `mode="repl"` or `mode="script"`. This will import all the needed packages and then convert your script tag into a `<pyprez-editor>` tag (or another tag based on the mode you selected).
+Set `mode="editor"` (default),`mode="console"`, `mode="script"`, or `mode="import"`. This will import all the needed packages and then convert your script tag into a `<pyprez-editor>` tag (or another tag based on the mode you selected).
 
 ```html
 <!DOCTYPE html>
@@ -44,8 +44,8 @@ QuickLinks:
 - [The Code](#the-code)
 - [Pyprez Tags](#pyprez-tags):
  	- [`<pyprez-editor>`](#pyprez-editor)
- 	- [`<pyprez-repl>`](#pyprez-repl)
- 	- [`<pyprez-env>`](#pyprez-env)
+ 	- [`<pyprez-console>`](#pyprez-console)
+ 	- [`<pyprez-import>`](#pyprez-import)
  	- [`<pyprez-script>`](#pyprez-script)
 - [Using on StackOverflow](#usingonstackoverflow)
  - [Pyprez API](#pyprez-api)
@@ -65,7 +65,7 @@ a Python to Javascript compiler, was formerly named Pyjamas as well.
 [View in GitHub Pages](https://modularizer.github.io/pyprez/)
 <div id="tryitContainer0"></div>
 
-<pyprez-repl rows="8" cols="80"></pyprez-repl>
+<pyprez-console rows="8" cols="80"></pyprez-console>
 
 ## The Code
 Pyprez' only dependency is [**Pyodide**](#pyodide). 
@@ -100,7 +100,7 @@ Pyprez' only dependency is [**Pyodide**](#pyodide).
 
 	    x
 	</pyprez-editor>
-	<pyprez-repl rows="8" cols="80"></pyprez-repl>
+	<pyprez-console rows="8" cols="80"></pyprez-console>
 </body>
 ```
 
@@ -134,26 +134,26 @@ pyprez.loadAndRunAsync(`
 <div id="jseditor0"></div>
 
 
-## Pyprez-Repl
- The `<pyprez-repl>` tag provides a minimal terminal emulator to play around with `pyodide`. It does the very basics and nothing more (no special color strings, no plots, etc.). It can be styled, but that is about it.
+## pyprez-console
+ The `<pyprez-console>` tag provides a minimal terminal emulator to play around with `pyodide`. It does the very basics and nothing more (no special color strings, no plots, etc.). It can be styled, but that is about it.
  
  [Pyodide's own console](https://pyodide.org/en/stable/console.html)  has much more support.
 
 #### examples
 
 ```html
-<pyprez-repl></pyprez-repl>
+<pyprez-console></pyprez-console>
 ```
 
 ```html
-<pyprez-repl rows="10" cols="80"></pyprez-repl>
+<pyprez-console rows="10" cols="80"></pyprez-console>
 ```
 
-<pyprez-repl rows="10" cols="80"></pyprez-repl>
+<pyprez-console rows="10" cols="80"></pyprez-console>
 
  
-## Pyprez-Env
-The `<pyprez-env>` tag allows you to load libraries using [pyodide.loadPackage](https://pyodide.org/en/stable/usage/api/js-api.html#pyodide.loadPackage) function. Accepted inputs are either innerHTML or a `src` attribute linking to a file like a `requirements.txt`. This tag is not totally necessary because the `pyprez.loadAndRunAsync` function handles loading package dependencies via [`pyodide.loadPackageFromImports`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpac#pyodide.loadPackagesFromImports).
+## pyprez-import
+The `<pyprez-import>` tag allows you to load libraries using [pyodide.loadPackage](https://pyodide.org/en/stable/usage/api/js-api.html#pyodide.loadPackage) function. Accepted inputs are either innerHTML or a `src` attribute linking to a file like a `requirements.txt`. This tag is not totally necessary because the `pyprez.loadAndRunAsync` function handles loading package dependencies via [`pyodide.loadPackageFromImports`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpac#pyodide.loadPackagesFromImports).
 
 The package names are selected from the text using the [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions) `/\s*-?\s*(.*?)\s*[==[0-9|.]*]?\s*[,|;|\n]/g`
 
@@ -162,14 +162,14 @@ The package names are selected from the text using the [regular expression](http
 #### examples
 
  ```html
- <pyprez-env>
+ <pyprez-import>
 	- numpy
 	- datetime
-</pyprez-env>
+</pyprez-import>
 ```
 
 ```html
- <pyprez-env src="./requirements.txt"></pyprez-env>
+ <pyprez-import src="./requirements.txt"></pyprez-import>
  ```
 
  ## Pyprez-Script

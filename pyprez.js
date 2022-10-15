@@ -129,7 +129,7 @@ function pyprezDebug(){
     }
 }
 if (PYPREZ_DEBUG){ // if debugging, start some timers
-    console.time("pyprez-env load") // time how long it takes the pyprez environment to load (relative to when this script is run)
+    console.time("pyprez-import load") // time how long it takes the pyprez environment to load (relative to when this script is run)
     console.time("pyodide load") // time how long it takes the pyodide object to load(relative to when this script is run)
 }
 
@@ -241,20 +241,20 @@ class PyPrez{
 var pyprez = new PyPrez();
 
 /* ___________________________________________________ ENV ___________________________________________________ */
-class PyprezEnv extends HTMLElement{
+class PyPrezImport extends HTMLElement{
     /*
-    custom element with the <pyprez-env></pyprez-env> tag which is used to load required packages into pyodide
+    custom element with the <pyprez-import></pyprez-import> tag which is used to load required packages into pyodide
 
     examples:
-        <pyprez-env>
+        <pyprez-import>
             numpy
             matplotlib
-        </pyprez-env>
-        <pyprez-env>
+        </pyprez-import>
+        <pyprez-import>
             -scipy
             -asyncio
-        </pyprez-env>
-        <pyprez-env src="requirements.txt"></pyprez-env>
+        </pyprez-import>
+        <pyprez-import src="requirements.txt"></pyprez-import>
     */
     constructor(){
         super();
@@ -262,17 +262,17 @@ class PyprezEnv extends HTMLElement{
         this.style.display = "none";
         let requirements = [...this.innerText.matchAll(this.re)].map(v=>v[1]);
         if (requirements.length){
-            pyprezDebug("importing requirements ", requirements, " from <pyprez-env/>", this)
+            pyprezDebug("importing requirements ", requirements, " from <pyprez-import/>", this)
             pyprez.then(pyo=>pyo.loadPackage(requirements)).then(()=>{
                 if (PYPREZ_DEBUG){
-                    console.timeEnd("pyprez-env load")
+                    console.timeEnd("pyprez-import load")
                 }});
         }
     }
     re = /\s*-?\s*(.*?)\s*[==[0-9|.]*]?\s*[,|;|\n]/g
 }
 window.addEventListener("load", ()=>{
-    customElements.define("pyprez-env", PyprezEnv);
+    customElements.define("pyprez-import", PyPrezImport);
 })
 
 /* ___________________________________________________ SCRIPT ___________________________________________________ */
@@ -500,21 +500,21 @@ window.addEventListener("load", ()=>{
     customElements.define("pyprez-editor", PyprezEditor);
 })
 
-/* ___________________________________________________ REPL ___________________________________________________ */
-class PyprezRepl extends HTMLElement{
+/* ___________________________________________________ Console ___________________________________________________ */
+class PyPrezConsole extends HTMLElement{
     /*
     simple and customizable Python REPL terminal emulator
 
     examples:
-        <pyprez-repl></pyprez-repl>
-        <pyprez-repl style="background-color:yellow;color:black"></pyprez-repl>
+        <pyprez-console></pyprez-console>
+        <pyprez-console style="background-color:yellow;color:black"></pyprez-console>
     */
     constructor(){
         super();
         this.classList.add("pyprez");
         this.attachStd = this.attachStd.bind(this)
         this.detachStd = this.detachStd.bind(this)
-        this.id = 'repl' + Math.floor(10000*Math.random())
+        this.id = 'console' + Math.floor(10000*Math.random())
         let cols = this.hasAttribute("cols")?this.getAttribute("cols"):120
         let rows = this.hasAttribute("rows")?this.getAttribute("rows"):20
         let bg = this.style["background-color"]?this.style["background-color"]:"#000"
@@ -629,6 +629,6 @@ class PyprezRepl extends HTMLElement{
     }
 }
 window.addEventListener("load", ()=>{
-    customElements.define("pyprez-repl", PyprezRepl);
+    customElements.define("pyprez-console", PyPrezConsole);
 })
 
