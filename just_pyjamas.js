@@ -22,52 +22,6 @@ PLEASE INCLUDE THE ELEMENTS BELOW IN <head> to get allow pyjamas to function
 </head>
 
 */
-document.currentScript.display = "none";
-
-let jsDependencies = [
-"https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
-"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.js"
-]
-let cssDependencies = ["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.css"]
-let get = src => fetch(src).then(r=>r.text())
-Array.from(document.querySelectorAll('.pyjamas')).map(el=>{el.opacity=0})
-function importScript(url){
-    let el = document.createElement("script")
-    el.src = url;
-    document.body.appendChild(el);
-    return new Promise((resolve, reject)=>{
-        el.addEventListener("load", resolve(url))
-    })
-}
-let addStyle = s=> {
-    let style = document.createElement("style");
-    style.innerHTML = s;
-    document.head.appendChild(style);
-}
-addStyle(".CodeMirror { border: 1px solid #eee; height: auto; }")
-if (document.currentScript.innerHTML){
-    let el = document.createElement("pyjamas-editor");
-    el.innerHTML = document.currentScript.innerHTML;
-    document.body.append(el)
-}
-function loadDependencies(){
-    return new Promise((resolve, reject)=>{
-        let numComplete = 0;
-        let finished = (url)=>{
-            console.warn(url)
-            numComplete +=1;
-            if (numComplete === (jsDependencies.length + cssDependencies.length)){
-                setTimeout(resolve, 1000)
-            }
-        }
-        jsDependencies.map(src=>importScript(src).then(finished))
-        cssDependencies.map(src => get(src).then(addStyle).then(()=>finished(src)))
-    })
-
-
-}
-var loaded = loadDependencies();
-
 var PYJAMAS_DEBUG = true // whether to log to console.debug or not
 function pyjamasDebug(){
     if (PYJAMAS_DEBUG){
@@ -159,18 +113,16 @@ class Pyjamas{
 
     _loadPyodide(config={}){
         /*load pyodide object once pyodide*/
-        loaded.then((()=>{
-            // setup the special config options to load pyodide with
-            let defaultConfig = {
-                stdout: (t=>{this.stdout(t)}).bind(this),
-                stderr: (t=>{this.stderr(t)}).bind(this),
-            }
-            config = Object.assign(defaultConfig, config)
 
-            // load pyodide then resolve or reject this.promise
-            loadPyodide(config).then(this._resolvePromise).then(r=>Array.from(document.querySelectorAll('.pyjamas')).map(el=>{el.opacity=1})).catch(this._rejectPromise);
-        }).bind(this))
+        // setup the special config options to load pyodide with
+        let defaultConfig = {
+            stdout: (t=>{this.stdout(t)}).bind(this),
+            stderr: (t=>{this.stderr(t)}).bind(this),
+        }
+        config = Object.assign(defaultConfig, config)
 
+        // load pyodide then resolve or reject this.promise
+        loadPyodide(config).then(this._resolvePromise).catch(this._rejectPromise);
 
         this.then(this._onload.bind(this));
         return this._pyodidePromise
@@ -204,7 +156,6 @@ class PyjamasEnv extends HTMLElement{
     */
     constructor(){
         super();
-        this.classList.add("pyjamas");
         this.style.display = "none";
         let requirements = [...this.innerText.matchAll(this.re)].map(v=>v[1]);
         if (requirements.length){
@@ -235,7 +186,6 @@ class PyjamasScript extends HTMLElement{
     */
     constructor(){
         super();
-        this.classList.add("pyjamas");
         this.style.display = "none";
         this.run = this.run.bind(this);
         if (this.hasAttribute("src") && this.getAttribute("src")){
@@ -271,7 +221,6 @@ class PyjamasEditor extends HTMLElement{
     */
     constructor(){
         super();
-        this.classList.add("pyjamas");
         this.loadEl = this.loadEl.bind(this);
         this.loadEditor = this.loadEditor.bind(this);
         this.language = "python"
@@ -386,39 +335,22 @@ class PyjamasEditor extends HTMLElement{
             let code = this.code;
             let promise;
             if (this.language == "python"){
-                this.code += "\n";
-                this.attachStd();
                 promise = pyjamas.loadAndRunAsync(code);
                 promise.then(r=>{
-                    this.code += "\n>>> " + (r?r.toString():"");
+                    this.code = code + "\n>>> " + (r?r.toString():"");
                     this.start.style.color = "red";
                     this.start.innerHTML = "↻";
-                    this.detachStd();
                     return r
                 })
             }else if (this.language == "javascript"){
                 let r = eval(code)
-                this.code += "\n>>> " + JSON.stringify(r, null, 2);
+                this.code = code + "\n>>> " + JSON.stringify(r, null, 2);
                 this.start.style.color = "red";
                 this.start.innerHTML = "↻";
                 return r
             }
         }
 
-    }
-    appendLine(v){
-        this.code += "\n" + v
-    }
-    attachStd(){
-        this.oldstdout = pyjamas.stdout
-        this.oldstderr = pyjamas.stderr
-        pyjamas.stdout = this.appendLine.bind(this)
-        pyjamas.stderr = this.appendLine.bind(this)
-    }
-    detachStd(r){
-        pyjamas.stdout = this.oldstdout
-        pyjamas.stderr = this.oldstderr
-        return r
     }
     reload(){
         this.start.innerHTML = "➤";
@@ -442,7 +374,6 @@ class PyjamasRepl extends HTMLElement{
     */
     constructor(){
         super();
-        this.classList.add("pyjamas");
         this.attachStd = this.attachStd.bind(this)
         this.detachStd = this.detachStd.bind(this)
         this.id = 'repl' + Math.floor(10000*Math.random())

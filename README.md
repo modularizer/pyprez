@@ -250,11 +250,6 @@ Pyscript seems to be so focused on making web development "accessible" to Python
 
  <details style="display:none">
 	<summary>Scripts which make GitHub Pages page interactive</summary>
-	<script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script> 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.js"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.css" />
-	<style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>  
 	<script src="https://modularizer.github.io/pyjamas/pyjamas.js"></script>
-	<script src="https://modularizer.github.io/pyjamas/readmeExamples.js"></script>
 </details>
  
