@@ -273,7 +273,7 @@ raise Exception("testing stderr")
 
 Pyodide's main drawback is load time, with initial load time often taking ~2-6 seconds.
   
-  ## PyScript
+## PyScript
 **Pyprez** is heavily inspired by [**PyScript**](https://pyscript.net/), a project recently endorsed by [Anaconda](https://anaconda.cloud/pyscript-python-in-the-browser) (May 2022), which is built on top of Pyodide and attempts to make Pyodide easier to use by providing [custom HTML tags](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements) such as `py-env`, `py-script` and `py-repl` and by allowing users to easily displayplots and graphs using [matplotlib](https://matplotlib.org/3.5.0/gallery/index.html) and other similar popular Python Libraries.
 
 ### PyScript drawbacks
