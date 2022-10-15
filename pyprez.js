@@ -30,6 +30,11 @@ if (document.currentScript.innerHTML){
     mode = mode?mode:"editor";
     let el = document.createElement("pyprez-" + mode);
     el.innerHTML = document.currentScript.innerHTML;
+
+    if (document.currentScript.hasAttribute("theme")){
+        el.setAttribute("theme", document.currentScript.getAttribute("theme"))
+    }
+
     document.body.append(el);
 
     // remove script content
@@ -43,9 +48,11 @@ if (location.hash.includes("skipdep") || location.search.includes("skipdep") || 
 
 // list dependencies
 let criticalJsDependencies = [["https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js", ()=>window.loadPyodide]]
+let cmVersion = "6.65.7"
+let cmBase = "https://cdnjs.cloudflare.com/ajax/libs/codemirror/" + cmVersion + "/"
 let jsDependencies = [
-["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.js", ()=>window.CodeMirror],
-["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/mode/python/python.min.js",
+[cmBase + "codemirror.min.js", ()=>window.CodeMirror],
+[cmBase + "mode/python/python.min.js",
 ()=>{
     if (!window.CodeMirror){return false}
     if (!window.CodeMirror.modes){return false}
@@ -54,7 +61,6 @@ let jsDependencies = [
 }]
 ]
 let cssDependencies = [["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.css", ()=>false]]
-// TODO: import custom codemirror themes and allow selecting theme
 
 // tool to add css to document
 let addStyle = s=> {
@@ -82,8 +88,10 @@ function importScript(url, complete=()=>false){
 // function to get the text of css dependencies
 let get = src => fetch(src).then(r=>r.text())
 
-// add our custom style
-addStyle(".CodeMirror { border: 1px solid #eee !important; height: auto !important; }")
+let importStyle = (url)=>{
+    console.log("importing", url)
+    return get(src).then(addStyle)
+}
 
 function loadDependencies(){
     return new Promise((resolve, reject)=>{
@@ -97,6 +105,7 @@ function loadDependencies(){
         let resolved = 0;
         let res = ()=>{
             if (!resolved){
+                addStyle(".CodeMirror { border: 1px solid #eee; height: auto; width: auto;}")
                 resolve();
             }
         }
@@ -120,6 +129,7 @@ function loadDependencies(){
 }
 
 var loaded = loadDependencies();
+var loadedCMStyles = ["default"];
 
 /* ___________________________________________ CONFIGURE DEBUG ______________________________________________________ */
 var PYPREZ_DEBUG = true // whether to log to console.debug or not
@@ -165,6 +175,16 @@ class PyPrez{
 
         // load pyodide and resolve the promise
         this._loadPyodide(config);
+    }
+    elementList = [];
+    elements = {};
+
+    addElement(el){
+        this.elements[this.elementList.length] = el;
+        this.elementList.push(el);
+        if (el.id){
+            this.elements[el.id] = el;
+        }
     }
     
     // set the functions that will handle stdout, stderr from the python interpreter
@@ -240,6 +260,7 @@ class PyPrez{
 }
 var pyprez = new PyPrez();
 
+
 /* ___________________________________________________ ENV ___________________________________________________ */
 class PyPrezImport extends HTMLElement{
     /*
@@ -268,6 +289,7 @@ class PyPrezImport extends HTMLElement{
                     console.timeEnd("pyprez-import load")
                 }});
         }
+        pyprez.addElement(this);
     }
     re = /\s*-?\s*(.*?)\s*[==[0-9|.]*]?\s*[,|;|\n]/g
 }
@@ -276,7 +298,7 @@ window.addEventListener("load", ()=>{
 })
 
 /* ___________________________________________________ SCRIPT ___________________________________________________ */
-class PyprezScript extends HTMLElement{
+class PyPrezScript extends HTMLElement{
     /*
     custom element which loads required packages and runs a block of python code in the pyodide interpreter
 
@@ -298,6 +320,7 @@ class PyprezScript extends HTMLElement{
         }else{
             this.run(this.innerHTML);
         }
+        pyprez.addElement(this);
     }
     run(code){
         pyprezDebug("running code from <pyprez-script>", code, this)
@@ -307,11 +330,11 @@ class PyprezScript extends HTMLElement{
     }
 }
 window.addEventListener("load", ()=>{
-    customElements.define("pyprez-script", PyprezScript);
+    customElements.define("pyprez-script", PyPrezScript);
 })
 
 /* ___________________________________________________ EDITOR ___________________________________________________ */
-class PyprezEditor extends HTMLElement{
+class PyPrezEditor extends HTMLElement{
     /*
     custom element which allows editing a block of python code, then when you are ready, pressing run to
     load required packages and run the block of python code in the pyodide interpreter and see the result
@@ -356,7 +379,11 @@ class PyprezEditor extends HTMLElement{
         }else{
             this.loadEl();
         }
-        this.addEventListener("keydown", this.keypressed.bind(this))
+        this.addEventListener("keydown", this.keypressed.bind(this));
+        pyprez.addElement(this);
+        if (this.hasAttribute("theme")){
+            this.theme = this.getAttribute("theme")
+        }
     }
     keypressed(e){
         if (e.shiftKey){
@@ -425,6 +452,14 @@ class PyprezEditor extends HTMLElement{
             this.editor.doc.setGutterMarker(0, "start", this.start);
         }else{
             this.textarea.value = v;
+        }
+    }
+    get theme(){return this.editor.options.theme}
+    set theme(v){
+        if (loadedCMStyles.includes(v)){this.editor.setOption("theme", v)}
+        else{
+            let src = cmBase + "theme/" + v + ".min.css"
+            get(src).then(addStyle).then((()=>{this.editor.setOption("theme", v)}).bind(this))
         }
     }
     numImports = 0;
@@ -497,7 +532,7 @@ class PyprezEditor extends HTMLElement{
     }
 }
 window.addEventListener("load", ()=>{
-    customElements.define("pyprez-editor", PyprezEditor);
+    customElements.define("pyprez-editor", PyPrezEditor);
 })
 
 /* ___________________________________________________ Console ___________________________________________________ */
@@ -549,7 +584,8 @@ class PyPrezConsole extends HTMLElement{
             this.text += "Simple Javascript Console\n>>> "
         }
 
-        this.textarea.addEventListener("keydown", this.keydown.bind(this))
+        this.textarea.addEventListener("keydown", this.keydown.bind(this));
+        pyprez.addElement(this);
     }
     startup(){
         let code = `

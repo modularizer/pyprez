@@ -47,6 +47,7 @@ QuickLinks:
  	- [`<pyprez-console>`](#pyprez-console)
  	- [`<pyprez-import>`](#pyprez-import)
  	- [`<pyprez-script>`](#pyprez-script)
+- [CodeMirror Themes](#codemirrorthemes)
 - [Using on StackOverflow](#usingonstackoverflow)
  - [Pyprez API](#pyprez-api)
  	- [`pyprez.then/catch`](#thencatch)
@@ -193,6 +194,21 @@ The package names are selected from the text using the [regular expression](http
 ```
 
 <div id="scriptContainer"></div>
+
+# CodeMirror Themes
+set the `theme` attribute of the `script` import element or `pyprez-editor` element to use a special CodeMirror theme, e.g. `theme="darcula"`.
+see available themes at https://codemirror.net/5/demo/theme.html 
+
+ ### python example
+
+ ```html
+ <pyprez-editor theme="darcula">
+	 import numpy as np
+	 np.random.rand(5)
+</pyprez-editor>
+```
+
+<div id="darculaEditorContainer"></div>
 
 # Using On Stack Overflow
 Theoretically this could be used on StackOverflow for python debugging.
