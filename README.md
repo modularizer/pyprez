@@ -7,20 +7,32 @@
 
 
 ## About
- **pyprez** is a minimal javascript package which allows you to **present** runnable python samples in the browser.
+**pyprez** is a minimal javascript package which allows you to **present** runnable python samples in the browser.
  
-The functionality of the pyprez comes primarily from [**Pyodide**](#pyodide), which allows you to run **front-end Python** through **WebAssembly** and easily interact between Python, javascript and HTML.
-In fact, 100% of the __computational__ functionality of **Pyprez** comes directly from pyodide object, which is made available at `window.pyodide`.
+The functionality of the pyprez comes primarily from [**Pyodide**](#pyodide), 
+which allows you to run **front-end Python** through **WebAssembly** and easily interact between Python, javascript and HTML.
+In fact, 100% of the __computational__ functionality of **Pyprez** comes directly from pyodide object, 
+which is made available at `window.pyodide`.
 Meanwhile some of its visual style provided by [CodeMirror](https://codemirror.net/) (accessible at `window.CodeMirror`).
 
-Pyprez is inspired [**Pyscript**](#pyscript), a project backed by Anaconda which provided a useful interface for pyodide also but introduced a [list of drawbacks](#pyscript-drawbacks) in the process.
+Pyprez is inspired [**Pyscript**](#pyscript), a project backed by Anaconda which provided a useful interface for 
+pyodide also but introduced a [list of drawbacks](#pyscript-drawbacks) in the process.
 
-Similarly to PyScript's [`<py-env>`](https://anaconda.cloud/api/files/803653a5-9b1e-41d4-a9ee-76c64b8d6cb4), [`<py-script>`](https://anaconda.cloud/api/files/c57a6ef0-dbb7-43da-acd9-94a781ef2673) and [`<py-repl>`](https://pyscript.net/examples/repl.html) tags, 
-Pyrez provides [`<pyprez-editor>`](#pyprez-editor), [`<pyprez-console>`](#pyprez-console), [`<pyprez-import>`](#pyprez-import), [`<pyprez-script>`](#pyprez-script) tags.
+Similarly to PyScript's 
+[`<py-env>`](https://anaconda.cloud/api/files/803653a5-9b1e-41d4-a9ee-76c64b8d6cb4), 
+[`<py-script>`](https://anaconda.cloud/api/files/c57a6ef0-dbb7-43da-acd9-94a781ef2673) and 
+[`<py-repl>`](https://pyscript.net/examples/repl.html) tags, 
+Pyrez provides 
+[`<pyprez-editor>`](#pyprez-editor), 
+[`<pyprez-console>`](#pyprez-console), 
+[`<pyprez-import>`](#pyprez-import), 
+[`<pyprez-script>`](#pyprez-script) tags.
 
 ## Getting Started
 `<script src="https://modularizer.github.io/pyprez/pyprez.js">` is all you need! <br/>
-Set `mode="editor"` (default),`mode="console"`, `mode="script"`, or `mode="import"`. This will import all the needed packages and then convert your script tag into a `<pyprez-editor>` tag (or another tag based on the mode you selected).
+Set `mode="editor"` (default),`mode="console"`, `mode="script"`, or `mode="import"`. 
+This will import all the needed packages and then convert your script tag into a `<pyprez-editor>` tag 
+(or another tag based on the mode).
 
 ```html
 <script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
@@ -38,7 +50,6 @@ Set `mode="editor"` (default),`mode="console"`, `mode="script"`, or `mode="impor
 </details>
 
 QuickLinks:
-- [Try It @ https://modularizer.github.io/pyprez/](https://modularizer.github.io/pyprez/#try-it)
 - [Pyprez Tags](#pyprez-tags):
  	- [`<pyprez-editor>`](#pyprez-editor)
  	- [`<pyprez-console>`](#pyprez-console)
@@ -60,10 +71,17 @@ a Python to Javascript compiler, was formerly named Pyjamas as well.
 
 # Pyprez Tags
 ## Pyprez-Editor
- The `<pyprez-editor>` tag is similar to the  `<pyprez-script>` tag, except instead of executing as soon as possible when the page is loaded, the tag provides a [CodeMirror](https://codemirror.net/6/) text editor element and does not execute until the gutter start button has been pressed. Then, the editor runs the code, streaming STDOUT and STDERR to the console, and the displays the result as a string in the editor. Additionally, the element can be reset and the code can be modified and rerun.
+ The `<pyprez-editor>` tag is similar to the  `<pyprez-script>` tag, 
+ except instead of executing as soon as possible when the page is loaded, 
+ the tag provides a [CodeMirror](https://codemirror.net/6/) text editor element and does not execute until 
+ the gutter start button has been pressed. 
+ Then, the editor runs the code, streaming STDOUT and STDERR to either the text box or the console 
+ if `stdout="false"` is set, and the displays the result as a string in the editor. 
+ Additionally, the element can be reset and the code can be modified and rerun.
  
- By default, the `<pyprez-editor>` tag evaulates Python in pyodide's CPython interpreter, but if the `language` attribute is set to "javascript" or if the src
- address ends with `.js`, the editor will run the code in javascript instead.
+ By default, the `<pyprez-editor>` tag evaulates Python in pyodide's CPython interpreter, 
+ but if the `language` attribute is set to "javascript" or if the src address ends with `.js`, 
+ the editor will run the code in javascript instead.
  
 ### pyprez-editor example
 [View in GitHub Pages](https://modularizer.github.io/pyprez#pyprez-editorexample)
@@ -89,11 +107,20 @@ pyprez.loadAndRunAsync(`
 `)
 ```
 
-<div id="jseditor0"></div>
+<details style="display:none">
+	<pyprez-editor language="js">
+	 pyprez.loadAndRunAsync(`
+		from js import alert
+		alert('pyodide object has loaded and is available at window.pyodide')
+	`)
+	</pyprez-editor>
+</details>
 
 
 ## pyprez-console
- The `<pyprez-console>` tag provides a minimal terminal emulator to play around with `pyodide`. It does the very basics and nothing more (no special color strings, no plots, etc.). It can be styled, but that is about it.
+ The `<pyprez-console>` tag provides a minimal terminal emulator to play around with `pyodide`. 
+ It does the very basics and nothing more (no special color strings, no plots, etc.). 
+ It can be styled, but that is about it.
  
  [Pyodide's own console](https://pyodide.org/en/stable/console.html)  has much more support.
 
@@ -112,11 +139,19 @@ pyprez.loadAndRunAsync(`
 
  
 ## pyprez-import
-The `<pyprez-import>` tag allows you to load libraries using [pyodide.loadPackage](https://pyodide.org/en/stable/usage/api/js-api.html#pyodide.loadPackage) function. Accepted inputs are either innerHTML or a `src` attribute linking to a file like a `requirements.txt`. This tag is not totally necessary because the `pyprez.loadAndRunAsync` function handles loading package dependencies via [`pyodide.loadPackageFromImports`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpac#pyodide.loadPackagesFromImports).
+The `<pyprez-import>` tag allows you to load libraries using 
+[pyodide.loadPackage](https://pyodide.org/en/stable/usage/api/js-api.html#pyodide.loadPackage) function.
+Accepted inputs are either innerHTML or a `src` attribute linking to a file like a `requirements.txt`. 
+This tag is not totally necessary because the `pyprez.loadAndRunAsync` function handles loading package dependencies 
+via [`pyodide.loadPackageFromImports`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpac#pyodide.loadPackagesFromImports).
 
-The package names are selected from the text using the [regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions) `/\s*-?\s*(.*?)\s*[==[0-9|.]*]?\s*[,|;|\n]/g`
+The package names are selected from the text using the 
+[regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions) 
+`/\s*-?\s*(.*?)\s*[==[0-9|.]*]?\s*[,|;|\n]/g`
 
-**note**: *the `==version` syntax used by `pip freeze` is ignored by the RegExp above, so specifying versions will not cause an error, but will not actually load that particular version, because this is not supported by pyodide*
+**note**: *the `==version` syntax used by `pip freeze` is ignored by the RegExp above, 
+so specifying versions will not cause an error, but will not actually load that particular version, 
+because this is not supported by pyodide*
 
 #### pyprez-import example
  ```html
@@ -131,7 +166,10 @@ The package names are selected from the text using the [regular expression](http
  ```
 
  ## Pyprez-Script
- The `<pyprez-script>` tag allows you to run Python code using `pyprez.loadAndRunAsync`, which uses [`pyodide.loadPackageFromImports`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpac#pyodide.loadPackagesFromImports) followed by [`pyodide.runPythonAsync`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=runpythona#pyodide.runPythonAsync). Accepted inputs are either innerHTML or a `src` attribute linking to a python file.
+ The `<pyprez-script>` tag allows you to run Python code using `pyprez.loadAndRunAsync`, which uses 
+ [`pyodide.loadPackageFromImports`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpac#pyodide.loadPackagesFromImports) 
+ followed by [`pyodide.runPythonAsync`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=runpythona#pyodide.runPythonAsync). 
+ Accepted inputs are either innerHTML or a `src` attribute linking to a python file.
 
 #### pyprez-script example
 [View in GitHub Pages](https://modularizer.github.io/pyprez#pyprez-scriptexample)
@@ -161,7 +199,9 @@ The package names are selected from the text using the [regular expression](http
 </details>
 
 # CodeMirror Themes
-set the `theme` attribute of the `script` import element or `pyprez-editor` element to use a special CodeMirror theme, e.g. `theme="darcula"`.
+set the `theme` attribute of the `script` import element or `pyprez-editor` element to use a special CodeMirror theme, 
+e.g. `theme="darcula"`.
+
 see available themes at https://codemirror.net/5/demo/theme.html 
 
 ### python example
@@ -180,7 +220,11 @@ see available themes at https://codemirror.net/5/demo/theme.html
 </details>
 
 # Using On Stack Overflow
-Theoretically this could be used on StackOverflow for python debugging.
+Theoretically this could be used on StackOverflow for python debugging. 
+In fact, I think this may just be the best usage of the package. Unfortunately, adding it to stack overflow does take a
+few clicks and copy pasting or memorizing a url. Additionally, the code snippet first shows up as javascript (because it is javascript)
+until the viewer clicks `Run Code Snippet` to see and interact with the editable and runnable python.
+
 ```markdown
 <!-- begin snippet: js hide: false console: false babel: false -->
 
@@ -196,10 +240,18 @@ Theoretically this could be used on StackOverflow for python debugging.
 ```
 
 # Pyprez API
-## then/catch
-When `pyprez.js` loads, the `pyprez` object (available at `window.pyprez`) creates a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) at `pyprez.promise`, which then resolves with the `pyodide` object when [`loadPyodide`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadPyodide#globalThis.loadPyodide) finishes loading the `pyodide` object.
+## elements
+Any html elements created by the pyprez custom tags get added to `pyprez.elements` object for easy retrieval.
 
-`pyprez.then` and `pyprez.catch` are simply shortcuts to `pyprez.promise.then` and `pyprez.promise.catch`. Therefore, `pyprez.then` can be use be sure that pyodide has finished loading, then use it as soon as possible.
+## then/catch
+When `pyprez.js` loads, the `pyprez` object (available at `window.pyprez`) creates a 
+[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) at `pyprez.promise`,
+which then resolves with the `pyodide` object when 
+[`loadPyodide`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadPyodide#globalThis.loadPyodide) 
+finishes loading the `pyodide` object.
+
+`pyprez.then` and `pyprez.catch` are simply shortcuts to `pyprez.promise.then` and `pyprez.promise.catch`. 
+Therefore, `pyprez.then` can be use be sure that pyodide has finished loading, then use it as soon as possible.
 
 #### example
 
@@ -209,12 +261,19 @@ pyprez.then(pyodide => pyodide.runPythonAsync(`
 	alert("pyodide object has loaded and is available at window.pyodide")
 `))
 ```
-
-<div id="thencatch"></div>
+<details style="display:none">
+ <pyprez-editor theme="darcula" language="js">
+pyprez.then(pyodide => pyodide.runPythonAsync(`
+	from js import alert
+	alert("pyodide object has loaded and is available at window.pyodide")
+`))
+</pyprez-editor>
+</details>
 
 ## loadAndRunAsync
-The `pyprez.loadAndRunAsync` function is an asynchronous utility function which immediately returns a PRomise to the result of some Python code, which gets
-evaluated as soon as possible. It works by doing does three things:
+The `pyprez.loadAndRunAsync` function is an asynchronous utility function which immediately returns a 
+Promise to the result of some Python code, which gets evaluated as soon as possible. 
+It works by doing does three things:
 - waits for pyodide to finish loading by using [`pyprez.then`](#then/catch)
 - loads any packages the code snippet requires, by using [`pyodide.loadPackagesFromImports`](#https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpackagesfromimports#pyodide.loadPackagesFromImports)
 - runs python in pyodide's [CPython interpreter](https://en.wikipedia.org/wiki/CPython) using [WebAssembly](https://webassembly.org/) via [`pyodide.runPythonAsync`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=runPythonAsync#pyodide.runPythonAsync)
@@ -228,7 +287,14 @@ pyprez.loadAndRunAsync(`
 `)
 ```
 
-<div id="loadandrunasync"></div>
+<details style="display:none">
+ <pyprez-editor theme="eclipse" language="js">
+pyprez.loadAndRunAsync(`
+	from js import alert
+	alert("pyodide object has loaded and is available at window.pyodide")
+`)
+</pyprez-editor>
+</details>
 
 ## stdout/stderr
 Pyprez automatically set up `stdout` to be handled by `console.log` and `stderr` to be handled by `console.err` by setting configuration options in `loadPyodide`.
@@ -253,6 +319,23 @@ raise Exception("testing stderr")
 `)
 ```
 
+<details style="display:none">
+ <pyprez-editor theme="eclipse" language="js">
+function appendText(m, color="#000"){
+	let el = document.createElement("div")
+	el.innerText = m
+	el.style.color = color
+	document.getElementById("stdouttarget").append(el)
+}
+pyprez.stdout = appendText
+pyprez.stderr = m => appendText(m, "red")
+
+pyprez.loadAndRunAsync(`
+for i in range(10):
+	print(i)
+raise Exception("testing stderr")
+</pyprez-editor>
+</details>
 <div id="stdoutstderr"></div>
 <div id="stdouttarget"></div>
 
