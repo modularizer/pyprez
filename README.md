@@ -1,10 +1,12 @@
 # Welcome to **pyprez!**
 <a href="https://github.com/modularizer/pyprez"><img src="https://github.com/favicon.ico" height="15px"/></a>
-[GitHub](https://github.com/modularizer/pyprez) <br/>
+[GitHub](https://github.com/modularizer/pyprez) (view source code)<br/>
 
 <a href="https://modularizer.github.io/pyprez"><img src="https://modularizer.github.io/pyprez/favicon.ico" height="15px"/></a>
-[GitHubPages](https://modularizer.github.io/pyprez) <br/>
+[GitHubPages](https://modularizer.github.io/pyprez) (interactive README)<br/>
 
+
+## About
  **pyprez** is a minimal javascript package which allows you to **present** runnable python samples in the browser.
  
 The functionality of the pyprez comes primarily from [**Pyodide**](#pyodide), which allows you to run **front-end Python** through **WebAssembly** and easily interact between Python, javascript and HTML.
