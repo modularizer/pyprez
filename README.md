@@ -114,6 +114,11 @@ pyprez.loadAndRunAsync(`
 	alert('pyodide object has loaded and is available at window.pyodide')
 `)
 ```
+<a href="https://modularizer.github.io/pyprez/#pyprez-editor-example" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
+<a href="https://modularizer.github.io/pyprez/#pyprez-editor-example" class="nonrendered">Try on live page</a>
+<a href="https://modularizer.github.io/pyprez/#pyprez-editor-example" class="nonrendered">
+<img src="./sample_imgs/js-1.png" />
+</a>
 
 
 ## pyprez-console
@@ -261,6 +266,11 @@ pyprez.then(pyodide => pyodide.runPythonAsync(`
 	alert("pyodide object has loaded and is available at window.pyodide")
 `))
 ```
+<a href="https://modularizer.github.io/pyprez/#thencatch" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
+<a href="https://modularizer.github.io/pyprez/#thencatch" class="nonrendered">Try on live page</a>
+<a href="https://modularizer.github.io/pyprez/#thencatch" class="nonrendered">
+<img src="./sample_imgs/js-then.png" />
+</a>
 
 ## loadAndRunAsync
 The `pyprez.loadAndRunAsync` function is an asynchronous utility function which immediately returns a 
@@ -278,6 +288,11 @@ pyprez.loadAndRunAsync(`
 	alert("pyodide object has loaded and is available at window.pyodide")
 `)
 ```
+<a href="https://modularizer.github.io/pyprez/#loadandrunasync" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
+<a href="https://modularizer.github.io/pyprez/#loadandrunasync" class="nonrendered">Try on live page</a>
+<a href="https://modularizer.github.io/pyprez/#loadandrunasync" class="nonrendered">
+<img src="./sample_imgs/js-async.png" />
+</a>
 
 ## stdout/stderr
 Pyprez automatically set up `stdout` to be handled by `console.log` and `stderr` to be handled by `console.err` by setting configuration options in `loadPyodide`.
@@ -301,14 +316,11 @@ for i in range(10):
 raise Exception("testing stderr")
 `)
 ```
-
-In GitHubPages, output will appear in the element below: <br/>
-<div id="stdoutstderr">
-<b>stdoutstderr</b>
-</div>
-<div id="stdouttarget">
-<b>stdouttarget</b>
-</div>
+<a href="https://modularizer.github.io/pyprez/#stdoutstderr" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
+<a href="https://modularizer.github.io/pyprez/#stdoutstderr" class="nonrendered">Try on live page</a>
+<a href="https://modularizer.github.io/pyprez/#stdoutstderr" class="nonrendered">
+<img src="./sample_imgs/js-stdout.png" />
+</a>
 
 
 ## Pyodide
