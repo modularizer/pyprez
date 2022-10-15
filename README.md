@@ -29,11 +29,13 @@ Set `mode="editor"` (default),`mode="console"`, `mode="script"`, or `mode="impor
     np.random.rand(5)
 </script>
 ```
-<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
-    import numpy as np
-    print("testing")
-    np.random.rand(5)
-</script>
+<details style="display:none">
+	<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
+		import numpy as np
+		print("testing")
+		np.random.rand(5)
+	</script>
+</details>
 
 QuickLinks:
 - [Try It @ https://modularizer.github.io/pyprez/](https://modularizer.github.io/pyprez/#try-it)
@@ -56,14 +58,6 @@ QuickLinks:
 This library was formerly called **PyJamas** but we changed it's name when we learned that [PyJs](http://pyjs.org/), 
 a Python to Javascript compiler, was formerly named Pyjamas as well.
 
-
-## Try It
-[View in GitHub Pages](https://modularizer.github.io/pyprez/)
-<div id="tryitContainer0"></div>
-
-<pyprez-console rows="8" cols="80"></pyprez-console>
-
-
 # Pyprez Tags
 ## Pyprez-Editor
  The `<pyprez-editor>` tag is similar to the  `<pyprez-script>` tag, except instead of executing as soon as possible when the page is loaded, the tag provides a [CodeMirror](https://codemirror.net/6/) text editor element and does not execute until the gutter start button has been pressed. Then, the editor runs the code, streaming STDOUT and STDERR to the console, and the displays the result as a string in the editor. Additionally, the element can be reset and the code can be modified and rerun.
@@ -71,21 +65,22 @@ a Python to Javascript compiler, was formerly named Pyjamas as well.
  By default, the `<pyprez-editor>` tag evaulates Python in pyodide's CPython interpreter, but if the `language` attribute is set to "javascript" or if the src
  address ends with `.js`, the editor will run the code in javascript instead.
  
- ### python example
-
+### pyprez-editor example
+[View in GitHub Pages](https://modularizer.github.io/pyprez#pyprez-editorexample)
  ```html
  <pyprez-editor>
 	 import numpy as np
 	np.random.rand(5)
 </pyprez-editor>
 ```
-
- <pyprez-editor>
+<details style="display:none">
+	<pyprez-editor>
 	 import numpy as np
-	np.random.rand(5)
-</pyprez-editor>
+	 np.random.rand(5)
+	</pyprez-editor>
+</details>
 
- ### javascript example
+### javascript example
 
 ```html
 pyprez.loadAndRunAsync(`
@@ -102,11 +97,12 @@ pyprez.loadAndRunAsync(`
  
  [Pyodide's own console](https://pyodide.org/en/stable/console.html)  has much more support.
 
-#### examples
-
+#### pyprez-console example
+[View in GitHub Pages](https://modularizer.github.io/pyprez#pyprez-consoleexample)
 ```html
 <pyprez-console></pyprez-console>
 ```
+<pyprez-console></pyprez-console>
 
 ```html
 <pyprez-console rows="10" cols="80"></pyprez-console>
@@ -122,8 +118,7 @@ The package names are selected from the text using the [regular expression](http
 
 **note**: *the `==version` syntax used by `pip freeze` is ignored by the RegExp above, so specifying versions will not cause an error, but will not actually load that particular version, because this is not supported by pyodide*
 
-#### examples
-
+#### pyprez-import example
  ```html
  <pyprez-import>
 	- numpy
@@ -138,12 +133,12 @@ The package names are selected from the text using the [regular expression](http
  ## Pyprez-Script
  The `<pyprez-script>` tag allows you to run Python code using `pyprez.loadAndRunAsync`, which uses [`pyodide.loadPackageFromImports`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpac#pyodide.loadPackagesFromImports) followed by [`pyodide.runPythonAsync`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=runpythona#pyodide.runPythonAsync). Accepted inputs are either innerHTML or a `src` attribute linking to a python file.
 
-#### examples
-
+#### pyprez-script example
+[View in GitHub Pages](https://modularizer.github.io/pyprez#pyprez-scriptexample)
  ```html
- <pyprez-script src="./my-script.py"></pyprez-script>
+ <pyprez-script src="./sample_front_end_python.py"></pyprez-script>
 ```
-
+<pyprez-script src="./sample_front_end_python.py"></pyprez-script>
 ```html
  <pyprez-script id="testScript">
 	 from js import document
@@ -154,7 +149,7 @@ The package names are selected from the text using the [regular expression](http
 	 el.innerText = str(datetime.datetime.now().isoformat())
 </pyprez-script>
 ```
-
+<details style="display:none">
  <pyprez-script id="testScript">
 	 from js import document
 	 import datetime
@@ -163,12 +158,13 @@ The package names are selected from the text using the [regular expression](http
 	 el.style.display = "block"
 	 el.innerText = str(datetime.datetime.now().isoformat())
 </pyprez-script>
+</details>
 
 # CodeMirror Themes
 set the `theme` attribute of the `script` import element or `pyprez-editor` element to use a special CodeMirror theme, e.g. `theme="darcula"`.
 see available themes at https://codemirror.net/5/demo/theme.html 
 
- ### python example
+### python example
 
  ```html
  <pyprez-editor theme="darcula">
@@ -176,11 +172,12 @@ see available themes at https://codemirror.net/5/demo/theme.html
 	 np.random.rand(5)
 </pyprez-editor>
 ```
-
+<details style="display:none">
  <pyprez-editor theme="darcula">
 	 import numpy as np
 	 np.random.rand(5)
 </pyprez-editor>
+</details>
 
 # Using On Stack Overflow
 Theoretically this could be used on StackOverflow for python debugging.
@@ -286,8 +283,11 @@ Unfortunately, [**PyScript**](https://pyscript.net/) has more drawbacks than fea
 Pyscript seems to be so focused on making web development "accessible" to Python developers, that they ended up removing most of the Pyodide functionality developers are looking for and instead made a **slow, bulky, buggy, front-end version of a [Jupyter notebook](https://jupyter.org/).**
 
 
- <details style="display:none">
+<details style="display:none">
 	<summary>Scripts which make GitHub Pages page interactive</summary>
 	<script src="https://modularizer.github.io/pyprez/pyprez.js"></script>
+	<script>
+		Array.from(document.getElementsByTagName('details')).map(el=>{el.style.display="block"})
+	</script>
 </details>
  
