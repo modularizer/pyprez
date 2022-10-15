@@ -10,5 +10,11 @@
     print("testing")
     np.random.rand(5)
 </script>
+<pyprez-editor language="js">
+pyprez.loadAndRunAsync(`
+	from js import alert
+	alert("pyodide object has loaded and is available at window.pyodide")
+`)
+</pyprez-editor>
 </body>
 </html>

@@ -371,7 +371,7 @@ Pyscript seems to be so focused on making web development "accessible" to Python
 
         let jscripts = Array.from(document.querySelectorAll('.language-javascript'));
         jscripts.map(el=>{
-            let parent = document.createElement("pyprez-editor");
+            let parent = document.createElement("div");
             let content = el.innerText;
             
             parent.innerHTML = `<pyprez-editor language="js">${content}</pyprez-editor>`
