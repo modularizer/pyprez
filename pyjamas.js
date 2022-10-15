@@ -1,24 +1,24 @@
 /*
 Pyodide is undeniably cool, and useful in niche cases. Pyscript is easy to use, but is bulky, slow, not especially
-easy to develop on, and is not really necessary seeing as 95+% of its utility comes from Pyodide. With Pyjamas,
+easy to develop on, and is not really necessary seeing as 95+% of its utility comes from Pyodide. With Pyprez,
 99.9+% of utility comes from Pyodide. We're not claiming to do anything better, its just a simple script to get you
 started with exploring Pyodide's capabilities.
 
 To use...
-PLEASE INCLUDE THE ELEMENTS BELOW IN <head> to get allow pyjamas to function
+PLEASE INCLUDE THE ELEMENTS BELOW IN <head> to get allow pyprez to function
 
 <head>
 	<!-- import Pyodide-->
 	<script  src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
 
-	<!-- import CodeMirror to display pyjamas-editor tag-->
+	<!-- import CodeMirror to display pyprez-editor tag-->
 	<script defer src="https://codemirror.net/mode/python/python.js"></script>
 	<link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/>
 	<script src="https://codemirror.net/lib/codemirror.js"></script>
 	<style> .CodeMirror { border: 1px solid #eee; height: auto; } </style>
 
-	<!-- import Pyjamas -->
-	<script src="./pyjamas.js"></script>
+	<!-- import Pyprez -->
+	<script src="./pyprez.js"></script>
 </head>
 
 */
@@ -30,7 +30,7 @@ let jsDependencies = [
 ]
 let cssDependencies = ["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.css"]
 let get = src => fetch(src).then(r=>r.text())
-Array.from(document.querySelectorAll('.pyjamas')).map(el=>{el.opacity=0})
+Array.from(document.querySelectorAll('.pyprez')).map(el=>{el.opacity=0})
 function importScript(url){
     let el = document.createElement("script")
     el.src = url;
@@ -49,10 +49,10 @@ if (document.currentScript.innerHTML){
     let mode = document.currentScript.getAttribute("mode")
     mode = mode?mode:"editor";
     let a = document.createElement("a");
-    a.href="https://modularizer.github.io/pyjamas"
+    a.href="https://modularizer.github.io/pyprez"
     a.innerHTML = `<img src="https://github.com/favicon.ico" height="15px"></a>`
     document.body.append(a)
-    let el = document.createElement("pyjamas-" + mode);
+    let el = document.createElement("pyprez-" + mode);
     el.innerHTML = document.currentScript.innerHTML;
     document.body.append(el)
 }
@@ -74,38 +74,38 @@ function loadDependencies(){
 }
 var loaded = loadDependencies();
 
-var PYJAMAS_DEBUG = true // whether to log to console.debug or not
-function pyjamasDebug(){
-    if (PYJAMAS_DEBUG){
+var PYPREZ_DEBUG = true // whether to log to console.debug or not
+function pyprezDebug(){
+    if (PYPREZ_DEBUG){
         console.debug(...arguments)
     }
 }
-if (PYJAMAS_DEBUG){ // if debugging, start some timers
-    console.time("pyjamas-env load") // time how long it takes the pyjamas environment to load (relative to when this script is run)
+if (PYPREZ_DEBUG){ // if debugging, start some timers
+    console.time("pyprez-env load") // time how long it takes the pyprez environment to load (relative to when this script is run)
     console.time("pyodide load") // time how long it takes the pyodide object to load(relative to when this script is run)
 }
 
 /* ___________________________________________________ LOADER ___________________________________________________ */
-class Pyjamas{
+class Pyprez{
     /*class which loads pyoidide and provides utility to allow user to load packages and run code as soon as possible
     examples:
-        var pyjamas = new Pyjamas();
+        var pyprez = new Pyprez();
 
         // use pyodide as soon as it loads
-        let promiseToFour = pyjamas.then(pyodide => {
+        let promiseToFour = pyprez.then(pyodide => {
                 console.log("pyodide has loaded");
                 return pyodide.runPython("2+2")
             });
 
         // load dependencies and run some code as soon as it loads
-        let promiseToRandom = pyjamas.loadAndRunAsync(`
+        let promiseToRandom = pyprez.loadAndRunAsync(`
                 import numpy as np
                 np.random.rand(5)
             `);
 
         //reroute stdout to a new javascript function
-        pyjamas.stdout = alert;
-        pyjamas.loadAndRunAsync(`print("testing if this alerts on window")`);
+        pyprez.stdout = alert;
+        pyprez.loadAndRunAsync(`print("testing if this alerts on window")`);
     */
     constructor(config={}){
         // bind the class methods to this instance
@@ -130,12 +130,12 @@ class Pyjamas{
             let requirementsLoaded;
             if (requirements === "detect"){
                 if (code){
-                    pyjamasDebug("auto loading packages detected in code")
-                    pyjamasDebug(code)
+                    pyprezDebug("auto loading packages detected in code")
+                    pyprezDebug(code)
                     requirementsLoaded = pyodide.loadPackagesFromImports(code)
                 }
             }else{
-                pyjamasDebug("loading", requirements)
+                pyprezDebug("loading", requirements)
                 requirementsLoaded = pyodide.loadPackage(requirements);
             }
             return requirementsLoaded
@@ -153,13 +153,13 @@ class Pyjamas{
     }
     _runPythonAsync(pyodide, code){
         if (code){
-            pyjamasDebug("running code asynchronously:")
-            pyjamasDebug(code)
+            pyprezDebug("running code asynchronously:")
+            pyprezDebug(code)
             return pyodide.runPythonAsync(code)
         }
     }
 
-    // allow pyjamas object to act a bit like a the promise to the pyodide object
+    // allow pyprez object to act a bit like a the promise to the pyodide object
     then(successCb, errorCb){return this.promise.then(successCb, errorCb)}
     catch(errorCb){return this.promise.catch(errorCB)}
 
@@ -174,7 +174,7 @@ class Pyjamas{
             config = Object.assign(defaultConfig, config)
 
             // load pyodide then resolve or reject this.promise
-            loadPyodide(config).then(this._resolvePromise).then(r=>Array.from(document.querySelectorAll('.pyjamas')).map(el=>{el.opacity=1})).catch(this._rejectPromise);
+            loadPyodide(config).then(this._resolvePromise).then(r=>Array.from(document.querySelectorAll('.pyprez')).map(el=>{el.opacity=1})).catch(this._rejectPromise);
         }).bind(this))
 
 
@@ -183,101 +183,101 @@ class Pyjamas{
     }
     _onload(pyodide){
         /*set the window variable and the class attribute of pyodide as soon as pyodide is loaded*/
-        if (PYJAMAS_DEBUG){
+        if (PYPREZ_DEBUG){
             console.timeEnd("pyodide load");
         }
         window.pyodide = pyodide;
         this.pyodide = pyodide;
     }
 }
-var pyjamas = new Pyjamas();
+var pyprez = new Pyprez();
 
 /* ___________________________________________________ ENV ___________________________________________________ */
-class PyjamasEnv extends HTMLElement{
+class PyprezEnv extends HTMLElement{
     /*
-    custom element with the <pyjamas-env></pyjamas-env> tag which is used to load required packages into pyodide
+    custom element with the <pyprez-env></pyprez-env> tag which is used to load required packages into pyodide
 
     examples:
-        <pyjamas-env>
+        <pyprez-env>
             numpy
             matplotlib
-        </pyjamas-env>
-        <pyjamas-env>
+        </pyprez-env>
+        <pyprez-env>
             -scipy
             -asyncio
-        </pyjamas-env>
-        <pyjamas-env src="requirements.txt"></pyjamas-env>
+        </pyprez-env>
+        <pyprez-env src="requirements.txt"></pyprez-env>
     */
     constructor(){
         super();
-        this.classList.add("pyjamas");
+        this.classList.add("pyprez");
         this.style.display = "none";
         let requirements = [...this.innerText.matchAll(this.re)].map(v=>v[1]);
         if (requirements.length){
-            pyjamasDebug("importing requirements ", requirements, " from <pyjamas-env/>", this)
-            pyjamas.then(pyo=>pyo.loadPackage(requirements)).then(()=>{
-                if (PYJAMAS_DEBUG){
-                    console.timeEnd("pyjamas-env load")
+            pyprezDebug("importing requirements ", requirements, " from <pyprez-env/>", this)
+            pyprez.then(pyo=>pyo.loadPackage(requirements)).then(()=>{
+                if (PYPREZ_DEBUG){
+                    console.timeEnd("pyprez-env load")
                 }});
         }
     }
     re = /\s*-?\s*(.*?)\s*[==[0-9|.]*]?\s*[,|;|\n]/g
 }
 window.addEventListener("load", ()=>{
-    customElements.define("pyjamas-env", PyjamasEnv);
+    customElements.define("pyprez-env", PyprezEnv);
 })
 
 /* ___________________________________________________ SCRIPT ___________________________________________________ */
-class PyjamasScript extends HTMLElement{
+class PyprezScript extends HTMLElement{
     /*
     custom element which loads required packages and runs a block of python code in the pyodide interpreter
 
     example:
-        <pyjamas-script>
+        <pyprez-script>
             import numpy as np
             np.random.rand(5)
-        </pyjamas-script>
-        <pyjamas-script src="my-script.py"></pyjamas-script>
+        </pyprez-script>
+        <pyprez-script src="my-script.py"></pyprez-script>
     */
     constructor(){
         super();
-        this.classList.add("pyjamas");
+        this.classList.add("pyprez");
         this.style.display = "none";
         this.run = this.run.bind(this);
         if (this.hasAttribute("src") && this.getAttribute("src")){
-            pyjamasDebug("fetching script for pyjamas-script src", this.getAttribute("src"))
+            pyprezDebug("fetching script for pyprez-script src", this.getAttribute("src"))
             fetch(this.getAttribute("src")).then(r=>r.text()).then(this.run)
         }else{
             this.run(this.innerHTML);
         }
     }
     run(code){
-        pyjamasDebug("running code from <pyjamas-script>", code, this)
+        pyprezDebug("running code from <pyprez-script>", code, this)
         this.innerHTML = code;
-        this.promise = pyjamas.loadAndRunAsync(code).then(v=>this.value=v?v.toString():"")
+        this.promise = pyprez.loadAndRunAsync(code).then(v=>this.value=v?v.toString():"")
         return this.promise
     }
 }
 window.addEventListener("load", ()=>{
-    customElements.define("pyjamas-script", PyjamasScript);
+    customElements.define("pyprez-script", PyprezScript);
 })
 
 /* ___________________________________________________ EDITOR ___________________________________________________ */
-class PyjamasEditor extends HTMLElement{
+class PyprezEditor extends HTMLElement{
     /*
     custom element which allows editing a block of python code, then when you are ready, pressing run to
     load required packages and run the block of python code in the pyodide interpreter and see the result
 
     example:
-        <pyjamas-editor>
+        <pyprez-editor>
             import numpy as np
             np.random.rand(5)
-        </pyjamas-editor>
-        <pyjamas-editor src="my-script.py"></pyjamas-editor>
+        </pyprez-editor>
+        <pyprez-editor src="my-script.py"></pyprez-editor>
     */
     constructor(){
         super();
-        this.classList.add("pyjamas");
+        this.classList.add("pyprez");
         this.loadEl = this.loadEl.bind(this);
         this.loadEditor = this.loadEditor.bind(this);
         this.language = "python"
@@ -294,7 +294,7 @@ class PyjamasEditor extends HTMLElement{
 
         if (this.hasAttribute("src") && this.getAttribute("src")){
             let src = this.getAttribute("src")
-            pyjamasDebug("fetching script for pyjamas-editor src", src)
+            pyprezDebug("fetching script for pyprez-editor src", src)
             if (src.endswith('.js')){
                 this.language = "javascript"
             }
@@ -382,7 +382,7 @@ class PyjamasEditor extends HTMLElement{
         let n = code.match(/import/g);
         if (n && n.length !== this.numImports){
             this.numImports = n.length;
-            pyjamas.load(this.code);
+            pyprez.load(this.code);
         }
     }
     executed = false
@@ -401,7 +401,7 @@ class PyjamasEditor extends HTMLElement{
             if (this.language == "python"){
                 this.code += "\n";
                 this.attachStd();
-                promise = pyjamas.loadAndRunAsync(code);
+                promise = pyprez.loadAndRunAsync(code);
                 promise.then(r=>{
                     this.code += "\n>>> " + (r?r.toString():"");
                     this.start.style.color = "red";
@@ -423,14 +423,14 @@ class PyjamasEditor extends HTMLElement{
         this.code += "\n" + v
     }
     attachStd(){
-        this.oldstdout = pyjamas.stdout
-        this.oldstderr = pyjamas.stderr
-        pyjamas.stdout = this.appendLine.bind(this)
-        pyjamas.stderr = this.appendLine.bind(this)
+        this.oldstdout = pyprez.stdout
+        this.oldstderr = pyprez.stderr
+        pyprez.stdout = this.appendLine.bind(this)
+        pyprez.stderr = this.appendLine.bind(this)
     }
     detachStd(r){
-        pyjamas.stdout = this.oldstdout
-        pyjamas.stderr = this.oldstderr
+        pyprez.stdout = this.oldstdout
+        pyprez.stderr = this.oldstderr
         return r
     }
     reload(){
@@ -441,21 +441,21 @@ class PyjamasEditor extends HTMLElement{
     }
 }
 window.addEventListener("load", ()=>{
-    customElements.define("pyjamas-editor", PyjamasEditor);
+    customElements.define("pyprez-editor", PyprezEditor);
 })
 
 /* ___________________________________________________ REPL ___________________________________________________ */
-class PyjamasRepl extends HTMLElement{
+class PyprezRepl extends HTMLElement{
     /*
     simple and customizable Python REPL terminal emulator
 
     examples:
-        <pyjamas-repl></pyjamas-repl>
-        <pyjamas-repl style="background-color:yellow;color:black"></pyjamas-repl>
+        <pyprez-repl></pyprez-repl>
+        <pyprez-repl style="background-color:yellow;color:black"></pyprez-repl>
     */
     constructor(){
         super();
-        this.classList.add("pyjamas");
+        this.classList.add("pyprez");
         this.attachStd = this.attachStd.bind(this)
         this.detachStd = this.detachStd.bind(this)
         this.id = 'repl' + Math.floor(10000*Math.random())
@@ -483,7 +483,7 @@ class PyjamasRepl extends HTMLElement{
         this.eval = this.eval.bind(this);
 
         if (this.language === "python"){
-            pyjamas.loadAndRunAsync(`
+            pyprez.loadAndRunAsync(`
                 import sys
                 s = f"""Python{sys.version}
                 Type "help", "copyright", "credits" or "license" for more information."""
@@ -502,7 +502,7 @@ class PyjamasRepl extends HTMLElement{
             Type "help", "copyright", "credits" or "license" for more information."""
             s
         `
-        pyjamas.loadAndRunAsync(code).then(this.print)
+        pyprez.loadAndRunAsync(code).then(this.print)
     }
     get text(){return this.textarea.value}
     set text(v){this.textarea.value = v}
@@ -525,20 +525,20 @@ class PyjamasRepl extends HTMLElement{
         return res
     }
     attachStd(){
-        this.oldstdout = pyjamas.stdout
-        this.oldstderr = pyjamas.stderr
-        pyjamas.stdout = this.appendLine.bind(this)
-        pyjamas.stderr = this.appendLine.bind(this)
+        this.oldstdout = pyprez.stdout
+        this.oldstderr = pyprez.stderr
+        pyprez.stdout = this.appendLine.bind(this)
+        pyprez.stderr = this.appendLine.bind(this)
     }
     detachStd(r){
-        pyjamas.stdout = this.oldstdout
-        pyjamas.stderr = this.oldstderr
+        pyprez.stdout = this.oldstdout
+        pyprez.stderr = this.oldstderr
         return r
     }
     eval(code){
         if (this.language === "python"){
             this.attachStd()
-            let r = pyjamas.loadAndRunAsync(code)
+            let r = pyprez.loadAndRunAsync(code)
             .then(this.detachStd, this.detachStd)
             .then(this.printResult)
             return r
@@ -573,6 +573,6 @@ class PyjamasRepl extends HTMLElement{
     }
 }
 window.addEventListener("load", ()=>{
-    customElements.define("pyjamas-repl", PyjamasRepl);
+    customElements.define("pyprez-repl", PyprezRepl);
 })
 

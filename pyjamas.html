@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Pyjamas</title>
+    <title>Pyprez</title>
 
     <!-- load Pyodide which provides core functionality -->
     <script src="https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js"></script>
 
-    <!-- load CodeMirror to make pyjamas-editor elements prettier -->
+    <!-- load CodeMirror to make pyprez-editor elements prettier -->
     <link rel="stylesheet" href = "https://codemirror.net/lib/codemirror.css"/>
     <script src="https://codemirror.net/lib/codemirror.js"></script>
     <script defer src="https://codemirror.net/mode/python/python.js"></script>
@@ -17,40 +17,40 @@
           height: auto;
         }
     </style>
-    <script src="./just_pyjamas.js"></script>
+    <script src="./just_pyprez.js"></script>
 </head>
 <body>
     <!-- pre-load libraries if you wish -->
-    <pyjamas-env>
+    <pyprez-env>
         -numpy
-    </pyjamas-env>
+    </pyprez-env>
 
     <!-- play around with a simple terminal emulator -->
-    <pyjamas-repl style="background-color:yellow;color:#000"></pyjamas-repl>
+    <pyprez-repl style="background-color:yellow;color:#000"></pyprez-repl>
 
     <!-- edit and test python code -->
-    <pyjamas-editor>
+    <pyprez-editor>
         import js
         import numpy as np
         x = np.arange(10)
         for v in x:
             print(v)
         x
-    </pyjamas-editor>
+    </pyprez-editor>
 
     <!-- edit and test python code from a file -->
-    <pyjamas-editor src="./sample_front_end_python.py"></pyjamas-editor>
+    <pyprez-editor src="./sample_front_end_python.py"></pyprez-editor>
 
     <!-- this script will run as soon as possible once the page loads and pyodide loads -->
-    <pyjamas-script src="./sample_front_end_python.py"></pyjamas-script>
+    <pyprez-script src="./sample_front_end_python.py"></pyprez-script>
 
     <!-- this script will run as soon as possible once the page loads and pyodide loads -->
-    <pyjamas-script>
+    <pyprez-script>
         from js import document
         el = document.createElement("div");
         el.innerText = "Hello, World"
         document.body.append(el);
         print("this should print in the console");
-    </pyjamas-script>
+    </pyprez-script>
 </body>
 </html>

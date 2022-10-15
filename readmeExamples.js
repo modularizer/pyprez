@@ -2,10 +2,10 @@
 let link = document.createElement("link")
 link.setAttribute("rel", "icon")
 link.setAttribute("type", "image/x-icon")
-link.setAttribute("href", "https://modularizer.github.io/pyjamas/favicon.ico")
+link.setAttribute("href", "https://modularizer.github.io/pyprez/favicon.ico")
 document.head.append(link)
 
-let el = document.createElement("pyjamas-script")
+let el = document.createElement("pyprez-script")
 el.id = "testScript"
 el.innerHTML = `
     from js import document
@@ -27,7 +27,7 @@ import time # import Python builitins
 
 import numpy as np # import packages from standard library
 
-print("this will show up in the Developer Console because 'stdout' has been piped to 'console.log' via 'pyjamas.stdout = console.log'")
+print("this will show up in the Developer Console because 'stdout' has been piped to 'console.log' via 'pyprez.stdout = console.log'")
 
 x = np.random.rand(5)
 js.alert(x.tolist())
@@ -41,24 +41,24 @@ np.random.rand(5)
 }
 
 for (let [id, code] of Object.entries(editors)){
-    let el = document.createElement("pyjamas-editor")
+    let el = document.createElement("pyprez-editor")
     el.innerHTML = code
     document.getElementById(id).append(el);
 }
 
 let jsEditors = {
 	jseditor0:
-"pyjamas.loadAndRunAsync(`\n"+
+"pyprez.loadAndRunAsync(`\n"+
 "	from js import alert\n"+
 "	alert('pyodide object has loaded and is available at window.pyodide')\n"+
 "`)",
 	thencatch:
-"pyjamas.then(pyodide => pyodide.runPythonAsync(`\n"+
+"pyprez.then(pyodide => pyodide.runPythonAsync(`\n"+
 "	from js import alert\n"+
 "	alert('pyodide object has loaded and is available at window.pyodide')\n"+
 "`))",
 	loadandrunasync:
-"pyjamas.loadAndRunAsync(`\n"+
+"pyprez.loadAndRunAsync(`\n"+
 "	from js import alert\n"+
 "	alert('pyodide object has loaded and is available at window.pyodide')\n"+
 "`)",
@@ -69,10 +69,10 @@ let jsEditors = {
 "	el.style.color = color\n"+
 "	document.getElementById('stdouttarget').append(el)\n"+
 "}\n"+
-"pyjamas.stdout = appendText\n"+
-'pyjamas.stderr = m => appendText(m, "red")\n'+
+"pyprez.stdout = appendText\n"+
+'pyprez.stderr = m => appendText(m, "red")\n'+
 "\n"+
-"pyjamas.loadAndRunAsync(`\n"+
+"pyprez.loadAndRunAsync(`\n"+
 "for i in range(10):\n"+
 "	print(i)\n"+
 "raise Exception('testing stderr')\n"+
@@ -80,7 +80,7 @@ let jsEditors = {
 }
 
 for (let [id, code] of Object.entries(jsEditors)){
-    let el = document.createElement("pyjamas-editor")
+    let el = document.createElement("pyprez-editor")
     el.innerHTML = code
     el.setAttribute("language", "javascript")
     document.getElementById(id).append(el);

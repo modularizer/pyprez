@@ -18,4 +18,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         tornado.ioloop.IOLoop.current().stop()
 
-    print("go to http://localhost/pyjamas.html in your browser")
+    print("go to http://localhost/pyprez.html in your browser")
