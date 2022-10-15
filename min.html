@@ -5,13 +5,38 @@
     <title>PyPrez</title>
 </head>
 <body>
-<script src="./pyprez.js" mode="editor">
+<script src="https://modularizer.github.io/pyprez/pyprez.js"></script>
+<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
     import numpy as np
-
-    if __name__ == "__main__":
-        print("testing")
-        print(np.random.rand(5))
-
+    print("testing")
+    np.random.rand(5)
 </script>
+<script>
+        let fav = document.createElement("link");
+        fav.setAttribute("rel","icon");
+        fav.setAttribute("type","image/x-icon");
+        fav.setAttribute("href", "https://modularizer.github.io/pyprez/favicon.ico");
+        document.head.appendChild(fav);
+
+
+        let scripts = Array.from(document.querySelectorAll('.language-html'));
+
+        let i = 0;
+        scripts.map(el=>{
+            let parent;
+            if (i){
+                parent = document.createElement("div");
+                parent.innerHTML = el.innerText.replaceAll("\x3C","<");
+            }else{
+                parent.innerHTML = `<pyprez-editor mode="editor" id="gettingstarted">
+                    import numpy as np
+                    print("testing")
+                    np.random.rand(5)
+                </pyprez-editor>`
+            }
+            el.after(parent);
+            i += 1;
+        })
+	</script>
 </body>
 </html>

@@ -309,9 +309,8 @@ Pyscript seems to be so focused on making web development "accessible" to Python
 
         let i = 0;
         scripts.map(el=>{
-            let parent;
+            let parent = document.createElement("div");
             if (i){
-                parent = document.createElement("div");
                 parent.innerHTML = el.innerText.replaceAll("\x3C","<");
             }else{
                 parent.innerHTML = `<pyprez-editor mode="editor" id="gettingstarted">
