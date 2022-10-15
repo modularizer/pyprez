@@ -236,7 +236,6 @@ until the viewer clicks `Run Code Snippet` to see and interact with the editable
 <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
 <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered">View on StackOverflow</a>
 <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534">
-<a>Try on live page</a>
 <img src="./sample_imgs/stack-overflow.png"/>
 </a>
 
@@ -368,6 +367,16 @@ Pyscript seems to be so focused on making web development "accessible" to Python
             }
             el.after(parent);
             i += 1;
+        })
+
+        let jscripts = Array.from(document.querySelectorAll('.language-javascript'));
+        jscripts.map(el=>{
+            let parent = document.createElement("pyprez-editor");
+            let content = el.innerText;
+            
+            parent.innerHTML = `<pyprez-editor language="js">${content}</pyprez-editor>`
+            console.log(parent)
+            el.after(parent);
         })
 	</script>
 </details>
