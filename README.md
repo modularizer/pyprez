@@ -304,10 +304,10 @@ raise Exception("testing stderr")
 
 In GitHubPages, output will appear in the element below: <br/>
 <div id="stdoutstderr">
-<b/>stdoutstderr</b>
+<b>stdoutstderr</b>
 </div>
 <div id="stdouttarget">
-<b/>stdouttarget</b>
+<b>stdouttarget</b>
 </div>
 
 
