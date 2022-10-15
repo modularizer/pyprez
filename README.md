@@ -61,6 +61,14 @@ To add to a StackOverflow question or answer, copy-paste the markdown below into
 <img src="./sample_imgs/stack-overflow.png"/>
 </a>
 
+### Regular User?
+Add a bookmark to your browser with the following text as the url.
+```
+javascript:navigator.clipboard.writeText('<!-- begin snippet: js hide: false console: false babel: false --> \n<!-- language: lang-html --> \n<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">\n    # your code here\n</script>\n<!-- end snippet -->')
+```
+
+Clicking on the bookmark will copy the code you need to your clipboard, then you can paste it into the StackOverflow question/answer.
+
 ## About
 **pyprez** is a minimal _javascript_ package which allows you to **present** runnable python samples in the browser.
  
