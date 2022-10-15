@@ -76,7 +76,7 @@ a Python to Javascript compiler, was formerly named Pyjamas as well.
 [View in GitHub Pages](https://modularizer.github.io/pyprez#pyprez-editorexample)
  ```html
  <pyprez-editor>
-	 import numpy as np
+    import numpy as np
 	np.random.rand(5)
 </pyprez-editor>
 ```
