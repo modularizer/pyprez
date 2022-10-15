@@ -84,6 +84,10 @@ a Python to Javascript compiler, was formerly named Pyjamas as well.
 </pyprez-editor>
 ```
 
+ ```html
+ <pyprez-editor src="./sample_front_end_python.py"></pyprez-editor>
+```
+
 ### javascript example
 
 ```javascript
@@ -147,9 +151,6 @@ because this is not supported by pyodide*
 
 #### pyprez-script example
 [View in GitHub Pages](https://modularizer.github.io/pyprez#pyprez-scriptexample)
- ```html
- <pyprez-script src="./sample_front_end_python.py"></pyprez-script>
-```
 ```html
  <pyprez-script id="testScript">
 	 from js import document
