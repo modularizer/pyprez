@@ -256,8 +256,13 @@ raise Exception("testing stderr")
 `)
 ```
 
-<div id="stdoutstderr"></div>
-<div id="stdouttarget"></div>
+In GitHubPages, output will appear in the element below: <br/>
+<div id="stdoutstderr">
+<b/>stdoutstderr</b>
+</div>
+<div id="stdouttarget">
+<b/>stdouttarget</b>
+</div>
 
 
 ## Pyodide
@@ -288,7 +293,6 @@ Pyscript seems to be so focused on making web development "accessible" to Python
 
 <details style="display:none">
 	<summary>Scripts which make GitHub Pages page interactive</summary>
-	<script src="https://modularizer.github.io/pyprez/pyprez.js"></script>
 	<script>
         let scripts = Array.from(document.querySelectorAll('.language-html'));
         scripts.map(el=>{
