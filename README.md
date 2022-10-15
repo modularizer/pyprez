@@ -8,7 +8,7 @@
 
 ## Getting Started
 ```html
-<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor" id="gettingstarted">
+<script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
     import numpy as np
     print("testing")
     np.random.rand(5)
@@ -306,18 +306,22 @@ Pyscript seems to be so focused on making web development "accessible" to Python
 
 
         let scripts = Array.from(document.querySelectorAll('.language-html'));
+
+        let i = 0;
         scripts.map(el=>{
-            let parent = document.createElement("div");
-            if (el.id === "gettingstarted"){
+            let parent;
+            if (i){
+                parent = document.createElement("div");
                 parent.innerHTML = el.innerText.replaceAll("\x3C","<");
             }else{
                 parent.innerHTML = `<pyprez-editor mode="editor" id="gettingstarted">
                     import numpy as np
                     print("testing")
                     np.random.rand(5)
-                </pyprez-editor>
+                </pyprez-editor>`
             }
             el.after(parent);
+            i += 1;
         })
 	</script>
 </details>
