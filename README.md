@@ -71,9 +71,9 @@ To add to a StackOverflow question or answer, copy-paste the markdown below into
 ### Regular User?
 Add a bookmark to your browser with the following text as the url.
 ```
-javascript:navigator.clipboard.writeText('<!-- begin snippet: js hide: false console: false babel: false --> \n\n  <!-- language: lang-html --> \n\n  <script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">\n    # your code here\n\n</script>\n\n<!-- end snippet -->')
+javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    "); let clip=navigator.clipboard.readText(); let c = sel; navigator.clipboard.writeText('<!-- begin snippet: js hide: false console: false babel: false --> \n\n  <!-- language: lang-html --> \n\n  <script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">\n    # your code here\n    ' + c + '\n  </script>\n\n<!-- end snippet -->')})()
 ```
-
+First either highlight the python you want to use or copy it to your clipboard.
 Clicking on the bookmark will copy the code you need to your clipboard, then you can paste it into the StackOverflow question/answer.
 
 ## About
