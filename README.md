@@ -17,12 +17,17 @@ Run **client-side python** in your browser to demo code.
     np.random.rand(5)
 </script>
 ```
+
+**Double Click on press Green Arrow to run code**
 <a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
 <a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered">Try on live page</a>
 <a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered">
 <img src="./sample_imgs/getting-started-editor.png" />
 </a>
 
+**NOTE: If this is the first time using pyodide on your device, it will take extra long to load (especially on mobile)**
+
+Options:
 * `mode="editor"(default),"console","script","import"`
 * `stdout="true"(default)(logs to textbox), or "false"(logs to console)`
 

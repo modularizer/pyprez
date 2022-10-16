@@ -420,6 +420,10 @@ class PyPrezEditor extends HTMLElement{
             else if (e.key == "Backspace"){this.reset(); e.preventDefault();}
         }
     }
+    dblclicked(e){
+        console.log("double clicked")
+        this.run();
+    }
     loadEl(){
         let lines = this.innerHTML.replaceAll("\t","    ").split("\n")
         let indent = " ".repeat(Math.min(...lines.filter(v=>v).map(v=>v.match(/\s*/)[0].length)));
@@ -441,8 +445,9 @@ class PyPrezEditor extends HTMLElement{
         }
     }
     _loadEditor(){
+    // ➤ is &#10148;
         this.innerHTML = `
-        <div style="color:green">➤</div>
+        <div style="color:green">&#10148;</div>
         <textarea style="height:auto;width:auto;">${this.initialCode}</textarea>
         `
         this.start = this.children[0]
@@ -471,6 +476,10 @@ class PyPrezEditor extends HTMLElement{
         });
         this.editor.on("keydown", this.loadPackages.bind(this));
         this.editor.doc.setGutterMarker(0, "start", this.start);
+
+        console.log("attaching dblclick", this.editor.display.lineDiv)
+        this.editor.display.lineDiv.addEventListener("dblclick", this.dblclicked.bind(this))
+
     }
     get code(){
         return this.editor?this.editor.getValue():this.textarea.value
@@ -509,9 +518,10 @@ class PyPrezEditor extends HTMLElement{
         }
     }
     run(){
-        if (this.code && !this.executed){
-            this.executed = this.code;
-            let code = this.code;
+        if (this.code){
+            this.executed = this.code.split("____________________________________\n")[0];
+            this.code = this.executed;
+            let code = this.executed;
             let promise;
             if (this.language == "python"){
                 this.code += "____________________________________\n";
@@ -523,7 +533,8 @@ class PyPrezEditor extends HTMLElement{
                 promise.then(r=>{
                     this.code += "\n>>> " + (r?r.toString():"");
                     this.start.style.color = "red";
-                    this.start.innerHTML = "↻";
+//                    this.start.innerHTML = "↻";
+                    this.start.innerHTML = "&#8635";
                     if (this.getAttribute("stdout") === "true"){
                         this.detachStd();
                     }
@@ -533,7 +544,8 @@ class PyPrezEditor extends HTMLElement{
                 let r = eval(code)
                 this.code += "\n>>> " + JSON.stringify(r, null, 2);
                 this.start.style.color = "red";
-                this.start.innerHTML = "↻";
+//                this.start.innerHTML = "↻";
+                this.start.innerHTML = "&#8635";
                 return r
             }
         }
@@ -554,7 +566,8 @@ class PyPrezEditor extends HTMLElement{
         return r
     }
     reload(){
-        this.start.innerHTML = "➤";
+//        this.start.innerHTML = "➤";
+        this.start.innerHTML = "&#10148";
         this.start.style.color = "green";
         this.code = this.executed;
         this.executed = false;
