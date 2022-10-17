@@ -1,6 +1,7 @@
 # Welcome to **pyprez!**
 Run **client-side python** in your browser to **prez**ent your code.
-
+<div style="display:flex">
+<div style="width:50%">
 <a href="https://github.com/modularizer/pyprez"><img src="https://github.com/favicon.ico" height="30px"/></a>
 [GitHub](https://github.com/modularizer/pyprez) (view source code)<br/>
 
@@ -8,6 +9,35 @@ Run **client-side python** in your browser to **prez**ent your code.
 [GitHubPages](https://modularizer.github.io/pyprez) (interactive README)<br/>
 
 <a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments"><img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" height="30px"/></a><a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments">Contact</a> I'd love to here feedback on ideas on how to make this better!
+</div>
+<div style="width:50%">
+	<h2 id="quick-links">Quick Links:<a class="anchorjs-link " href="#quick-links" aria-label="Anchor" data-anchorjs-icon="" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+<ul>
+  <li><a href="#getting-started">Getting Started</a></li>
+  <li><a href="#use-on-stack-overflow">StackOverflow</a></li>
+  <li><a href="#about">About</a></li>
+  <li><a href="#use-cases">Use Cases</a></li>
+  <li><a href="#pyprez-tags">Tags</a>:
+  	<ul>
+ 	<li><a href="#pyprez-editor"><code class="language-plaintext highlighter-rouge">&lt;pyprez-editor&gt;</code></a></li>
+ 	<li><a href="#pyprez-console"><code class="language-plaintext highlighter-rouge">&lt;pyprez-console&gt;</code></a></li>
+ 	<li><a href="#pyprez-import"><code class="language-plaintext highlighter-rouge">&lt;pyprez-import&gt;</code></a></li>
+ 	<li><a href="#pyprez-script"><code class="language-plaintext highlighter-rouge">&lt;pyprez-script&gt;</code></a></li>
+	</ul>
+  <li><a href="#codemirror-themes">Custom Themes</a></li>
+  <li><a href="#pyprez-api">API</a>
+    <ul>
+      <li><a href="#elements"><code class="language-plaintext highlighter-rouge">pyprez.elements</code></a></li>
+      <li><a href="#thencatch"><code class="language-plaintext highlighter-rouge">pyprez.then/catch</code></a></li>
+      <li><a href="#loadandrunasync"><code class="language-plaintext highlighter-rouge">pyprez.loadAndRunAsync</code></a></li>
+      <li><a href="#stdoutstderr"><code class="language-plaintext highlighter-rouge">pyprez.stdout/stderr</code></a></li>
+    </ul>
+  </li>
+  <li><a href="#pyodide">Pyodide</a></li>
+  <li><a href="#pyscript">PyScript</a></li>
+</ul>
+</div>
+</div>
 
 # Getting Started
 **Double-Click or press Green Arrow to run code**
@@ -79,35 +109,6 @@ Meanwhile much of the visual style is provided by [CodeMirror](https://codemirro
 
 **pyprez** is inspired [**Pyscript**](#pyscript), a project backed by Anaconda which provided a useful interface for 
 pyodide also but introduced a [list of drawbacks](#pyscript-drawbacks) in the process.
-
-Similarly to PyScript's 
-[`<py-env>`](https://anaconda.cloud/api/files/803653a5-9b1e-41d4-a9ee-76c64b8d6cb4), 
-[`<py-script>`](https://anaconda.cloud/api/files/c57a6ef0-dbb7-43da-acd9-94a781ef2673) and 
-[`<py-repl>`](https://pyscript.net/examples/repl.html) tags, 
-Pyrez provides 
-[`<pyprez-editor>`](#pyprez-editor), 
-[`<pyprez-console>`](#pyprez-console), 
-[`<pyprez-import>`](#pyprez-import), 
-[`<pyprez-script>`](#pyprez-script) tags.
-
-## Quick Links:
-- [Getting Started](#getting-started)
-- [About](#about)
-- [StackOverflow](#use-on-stackoverflow)
-- [Use Cases](#use-cases)
-- [Tags](#pyprez-tags):
- 	- [`<pyprez-editor>`](#pyprez-editor)
- 	- [`<pyprez-console>`](#pyprez-console)
- 	- [`<pyprez-import>`](#pyprez-import)
- 	- [`<pyprez-script>`](#pyprez-script)
-- [Custom Themes](#codemirror-themes)
-- [API](#pyprez-api)
-    - [`pyprez.elements`](#elements)
- 	- [`pyprez.then/catch`](#thencatch)
- 	- [`pyprez.loadAndRunAsync`](#loadandrunasync)
- 	- [`pyprez.stdout/stderr`](#stdoutstderr)
-- [Pyodide](#pyodide)
-- [PyScript](#pyscript)
 
 # Use Cases
 Some cool things about **pyodide** which **pyprez** takes advantage of are:
