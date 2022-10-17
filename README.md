@@ -368,7 +368,7 @@ Pyscript seems to be so focused on making web development "accessible" to Python
 	<summary>Scripts which make GitHub Pages page interactive</summary>
     <script src="https://modularizer.github.io/pyprez/pyprez.js"></script>
 	<script>
-        document.addEvelentListener('load', ()=>{
+        document.addEventListener('load', ()=>{
         let sp = document.getElementById("stackplaceholder")
         sp.pyprezEditor.code = `
 import random
