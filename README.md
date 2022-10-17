@@ -36,7 +36,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 
 ## Method 2
 [Converter-Only Page](./stackconverter.html)
-<stack-converter codeblock="false" id="stackplaceholder"></stack-converter>
+<stack-converter id="stackplaceholder"></stack-converter>
 
 <img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
 
@@ -368,6 +368,7 @@ Pyscript seems to be so focused on making web development "accessible" to Python
 	<summary>Scripts which make GitHub Pages page interactive</summary>
     <script src="https://modularizer.github.io/pyprez/pyprez.js"></script>
 	<script>
+        document.addEvelentListener('load', ()=>{
         let sp = document.getElementById("stackplaceholder")
         sp.pyprezEditor.code = `
 import random
@@ -379,6 +380,7 @@ if __name__=="__main__":
     
     # now produce an error to debug
     print(x[2])`
+})
 
 
         let samples = Array.from(document.querySelectorAll('.nonrendered'));
