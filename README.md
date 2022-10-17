@@ -34,6 +34,10 @@ Run **client-side python** in your browser to **prez**ent your code.
 - [PyScript](#pyscript)
 
 # Use On Stack Overflow
+
+<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
+<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534">View a real answer</a>
+
 ## Method 1:
 ### step 1
 <img src="./sample_imgs/stack-overflow-start.png"/>
@@ -60,9 +64,6 @@ Convert your code here then copy-paste result into your question/answer. [Conver
 
 **It will render something like this**
 <img src="./sample_imgs/stack-overflow-sample.png"/>
-
-<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
-<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534">View a real answer</a>
 
 ## Method 3 
 ### StackOverflow Power User?
