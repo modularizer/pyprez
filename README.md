@@ -39,7 +39,7 @@ Run **client-side python** in your browser to **prez**ent your code.
   * make sure to add a comment or an import to the top of the python script (`# python` works). This will throw a javascript error and ensure the code runs only as python
 
 ## Method 2
-Convert your code here then copy-paste result into your question/answer. [Converter-Only Page](./stackconverter.html)
+Convert your code here then copy-paste result into your question/answer. [Converter-Only Page](https://modularizer.github.io/pyprez/stackconverter.html)
 <stack-converter id="stackplaceholder"></stack-converter>
 
 <img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
