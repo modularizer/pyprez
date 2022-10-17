@@ -75,6 +75,10 @@ Convert your code here then copy-paste result into your question/answer. [Conver
 4. paste to replace the highlighted text
 <img src="./sample_imgs/stack-bookmark.png"/>
 
+
+<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
+<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534">View live StackOverflow answer</a>
+
 ### Other options
 [PySnippet](https://github.com/pysnippet/pysnippet) is a super concise package which also allows you to demo python code on stack overflow.
 
