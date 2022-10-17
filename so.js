@@ -13,10 +13,12 @@ This js file will import pyodide and codemirror dependencies for you, so all you
 */
 
 document.addEventListener("DOMContentLoaded", () => {
-    let stackEditor = document.createElement("div");
-    document.body.appendChild(stackEditor);
-    let demoCode = document.scripts[document.scripts.length - 1].innerText.trim();
-    stackEditor.outerHTML = `<pyprez-editor>${demoCode}</pyprez-editor>`;
+    if (location.href !== "https://github.com/modularizer/pyprez"){
+        let stackEditor = document.createElement("div");
+        document.body.appendChild(stackEditor);
+        let demoCode = document.scripts[document.scripts.length - 1].innerText.trim();
+        stackEditor.outerHTML = `<pyprez-editor>${demoCode}</pyprez-editor>`;
+    }
 });
 
 // allow importing this script multiple times without raising an error
