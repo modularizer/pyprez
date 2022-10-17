@@ -53,12 +53,14 @@ test a live python question/answer without leaving the page.
 
 ## Method 3 
 ### StackOverflow Power User?
-Add a bookmark to your browser with the following text as the url.
-```
-javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    "); navigator.clipboard.writeText('<!-- begin snippet: js hide: false console: false babel: false --> \n\n  <!-- language: lang-js --> \n\n  ' + sel + '\n\n  <!-- language: lang-html --> \n\n  <script src="https://modularizer.github.io/pyprez/so.js"/><script>\n\n<!-- end snippet -->')})()
-```
-First either highlight the python you want to use or copy it to your clipboard.
-Clicking on the bookmark will copy the code you need to your clipboard, then you can paste it into the StackOverflow question/answer.
+1. Add a bookmark to your browser with the following text as the url.
+    ```
+    javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    ");if (sel.startsWith('```python')){sel = sel.replace('```python', '').slice(0,-3)} navigator.clipboard.writeText('\n\n\x3C!-- begin snippet: js hide: false console: false babel: false -->\n\n\x3C!-- language: lang-js -->\n\n    # py\n    ' + sel + '\n\x3C!-- language: lang-html -->\n\n    \x3Cscript src="https://modularizer.github.io/pyprez/so.js">\x3C/script>\n\n\n\x3C!-- end snippet -->')})()
+    ```
+2. highlight the python codeblock you want to use
+3. click on the bookmark
+4. paste to replace the highlighted text
+<img src="./sample_imgs/stack-overflow-sample.png"/>
 
 ### Other options
 [PySnippet](https://github.com/pysnippet/pysnippet) is a super concise package which also allows you to demo python code on stack overflow.
