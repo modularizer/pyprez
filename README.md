@@ -44,8 +44,7 @@ Convert your code here then copy-paste result into your question/answer. [Conver
 
 <img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
 
-**If** the viewer clicks `Run Code Snippet`, they will be able to edit and
-test a live python question/answer without leaving the page.
+**If** the viewer clicks `Run Code Snippet`, they will be able to edit and test a live python question or answer without leaving the page.
 
 **It will render something like this**
 <img src="./sample_imgs/stack-overflow-sample.png"/>
@@ -148,7 +147,7 @@ Front-end Python will never replace back-end computations, but may be useful for
 </a>
 
  ```html
- <pyprez-editor src="./sample_front_end_python.py"></pyprez-editor>
+ &ltpyprez-editor src="./sample_front_end_python.py"&gt&lt/pyprez-editor%gt
 ```
 
 ### javascript example
