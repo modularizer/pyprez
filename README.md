@@ -33,7 +33,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 1.  disable console logging
 2. paste the following into HTML or click `Add an external library` just the url
     ```html
-    <script src="https://modularizer.github.io/pyprez/so.js"></script>
+    &ltscript src="https://modularizer.github.io/pyprez/so.js"&gt&lt/script&gt
     ```
 3. write your python in the javascript box
   * make sure to add a comment or an import to the top of the python script (`# python` works). This will throw a javascript error and ensure the code runs only as python
@@ -215,7 +215,7 @@ because this is not supported by pyodide*
 ```
 
 ```html
- <pyprez-import src="./requirements.txt"></pyprez-import>
+ &ltpyprez-import src="./requirements.txt"&gt&lt/pyprez-import&gt
  ```
 
 ## Pyprez-Script
