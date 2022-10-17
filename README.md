@@ -397,7 +397,7 @@ Pyscript seems to be so focused on making web development "accessible" to Python
                     np.random.rand(5)
                 </pyprez-editor>`
             }else if (i==0){
-                parent.outerHTML = `<pyprez-editor mode="editor">
+                el.outerHTML = `<pyprez-editor mode="editor">
                     print("2^4=",2**4)
                 </pyprez-editor>`
             }
