@@ -739,9 +739,6 @@ class StackOverflow extends HTMLElement{
         this.innerHTML = this.getInnerHTML()
         pyprez.addElement(this);
     }
-    get addCodeblock(){ return this.hasAttribute("codeblock")?(this.getAttribute("codeblock")==="true"):true}
-    get addRunnable(){ return this.hasAttribute("runnable")?(this.getAttribute("runnable")=="true"):true}
-
     get header(){
         return this._header
     }
@@ -782,30 +779,24 @@ class StackOverflow extends HTMLElement{
        rx="2" />
   </g>
 </svg>
-${this.getBlock()}
 ${this.getRunnable()}
 </pre>
         `
     }
-    getBlock(){
-        console.log("addBlock", this.addCodeblock)
-        let r = this.addRunnable?"\n":""
-        let b = "```python\n" + this.code + "\n```" + r
-        return this.addCodeblock?b:""
-    }
     getRunnable(){
-        console.log("addRunnable", this.addRunnable)
-        return this.addRunnable?`${this.header}
+        return `${this.header}
 &lt!-- begin snippet: js hide: false console: false babel: false --&gt
 
-  &lt!-- language: lang-html --&gt
+  &lt!-- language: lang-js --&gt
 
-  &ltscript src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor"&gt
     ${this.code}
-  &lt/script&gt
+
+ &lt!-- language: lang-html --&gt
+
+    &ltscript src="https://modularizer.github.io/pyprez/so.js"&gt&lt/script&gt
 
 &lt!-- end snippet --&gt
-</pre>`:""
+</pre>`
     }
 }
 window.addEventListener("load", ()=>{
@@ -820,10 +811,6 @@ class StackOverflowConverter extends HTMLElement{
         console.warn("ih=", ih)
         let mode = this.hasAttribute("mode")?`mode=${this.getAttribute("mode")}`:"";
         let src = this.hasAttribute("src")?`src=${this.getAttribute("src")}`:"";
-        let cb = this.hasAttribute("codeblock")?`codeblock=${this.getAttribute("codeblock")}`:"";
-        let rb = this.hasAttribute("runnable")?`runnable=${this.getAttribute("runnable")}`:"";
-        let cbc = this.hasAttribute("codeblock")&(this.getAttribute("codeblock")=="false")?"":"checked"
-        let rbc = this.hasAttribute("runnable")&(this.getAttribute("runnable")=="false")?"":"checked"
         this.innerHTML = `
         <div style="display:flex">
             <div style="flex:50%">
@@ -840,36 +827,18 @@ class StackOverflowConverter extends HTMLElement{
                 </pyprez-editor>
             </div>
             <div style="flex:50%">
-                <input type="checkbox" ${cbc}>Add normal codeblock</input>
-                <input type="checkbox" ${rbc}>Make Runnable</input>
-                <stack-overflow ${cb} ${rb}>
-                </stack-overflow>
+                <stack-overflow></stack-overflow>
             </div>
         </div>
         `
-        this.codeblockCheck = this.children[1].children[1].children[0]
-        this.runnableCheck = this.children[1].children[1].children[1]
         this.pyprezEditor = this.children[1].children[0].children[0]
-        this.stackOverflow = this.children[1].children[1].children[2]
+        this.stackOverflow = this.children[1].children[1].children[0]
         this.sync()
-        this.codeblockCheck.addEventListener("change", this.codeblockChange.bind(this))
-        this.runnableCheck.addEventListener("change", this.runnableChange.bind(this))
         this.pyprezEditor.addEventListener("keydown", (()=>{setTimeout(this.sync.bind(this), 10)}).bind(this))
-    }
-    codeblockChange(){
-        this.stackOverflow.setAttribute("codeblock", this.codeblockCheck.checked?"true":"false")
-        this.sync()
-    }
-    runnableChange(){
-        console.warn(this.runnableCheck.checked)
-        this.stackOverflow.setAttribute("runnable", this.runnableCheck.checked?"true":"false")
-        this.sync()
     }
     sync(){
         this.stackOverflow.code = this.pyprezEditor.code
     }
-    get code(){return this.pyprezEditor.code}
-    set code(code){this.pyprezEditor.code=code}
 }
 window.addEventListener("load", ()=>{
     customElements.define("stack-converter",  StackOverflowConverter);

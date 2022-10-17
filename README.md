@@ -67,9 +67,7 @@ This is especially useful for questions which don't require a lot of slow import
 
 <img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
 
-
-Unfortunately, the code snippet first shows up as javascript (because it is javascript), which could be a bit confusing 
-for some StackOverflow users. However, **if** the viewer clicks `Run Code Snippet`, they will be able to edit and
+**If** the viewer clicks `Run Code Snippet`, they will be able to edit and
 test a live python question/answer without leaving the page.
 
 **It will render something like this**
@@ -81,7 +79,7 @@ test a live python question/answer without leaving the page.
 ### StackOverflow Power User?
 Add a bookmark to your browser with the following text as the url.
 ```
-javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    "); navigator.clipboard.writeText('<!-- begin snippet: js hide: false console: false babel: false --> \n\n  <!-- language: lang-html --> \n\n  <script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">\n    # your code here\n    ' + sel + '\n  </script>\n\n<!-- end snippet -->')})()
+javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    "); navigator.clipboard.writeText('<!-- begin snippet: js hide: false console: false babel: false --> \n\n  <!-- language: lang-js --> \n\n  ' + sel + '\n\n  <!-- language: lang-html --> \n\n  <script src="https://modularizer.github.io/pyprez/so.js"/><script>\n\n<!-- end snippet -->')})()
 ```
 First either highlight the python you want to use or copy it to your clipboard.
 Clicking on the bookmark will copy the code you need to your clipboard, then you can paste it into the StackOverflow question/answer.
