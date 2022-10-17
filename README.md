@@ -1,5 +1,5 @@
 # Welcome to **pyprez!**
-Run **client-side python** in your browser to demo code.
+Run **client-side python** in your browser to **prez**ent your code.
 
 <a href="https://github.com/modularizer/pyprez"><img src="https://github.com/favicon.ico" height="30px"/></a>
 [GitHub](https://github.com/modularizer/pyprez) (view source code)<br/>
