@@ -13,9 +13,10 @@ This js file will import pyodide and codemirror dependencies for you, so all you
 */
 
 document.addEventListener("DOMContentLoaded", () => {
-    let stackEditor = document.createElement("pyprez-editor");
-    stackEditor.code = document.scripts[document.scripts.length - 1].innerText.trim();
+    let stackEditor = document.createElement("div");
     document.body.appendChild(stackEditor);
+    let demoCode = document.scripts[document.scripts.length - 1].innerText.trim();
+    stackEditor.outerHTML = `<pyprez-editor>${demoCode}</pyprez-editor>`
 });
 
 // allow importing this script multiple times without raising an error
@@ -328,9 +329,12 @@ class PyPrezEditor extends HTMLElement{
         this.run();
     }
     loadEl(){
-        let lines = this.innerHTML.replaceAll("\t","    ").split("\n")
-        let indent = " ".repeat(Math.min(...lines.filter(v=>v).map(v=>v.match(/\s*/)[0].length)));
-        let code = lines.map(v=>v.startsWith(indent)?v.replace(indent, ""):v).join("\n")
+        let code="";
+        if (this.innerHTML){
+            let lines = this.innerHTML.replaceAll("\t","    ").split("\n")
+            let indent = " ".repeat(Math.min(...lines.filter(v=>v).map(v=>v.match(/\s*/)[0].length)));
+            code = lines.map(v=>v.startsWith(indent)?v.replace(indent, ""):v).join("\n")
+        }
         this.initialCode = code;
         console.log("initial code", this.initialCode)
         this.innerHTML = `<pre>${code}</pre>`

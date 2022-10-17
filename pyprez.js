@@ -427,9 +427,13 @@ class PyPrezEditor extends HTMLElement{
         this.run();
     }
     loadEl(){
-        let lines = this.innerHTML.replaceAll("\t","    ").split("\n")
-        let indent = " ".repeat(Math.min(...lines.filter(v=>v).map(v=>v.match(/\s*/)[0].length)));
-        let code = lines.map(v=>v.startsWith(indent)?v.replace(indent, ""):v).join("\n")
+        let code="";
+        if (this.innerHTML){
+            let lines = this.innerHTML.replaceAll("\t","    ").split("\n")
+            let indent = " ".repeat(Math.min(...lines.filter(v=>v).map(v=>v.match(/\s*/)[0].length)));
+            code = lines.map(v=>v.startsWith(indent)?v.replace(indent, ""):v).join("\n")
+        }
+
         this.initialCode = code;
         console.log("initial code", this.initialCode)
         this.innerHTML = `<pre>${code}</pre>`
