@@ -120,11 +120,9 @@ Front-end Python will never replace back-end computations, but may be useful for
 
 # Pyprez Tags
 ## Pyprez-Editor
- The `<pyprez-editor>` tag is similar to the  `<pyprez-script>` tag, 
- except instead of executing as soon as possible when the page is loaded, 
- the tag provides a [CodeMirror](https://codemirror.net/6/) text editor element and does not execute until 
- the gutter start button has been pressed. 
- Then, the editor runs the code, streaming STDOUT and STDERR to either the text box or the console 
+ The `<pyprez-editor>` tag provides a [CodeMirror](https://codemirror.net/6/) text editor element and does not execute until 
+ it is double-clicked (useful on mobile) or the green start button has been pressed. 
+ Then, the editor runs the code in the browser, streaming STDOUT and STDERR to either the text box or the console 
  if `stdout="false"` is set, and the displays the result as a string in the editor. 
  Additionally, the element can be reset and the code can be modified and rerun.
  
