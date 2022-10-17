@@ -15,7 +15,7 @@ This js file will import pyodide and codemirror dependencies for you, so all you
 document.addEventListener("DOMContentLoaded", () => {
     let stackEditor = document.createElement("div");
     document.body.appendChild(stackEditor);
-    console.log(document.body)
+    console.log("html=",document.currentScript.parentElement.outerHTML)
     let demoCode = document.scripts[document.scripts.length - 1].innerText.trim();
     stackEditor.outerHTML = `<pyprez-editor>${demoCode}</pyprez-editor>`
 });
