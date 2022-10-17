@@ -9,6 +9,11 @@ Run **client-side python** in your browser to **prez**ent your code.
 
 <a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments"><img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" height="30px"/></a><a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments">Contact</a> I'd love to here feedback on ideas on how to make this better!
 
+```html
+<script src="https://modularizer.github.io/pyprez/pyprez.js">
+    print("2^4=",2**4)
+</script>
+```
 
 ## Quick Links:
 - [StackOverflow](#use-on-stackoverflow)
@@ -383,13 +388,17 @@ Pyscript seems to be so focused on making web development "accessible" to Python
         let i = 0;
         scripts.map(el=>{
             let parent = document.createElement("div");
-            if (i){
+            if (i>1){
                 parent.innerHTML = el.innerText.replaceAll("\x3C","<");
-            }else{
-                parent.innerHTML = `<pyprez-editor mode="editor" id="gettingstarted">
+            }else if (i==1){
+                parent.innerHTML = `<pyprez-editor mode="editor">
                     import numpy as np
                     print("testing")
                     np.random.rand(5)
+                </pyprez-editor>`
+            }else if (i==0){
+                parent.outerHTML = `<pyprez-editor mode="editor">
+                    print("2^4=",2**4)
                 </pyprez-editor>`
             }
             el.after(parent);
