@@ -40,17 +40,18 @@ work on GitHub Pages, so if you click the static image it will take you to the w
 </div>
 
 # Use On Stack Overflow
-One of the best uses of this package may be to use it on stack overflow for debugging Python questions, especially
-questions which don't require a lot of slow imports.
-
-Unfortunately, the code snippet first shows up as javascript (because it is javascript), which could be a bit confusing 
-for some StackOverflow users. However, **if** the viewer clicks `Run Code Snippet`, they will be able to edit and
-test a live python question/answer without leaving the page.
+One of the best uses of this package may be to use it for debugging Python questions with live runnable demos.
+This is especially useful for questions which don't require a lot of slow imports.
 
 [Converter-Only Page](./stackconverter.html)
 <stack-converter codeblock="false" id="stackplaceholder"></stack-converter>
 
 <img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
+
+
+Unfortunately, the code snippet first shows up as javascript (because it is javascript), which could be a bit confusing 
+for some StackOverflow users. However, **if** the viewer clicks `Run Code Snippet`, they will be able to edit and
+test a live python question/answer without leaving the page.
 
 **It will render something like this**
 <img src="./sample_imgs/stack-overflow-sample.png"/>
