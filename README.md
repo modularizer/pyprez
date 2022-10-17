@@ -24,11 +24,11 @@ Run **client-side python** in your browser to **prez**ent your code.
 # Use On Stack Overflow
 ## Method 1:
 ### step 1
-<img src="./sample_imgs/stack-overflow-start.png" class="nonrendered"/>
+<img src="./sample_imgs/stack-overflow-start.png"/>
 * click to add a runnable code segment
 
 ### step 2
-<img src="./sample_imgs/stack-overflow-example.png" class="nonrendered"/>
+<img src="./sample_imgs/stack-overflow-example.png"/>
 
 * disable console logging
 * paste `<script src="https://modularizer.github.io/pyprez/so.js"></script>` into HTML or click `Add an external library` and paste `https://modularizer.github.io/pyprez/so.js`
