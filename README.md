@@ -11,23 +11,67 @@ Run **client-side python** in your browser to **prez**ent your code.
 
 
 ## Quick Links:
-- [Getting Started](#getting-started)
-- [About](#about)
 - [StackOverflow](#use-on-stackoverflow)
+- [About](#about)
+- [Getting Started](#getting-started)
 - [Use Cases](#use-cases)
-- [Tags](#pyprez-tags):
- 	- [`<pyprez-editor>`](#pyprez-editor)
- 	- [`<pyprez-console>`](#pyprez-console)
- 	- [`<pyprez-import>`](#pyprez-import)
- 	- [`<pyprez-script>`](#pyprez-script)
+- [Tags](#pyprez-tags): [`<pyprez-editor>`](#pyprez-editor) , [`<pyprez-console>`](#pyprez-console), [`<pyprez-import>`](#pyprez-import), [`<pyprez-script>`](#pyprez-script)
 - [Custom Themes](#codemirror-themes)
 - [API](#pyprez-api)
-    - [`pyprez.elements`](#elements)
- 	- [`pyprez.then/catch`](#thencatch)
- 	- [`pyprez.loadAndRunAsync`](#loadandrunasync)
- 	- [`pyprez.stdout/stderr`](#stdoutstderr)
 - [Pyodide](#pyodide)
 - [PyScript](#pyscript)
+
+# Use On Stack Overflow
+## Method 1:
+### step 1
+* click to add a runnable code segment
+<img src="./sample_imgs/stack-overflow-start.png" class="nonrendered"/>
+
+### step 2
+* disable console logging
+* paste `<script src="https://modularizer.github.io/pyprez/so.js"></script>` into HTML
+* write your python in the javascript box
+* run to test
+<img src="./sample_imgs/stack-overflow-example.png" class="nonrendered"/>
+
+## Method 2
+[Converter-Only Page](./stackconverter.html)
+<stack-converter codeblock="false" id="stackplaceholder"></stack-converter>
+
+<img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
+
+**If** the viewer clicks `Run Code Snippet`, they will be able to edit and
+test a live python question/answer without leaving the page.
+
+**It will render something like this**
+<img src="./sample_imgs/stack-overflow-sample.png"/>
+
+<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
+<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered">View a real answer</a>
+
+## Method 3 
+### StackOverflow Power User?
+Add a bookmark to your browser with the following text as the url.
+```
+javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    "); navigator.clipboard.writeText('<!-- begin snippet: js hide: false console: false babel: false --> \n\n  <!-- language: lang-js --> \n\n  ' + sel + '\n\n  <!-- language: lang-html --> \n\n  <script src="https://modularizer.github.io/pyprez/so.js"/><script>\n\n<!-- end snippet -->')})()
+```
+First either highlight the python you want to use or copy it to your clipboard.
+Clicking on the bookmark will copy the code you need to your clipboard, then you can paste it into the StackOverflow question/answer.
+
+### Other options
+[PySnippet](https://github.com/pysnippet/pysnippet) is a super concise package which also allows you to demo python code on stack overflow.
+
+## About
+**pyprez** is a minimal _javascript_ package which allows you to **present** runnable python samples in the browser.
+ 
+The functionality comes primarily from [**Pyodide**](#pyodide), 
+which allows you to run **front-end Python** through **WebAssembly** and easily interact between Python, javascript and HTML.
+The pyodide object is made available at `window.pyodide`.
+Meanwhile much of the visual style is provided by [CodeMirror](https://codemirror.net/) (accessible at `window.CodeMirror`).
+
+**pyprez** is inspired [**Pyscript**](#pyscript), a project backed by Anaconda which provided a useful interface for 
+pyodide also but introduced a [list of drawbacks](#pyscript-drawbacks) in the process.
+
 
 # Getting Started
 **Double-Click or press Green Arrow to run code**
@@ -57,46 +101,6 @@ Some markdown flavors, github included, disable javascript, so these examples wi
 work on GitHub Pages, so if you click the static image it will take you to the working example.
     </p>
 </div>
-
-# Use On Stack Overflow
-One of the best uses of this package may be to use it for debugging Python questions with live runnable demos.
-This is especially useful for questions which don't require a lot of slow imports.
-
-[Converter-Only Page](./stackconverter.html)
-<stack-converter codeblock="false" id="stackplaceholder"></stack-converter>
-
-<img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
-
-**If** the viewer clicks `Run Code Snippet`, they will be able to edit and
-test a live python question/answer without leaving the page.
-
-**It will render something like this**
-<img src="./sample_imgs/stack-overflow-sample.png"/>
-
-<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
-<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered">View a real answer</a>
-
-### StackOverflow Power User?
-Add a bookmark to your browser with the following text as the url.
-```
-javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    "); navigator.clipboard.writeText('<!-- begin snippet: js hide: false console: false babel: false --> \n\n  <!-- language: lang-js --> \n\n  ' + sel + '\n\n  <!-- language: lang-html --> \n\n  <script src="https://modularizer.github.io/pyprez/so.js"/><script>\n\n<!-- end snippet -->')})()
-```
-First either highlight the python you want to use or copy it to your clipboard.
-Clicking on the bookmark will copy the code you need to your clipboard, then you can paste it into the StackOverflow question/answer.
-
-### Other options
-[PySnippet](https://github.com/pysnippet/pysnippet) is a super concise package which also allows you to demo python code on stack overflow.
-
-## About
-**pyprez** is a minimal _javascript_ package which allows you to **present** runnable python samples in the browser.
- 
-The functionality comes primarily from [**Pyodide**](#pyodide), 
-which allows you to run **front-end Python** through **WebAssembly** and easily interact between Python, javascript and HTML.
-The pyodide object is made available at `window.pyodide`.
-Meanwhile much of the visual style is provided by [CodeMirror](https://codemirror.net/) (accessible at `window.CodeMirror`).
-
-**pyprez** is inspired [**Pyscript**](#pyscript), a project backed by Anaconda which provided a useful interface for 
-pyodide also but introduced a [list of drawbacks](#pyscript-drawbacks) in the process.
 
 # Use Cases
 Some cool things about **pyodide** which **pyprez** takes advantage of are:
