@@ -413,16 +413,7 @@ Pyscript seems to be so focused on making web development "accessible" to Python
     <script>
 
     let sp = document.getElementById("stackplaceholder");
-        sp.pyprezEditor.code = `
-import random
-
-x = 5
-
-if __name__=="__main__":
-    print(f"my random number is {random.random()}")
-    
-    # now produce an error to debug
-    print(x[2])`;
+    sp.pyprezEditor.code = "#python\n\nx=5\nprint(f'{x=}')"
     </script>
 </details>
  
