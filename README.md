@@ -60,7 +60,7 @@ test a live python question/answer without leaving the page.
 2. highlight the python codeblock you want to use
 3. click on the bookmark
 4. paste to replace the highlighted text
-<img src="./sample_imgs/stack-overflow-sample.png"/>
+<img src="./sample_imgs/stack-bookmark.png"/>
 
 ### Other options
 [PySnippet](https://github.com/pysnippet/pysnippet) is a super concise package which also allows you to demo python code on stack overflow.
