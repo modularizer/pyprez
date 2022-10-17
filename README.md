@@ -43,35 +43,36 @@ work on GitHub Pages, so if you click the static image it will take you to the w
 One of the best uses of this package may be to use it on stack overflow for debugging Python questions, especially
 questions which don't require a lot of slow imports.
 
-Unfortunately, adding it to stack overflow does take a few clicks and copy pasting or memorizing a url. 
-Additionally, the code snippet first shows up as javascript (because it is javascript)
-until the viewer clicks `Run Code Snippet` to see and interact with the editable and runnable python.
+Unfortunately, the code snippet first shows up as javascript (because it is javascript), which could be a bit confusing 
+for some StackOverflow users. However, **if** the viewer clicks `Run Code Snippet`, they will be able to edit and
+test a live python question/answer without leaving the page.
 
-To add to a StackOverflow question or answer, copy-paste the markdown below into your answer...
-```markdown
-<!-- begin snippet: js hide: false console: false babel: false -->
+[Converter-Only Page](./stackconverter.html)
 
-<!-- language: lang-html -->
+<stack-converter codeblock="false">
+import random
 
-    <script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
-        import numpy as np
-        print("testing")
-        np.random.rand(5)
-    </script>
+x = 5
 
-<!-- end snippet -->
-```
+if __name__=="__main__":
+    print(f"my random number is {random.random()}")
+    
+    # now produce an error to debug
+    print(x[2])
+</stack-converter>
+
+<img src="./sample_imgs/stack-overflow-converter.png" class="nonrendered"/>
+
+**It will render something like this**
+<img src="./sample_imgs/stack-overflow-converter.png"/>
 
 <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
-<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered">View on StackOverflow</a>
-<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534">
-<img src="./sample_imgs/stack-overflow.png"/>
-</a>
+<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered">View a real answer</a>
 
 ### Regular User?
 Add a bookmark to your browser with the following text as the url.
 ```
-javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    "); let clip=navigator.clipboard.readText(); let c = sel; navigator.clipboard.writeText('<!-- begin snippet: js hide: false console: false babel: false --> \n\n  <!-- language: lang-html --> \n\n  <script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">\n    # your code here\n    ' + c + '\n  </script>\n\n<!-- end snippet -->')})()
+javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    "); navigator.clipboard.writeText('<!-- begin snippet: js hide: false console: false babel: false --> \n\n  <!-- language: lang-html --> \n\n  <script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">\n    # your code here\n    ' + sel + '\n  </script>\n\n<!-- end snippet -->')})()
 ```
 First either highlight the python you want to use or copy it to your clipboard.
 Clicking on the bookmark will copy the code you need to your clipboard, then you can paste it into the StackOverflow question/answer.

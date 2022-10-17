@@ -203,6 +203,7 @@ class PyPrez{
         // create a deferred promise that will be resolved later with the pyodide object
         this.promise = new Promise((resolve, reject)=>{this._resolvePromise = resolve; this._rejectPromise = reject;})
 
+        this._loadPyodide = this._loadPyodide.bind(this)
         // load pyodide and resolve the promise
         this._loadPyodide(config);
     }
@@ -270,7 +271,6 @@ class PyPrez{
                 stderr: (t=>{this.stderr(t)}).bind(this),
             }
             config = Object.assign(defaultConfig, config)
-
             // load pyodide then resolve or reject this.promise
             loadPyodide(config).then(this._resolvePromise).catch(this._rejectPromise);
         }).bind(this))
@@ -377,6 +377,8 @@ class PyPrezEditor extends HTMLElement{
     */
     constructor(){
         super();
+//        alert("loading" + this.innerHTML)
+//        console.log("this=", this)
         this.classList.add("pyprez");
         this.loadEl = this.loadEl.bind(this);
         this.loadEditor = this.loadEditor.bind(this);
@@ -389,7 +391,7 @@ class PyPrezEditor extends HTMLElement{
         }
         let aliases = {
             "py": "python",
-            "js": "javascript"
+            "js": "javascript",
         }
         if (aliases[this.language]){
             this.language = aliases[this.language]
@@ -485,6 +487,9 @@ class PyPrezEditor extends HTMLElement{
         return this.editor?this.editor.getValue():this.textarea.value
     }
     set code(v){
+        if (this.mode == "html"){
+            v = v.replaceAll("<", "&lt").replaceAll(">", "gt")
+        }
         if (this.editor){
             this.editor.setValue(v);
             this.editor.doc.setGutterMarker(0, "start", this.start);
@@ -519,12 +524,12 @@ class PyPrezEditor extends HTMLElement{
     }
     run(){
         if (this.code){
-            this.executed = this.code.split("____________________________________\n")[0];
+            this.executed = this.code.split("\n____________________\n")[0];
             this.code = this.executed;
             let code = this.executed;
             let promise;
             if (this.language == "python"){
-                this.code += "____________________________________\n";
+                this.code += "\n____________________\n";
                 if (this.getAttribute("stdout") === "true"){
                     this.attachStd();
                 }
@@ -547,6 +552,12 @@ class PyPrezEditor extends HTMLElement{
 //                this.start.innerHTML = "↻";
                 this.start.innerHTML = "&#8635";
                 return r
+            }else if (this.language == "html"){
+                if (!this.htmlResponse){
+                    this.htmlResponse = document.createElement("div");
+                    this.after(this.htmlResponse)
+                }
+                this.htmlResponse.innerHTML = this.code.replaceAll("&lt","<").replaceAll("&gt", ">");
             }
         }
 
@@ -574,7 +585,7 @@ class PyPrezEditor extends HTMLElement{
     }
 }
 window.addEventListener("load", ()=>{
-    customElements.define("pyprez-editor", PyPrezEditor);
+customElements.define("pyprez-editor", PyPrezEditor);
 })
 
 /* ___________________________________________________ CONSOLE ___________________________________________________ */
@@ -709,5 +720,154 @@ class PyPrezConsole extends HTMLElement{
 window.addEventListener("load", ()=>{
     customElements.define("pyprez-console", PyPrezConsole);
 })
+
+
+
+class StackOverflow extends HTMLElement{
+    constructor(){
+        super();
+        this.classList.add("pyprez");
+        if (!this.style.display){
+            this.style.display = "flex"
+        }
+        this._header = "Run the javascript snippet below to see a runnable Python example:"
+        this._code = "# your code here"
+        this.innerHTML = this.getInnerHTML()
+        pyprez.addElement(this);
+    }
+    get addCodeblock(){ return this.hasAttribute("codeblock")?(this.getAttribute("codeblock")==="true"):true}
+    get addRunnable(){ return this.hasAttribute("runnable")?(this.getAttribute("runnable")=="true"):true}
+
+    get header(){
+        return this._header
+    }
+    set header(header){
+        this._header = header
+        this.innerHTML = this.getInnerHTML()
+    }
+    get code(){
+        return this._code
+    }
+    set code(code){
+        this._code = code
+        this.innerHTML = this.getInnerHTML()
+    }
+    getInnerHTML(){
+        return `
+<pre style="background:#d3d3d3;border-radius:0.5em;padding:1%;margin:1%;" contenteditable="true">
+    <svg
+        id="copy"
+        height="40px"
+        width="30px"
+        viewBox="0 0 22 27"
+        xmlns="http://www.w3.org/2000/svg"
+        style="float:right;order: 2;margin-bottom:-40px;cursor:pointer;"
+        onclick="navigator.clipboard.writeText(this.parentElement.innerText)">
+  <g>
+    <path
+       style="fill:none;stroke:#000;stroke-width:1;"
+       d="M 5,22 h -1 a 2 2 0 0 1 -2 -2 v -16 a 2 2 0 0 1 2 -2 h 11 a 2 2 0 0 1 2 2 v 1"
+       id="bottom" />
+    <rect
+       style="fill:none;stroke:#000;stroke-width:1;"
+       id="top"
+       width="15"
+       height="20"
+       x="5"
+       y="5"
+       rx="2" />
+  </g>
+</svg>
+${this.getBlock()}
+${this.getRunnable()}
+</pre>
+        `
+    }
+    getBlock(){
+        console.log("addBlock", this.addCodeblock)
+        let r = this.addRunnable?"\n":""
+        let b = "```python\n" + this.code + "\n```" + r
+        return this.addCodeblock?b:""
+    }
+    getRunnable(){
+        console.log("addRunnable", this.addRunnable)
+        return this.addRunnable?`${this.header}
+&lt!-- begin snippet: js hide: false console: false babel: false --&gt
+
+  &lt!-- language: lang-html --&gt
+
+  &ltscript src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor"&gt
+    ${this.code}
+  &lt/script&gt
+
+&lt!-- end snippet --&gt
+</pre>`:""
+    }
+}
+window.addEventListener("load", ()=>{
+    customElements.define("stack-overflow", StackOverflow);
+})
+
+
+class StackOverflowConverter extends HTMLElement{
+    constructor(){
+        super();
+        let ih = this.innerHTML;
+        console.warn("ih=", ih)
+        let mode = this.hasAttribute("mode")?`mode=${this.getAttribute("mode")}`:"";
+        let src = this.hasAttribute("src")?`src=${this.getAttribute("src")}`:"";
+        let cb = this.hasAttribute("codeblock")?`codeblock=${this.getAttribute("codeblock")}`:"";
+        let rb = this.hasAttribute("runnable")?`runnable=${this.getAttribute("runnable")}`:"";
+        let cbc = this.hasAttribute("codeblock")&(this.getAttribute("codeblock")=="false")?"":"checked"
+        let rbc = this.hasAttribute("runnable")&(this.getAttribute("runnable")=="false")?"":"checked"
+        this.innerHTML = `
+        <div style="display:flex">
+            <div style="flex:50%">
+                <b>Edit your python snippet here...</b>
+            </div>
+            <div style="flex:50%">
+                <b>then copy-paste this auto-generated markdown into StackOverflow</b>
+            </div>
+        </div>
+        <div style="display: flex">
+            <div style="flex:50%">
+                <pyprez-editor ${mode} ${src}>
+                    ${ih}
+                </pyprez-editor>
+            </div>
+            <div style="flex:50%">
+                <input type="checkbox" ${cbc}>Add normal codeblock</input>
+                <input type="checkbox" ${rbc}>Make Runnable</input>
+                <stack-overflow ${cb} ${rb}>
+                </stack-overflow>
+            </div>
+        </div>
+        `
+        this.codeblockCheck = this.children[1].children[1].children[0]
+        this.runnableCheck = this.children[1].children[1].children[1]
+        this.pyprezEditor = this.children[1].children[0].children[0]
+        this.stackOverflow = this.children[1].children[1].children[2]
+        this.sync()
+        this.codeblockCheck.addEventListener("change", this.codeblockChange.bind(this))
+        this.runnableCheck.addEventListener("change", this.runnableChange.bind(this))
+        this.pyprezEditor.addEventListener("keydown", (()=>{setTimeout(this.sync.bind(this), 10)}).bind(this))
+    }
+    codeblockChange(){
+        this.stackOverflow.setAttribute("codeblock", this.codeblockCheck.checked?"true":"false")
+        this.sync()
+    }
+    runnableChange(){
+        console.warn(this.runnableCheck.checked)
+        this.stackOverflow.setAttribute("runnable", this.runnableCheck.checked?"true":"false")
+        this.sync()
+    }
+    sync(){
+        this.stackOverflow.code = this.pyprezEditor.code
+    }
+}
+window.addEventListener("load", ()=>{
+    customElements.define("stack-converter",  StackOverflowConverter);
+})
+
 
 }
