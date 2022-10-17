@@ -32,7 +32,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 
 1.  disable console logging
 2. paste the following into HTML or click `Add an external library` just the url
-    ```html
+    ```text
     <script src="https://modularizer.github.io/pyprez/so.js"></script>
     ```
 3. write your python in the javascript box
