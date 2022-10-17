@@ -864,6 +864,8 @@ class StackOverflowConverter extends HTMLElement{
     sync(){
         this.stackOverflow.code = this.pyprezEditor.code
     }
+    get code(){return this.pyprezEditor.code}
+    set code(code){this.pyprezEditor.code=code}
 }
 window.addEventListener("load", ()=>{
     customElements.define("stack-converter",  StackOverflowConverter);

@@ -48,18 +48,7 @@ for some StackOverflow users. However, **if** the viewer clicks `Run Code Snippe
 test a live python question/answer without leaving the page.
 
 [Converter-Only Page](./stackconverter.html)
-
-<stack-converter codeblock="false">
-import random
-
-x = 5
-
-if __name__=="__main__":
-    print(f"my random number is {random.random()}")
-    
-    # now produce an error to debug
-    print(x[2])
-</stack-converter>
+<stack-converter codeblock="false: id="stackplaceholder"></stack-converter>
 
 <img src="./sample_imgs/stack-overflow-converter.png" class="nonrendered"/>
 
@@ -378,10 +367,24 @@ Unfortunately, [**PyScript**](https://pyscript.net/) has more drawbacks than fea
 Pyscript seems to be so focused on making web development "accessible" to Python developers, that they ended up removing most of the Pyodide functionality developers are looking for and instead made a **slow, bulky, buggy, front-end version of a [Jupyter notebook](https://jupyter.org/).**
 
 
+
 <details style="display:none">
 	<summary>Scripts which make GitHub Pages page interactive</summary>
     <script src="https://modularizer.github.io/pyprez/pyprez.js"></script>
 	<script>
+        let sp = document.getElementById("stackplaceholder")
+        sp.code = `
+import random
+
+x = 5
+
+if __name__=="__main__":
+    print(f"my random number is {random.random()}")
+    
+    # now produce an error to debug
+    print(x[2])`
+
+
         let samples = Array.from(document.querySelectorAll('.nonrendered'));
         samples.map(el=>{el.style.display="none"});
 
