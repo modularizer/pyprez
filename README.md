@@ -17,6 +17,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 
 <a href="https://modularizer.github.io/pyprez" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
 <a href="https://modularizer.github.io/pyprez" class="nonrendered">Try on live page</a>
+
 <img src="./sample_imgs/first.png" class="nonrendered"/>
 
 ## Quick Links:
