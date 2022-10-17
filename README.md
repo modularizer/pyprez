@@ -48,7 +48,7 @@ for some StackOverflow users. However, **if** the viewer clicks `Run Code Snippe
 test a live python question/answer without leaving the page.
 
 [Converter-Only Page](./stackconverter.html)
-<stack-converter codeblock="false: id="stackplaceholder"></stack-converter>
+<stack-converter codeblock="false" id="stackplaceholder"></stack-converter>
 
 <img src="./sample_imgs/stack-overflow-converter.png" class="nonrendered"/>
 
