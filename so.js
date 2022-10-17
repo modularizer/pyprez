@@ -17,8 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(stackEditor);
     let demoCode = document.scripts[document.scripts.length - 1].innerText.trim();
     stackEditor.outerHTML = `<pyprez-editor>${demoCode}</pyprez-editor>`;
-    window.print = ()=>{}
-
 });
 
 // allow importing this script multiple times without raising an error

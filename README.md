@@ -31,6 +31,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 * disable console logging
 * paste `<script src="https://modularizer.github.io/pyprez/so.js"></script>` into HTML or click `Add an external library` and paste `https://modularizer.github.io/pyprez/so.js`
 * write your python in the javascript box
+  * make sure to add a comment or an import to the top of the python script (`# python` works). If you don't the page may try to literally print to a printer...
 * run to test
 <img src="./sample_imgs/stack-overflow-example.png" class="nonrendered"/>
 
