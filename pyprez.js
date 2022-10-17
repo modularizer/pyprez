@@ -253,7 +253,7 @@ class PyPrez{
         if (code){
             pyprezDebug("running code asynchronously:")
             pyprezDebug(code)
-            return pyodide.runPythonAsync(code)
+            return pyodide.runPythonAsync(code).catch(this.stderr)
         }
     }
 
