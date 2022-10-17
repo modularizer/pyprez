@@ -66,6 +66,9 @@ javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n  
 First either highlight the python you want to use or copy it to your clipboard.
 Clicking on the bookmark will copy the code you need to your clipboard, then you can paste it into the StackOverflow question/answer.
 
+### Other options
+[PySnippet](https://github.com/pysnippet/pysnippet) is a super concise package which also allows you to demo python code on stack overflow.
+
 ## About
 **pyprez** is a minimal _javascript_ package which allows you to **present** runnable python samples in the browser.
  
@@ -90,14 +93,14 @@ Pyrez provides
 ## Quick Links:
 - [Getting Started](#getting-started)
 - [About](#about)
-- [StackOverflow](#useonstackoverflow)
-- [Use Cases](#usecases)
+- [StackOverflow](#use-on-stackoverflow)
+- [Use Cases](#use-cases)
 - [Tags](#pyprez-tags):
  	- [`<pyprez-editor>`](#pyprez-editor)
  	- [`<pyprez-console>`](#pyprez-console)
  	- [`<pyprez-import>`](#pyprez-import)
  	- [`<pyprez-script>`](#pyprez-script)
-- [Themes](#codemirrorthemes)
+- [Custom Themes](#codemirror-themes)
 - [API](#pyprez-api)
     - [`pyprez.elements`](#elements)
  	- [`pyprez.then/catch`](#thencatch)
