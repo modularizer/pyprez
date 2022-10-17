@@ -53,7 +53,7 @@ test a live python question/answer without leaving the page.
 <img src="./sample_imgs/stack-overflow-converter.png" class="nonrendered"/>
 
 **It will render something like this**
-<img src="./sample_imgs/stack-overflow-converter.png"/>
+<img src="./sample_imgs/stack-overflow-sample.png"/>
 
 <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
 <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered">View a real answer</a>
