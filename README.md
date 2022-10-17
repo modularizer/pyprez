@@ -9,6 +9,8 @@ Run **client-side python** in your browser to **prez**ent your code.
 
 <a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments"><img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" height="30px"/></a><a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments">Contact</a> I'd love to here feedback on ideas on how to make this better!
 
+
+## Sample
 ```html
 <script src="https://modularizer.github.io/pyprez/pyprez.js">
     print("2^4=",2**4)
