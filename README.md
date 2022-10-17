@@ -58,7 +58,7 @@ test a live python question/answer without leaving the page.
 <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
 <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534" class="nonrendered">View a real answer</a>
 
-### Regular User?
+### StackOverflow Power User?
 Add a bookmark to your browser with the following text as the url.
 ```
 javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    "); navigator.clipboard.writeText('<!-- begin snippet: js hide: false console: false babel: false --> \n\n  <!-- language: lang-html --> \n\n  <script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">\n    # your code here\n    ' + sel + '\n  </script>\n\n<!-- end snippet -->')})()
