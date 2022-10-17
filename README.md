@@ -146,9 +146,6 @@ Front-end Python will never replace back-end computations, but may be useful for
 <img src="./sample_imgs/editor-2.png" />
 </a>
 
- ```html
- <pyprez-editor src="./sample_front_end_python.py"></pyprez-editor>
-```
 
 ### javascript example
 
