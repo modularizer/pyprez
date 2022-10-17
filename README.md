@@ -50,7 +50,7 @@ test a live python question/answer without leaving the page.
 [Converter-Only Page](./stackconverter.html)
 <stack-converter codeblock="false" id="stackplaceholder"></stack-converter>
 
-<img src="./sample_imgs/stack-overflow-converter.png" class="nonrendered"/>
+<img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
 
 **It will render something like this**
 <img src="./sample_imgs/stack-overflow-sample.png"/>
