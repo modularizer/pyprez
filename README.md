@@ -36,7 +36,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 <img src="./sample_imgs/stack-overflow-example.png" class="nonrendered"/>
 
 ## Method 2
-[Converter-Only Page](./stackconverter.html)
+Convert your code here then copy-paste result into your question/answer. [Converter-Only Page](./stackconverter.html)
 <stack-converter id="stackplaceholder"></stack-converter>
 
 <img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
