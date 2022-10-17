@@ -10,6 +10,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 <a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments"><img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" height="30px"/></a><a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments">Contact</a> I'd love to here feedback on ideas on how to make this better!
 
 # Getting Started
+**Double-Click or press Green Arrow to run code**
 ```html
 <script src="https://modularizer.github.io/pyprez/pyprez.js" mode="editor">
     import numpy as np
@@ -17,8 +18,6 @@ Run **client-side python** in your browser to **prez**ent your code.
     np.random.rand(5)
 </script>
 ```
-
-**Double Click on press Green Arrow to run code**
 <a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
 <a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered">Try on live page</a>
 <a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered">
