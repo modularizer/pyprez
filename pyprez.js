@@ -788,7 +788,7 @@ ${this.getRunnable()}
 &lt!-- begin snippet: js hide: false console: false babel: false --&gt
 
   &lt!-- language: lang-js --&gt
-    # python
+    # keep this comment
     ${this.code}
 
  &lt!-- language: lang-html --&gt
