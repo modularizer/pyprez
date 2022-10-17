@@ -29,7 +29,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 
 ### step 2
 * disable console logging
-* paste `<script src="https://modularizer.github.io/pyprez/so.js"></script>` into HTML
+* paste `<script src="https://modularizer.github.io/pyprez/so.js"></script>` into HTML or click `Add an external library` and paste `https://modularizer.github.io/pyprez/so.js`
 * write your python in the javascript box
 * run to test
 <img src="./sample_imgs/stack-overflow-example.png" class="nonrendered"/>
