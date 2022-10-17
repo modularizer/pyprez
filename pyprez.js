@@ -73,7 +73,7 @@ let jsDependencies = {
         then: {
             codemirrorPython: {
                 src: cmBase + "mode/python/python.min.js",
-                check: ()=>window.loadPyodide
+                check: false
             }
         }
     },
@@ -116,7 +116,7 @@ let importStyle = (url)=>{
 // recursively load dependency tree
 function _loadDependencies(tree, res){
     for (let [k, v] of Object.entries(tree)){
-       if (!v.check()){
+       if (!v.check || !v.check()){
             importScript(v.src).then(()=>{
                 if (v.tree){
                     _loadDependencies(tree, res)
