@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let stackEditor = document.createElement("div");
         document.body.appendChild(stackEditor);
         let demoCode = document.scripts[document.scripts.length - 1].innerText.trim();
-        stackEditor.outerHTML = `<pyprez-editor>${demoCode}</pyprez-editor>`;
+        stackEditor.outerHTML = `<pyprez-editor runonload="true">${demoCode}</pyprez-editor>`;
     }
 });
 
@@ -318,6 +318,10 @@ class PyPrezEditor extends HTMLElement{
         pyprez.addElement(this);
         if (this.hasAttribute("theme")){
             this.theme = this.getAttribute("theme")
+        }
+        console.warn(this.hasAttribute("runonload"), this.getAttribute("runonload"))
+        if (this.hasAttribute("runonload") & (this.getAttribute("runonload")==="true")){
+            this.run();
         }
     }
     keypressed(e){
