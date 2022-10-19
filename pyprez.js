@@ -44,6 +44,11 @@ let pyodideImported = new DeferredPromise();
 let pyprezScript = document.currentScript;
 document.addEventListener('DOMContentLoaded', domContentLoaded.resolve)
 
+if (document.readyState === "complete" || document.readyState === "loaded") {
+     // document is already ready to go
+     domContentLoaded.resolve()
+}
+
 /* ___________________________________________ DEFINE DEPENDENCIES _________________________________________________ */
 let jsDependencies = {
     codemirror: {
@@ -136,18 +141,15 @@ if (document.currentScript.innerHTML){
         let runonload = pyprezScript.hasAttribute("runonload")?pyprezScript.getAttribute("runonload"):"true"
         let mode = pyprezScript.hasAttribute("mode")?pyprezScript.getAttribute("mode"):"editor"
         let theme = pyprezScript.hasAttribute("theme")?pyprezScript.getAttribute("theme"):"default"
-        let githublink = pyprezScript.hasAttribute("githublink")?pyprezScript.getAttribute("githublink")==="true":true
+        let githublink = pyprezScript.hasAttribute("githublink")?pyprezScript.getAttribute("githublink"):"true"
         let lastScript = document.scripts[document.scripts.length - 1]
         if (convert){
             let demoCode = lastScript.innerHTML.trim()
 //            loadScriptAsElement(lastScript);
             let stackEditor = document.createElement("div");
-            let gh = githublink?'<a href="https://modularizer.github.io/pyprez"><img src="https://github.com/favicon.ico" height="15px"/></a>':""
-
             document.body.appendChild(stackEditor);
             stackEditor.outerHTML = `
-                ${gh}
-                <pyprez-${mode} runonload="${runonload}" theme="${theme}">${demoCode}</pyprez-${mode}>
+                <pyprez-${mode} runonload="${runonload}" theme="${theme}" githublink="${githublink}">${demoCode}</pyprez-${mode}>
             `;
         }
     })
@@ -225,7 +227,7 @@ function loadDependencies(){
     // try to load css dependencies but don't wait on them
     cssDependencies.map(importStyle)
     addStyle('.CodeMirror { border: 1px solid #eee !important; height: auto !important; }')
-    
+
     // loading js dependencies will cause deferred promises to resolve
     _loadDependencies(jsDependencies)
 }
@@ -502,12 +504,20 @@ class PyPrezEditor extends HTMLElement{
     }
     _loadEditor(){
     // ➤ is &#10148;
+        let githublink = this.hasAttribute("githublink")?this.getAttribute("githublink")==="true":false
+        let gh = githublink?'<a href="https://modularizer.github.io/pyprez"><img src="https://github.com/favicon.ico" height="15px"/></a>':"<div></div>"
+
         this.innerHTML = `
         <div style="color:green">&#10148;</div>
+        <div style="background-color:#d3d3d3;border-color:#808080;border-radius:3px;display:flex">
+            ${gh}
+            <div style="margin-left:10px;overflow:hidden;">Loading</div>
+        </div>
         <textarea style="height:auto;width:auto;">${this.initialCode}</textarea>
         `
         this.start = this.children[0]
-        this.textarea = this.children[1]
+        this.messageBar = this.children[1].children[1]
+        this.textarea = this.children[2]
         this.textarea.style.height = this.textarea.scrollHeight +"px"
 
         console.log("initial code", this.initialCode.split("\n").map(v=>v.length).reduce((a,b)=>a>b?a:b))
@@ -536,6 +546,12 @@ class PyPrezEditor extends HTMLElement{
         console.log("attaching dblclick", this.editor.display.lineDiv)
         this.editor.display.lineDiv.addEventListener("dblclick", this.dblclicked.bind(this))
     }
+    get message(){
+        return this.messageBar.innerHTML
+    }
+    set message(v){
+        this.messageBar.innerHTML = v
+    }
     get code(){
         return this.editor?this.editor.getValue():this.textarea.value
     }
@@ -546,8 +562,11 @@ class PyPrezEditor extends HTMLElement{
         if (this.editor){
             this.editor.setValue(v);
             this.editor.doc.setGutterMarker(0, "start", this.start);
+            let si = this.editor.getScrollInfo();
+            this.editor.scrollTo(0, si.height)
         }else{
             this.textarea.value = v;
+            this.textarea.scrollTop = this.textarea.scrollHeight;
         }
     }
     get theme(){return this.editor.options.theme}
@@ -569,6 +588,7 @@ class PyPrezEditor extends HTMLElement{
         let code = this.code;
         let n = code.match(/import/g);
         if (n && n.length !== this.numImports){
+            this.message = "Loading packages..."
             this.numImports = n.length;
             pyprez.load(this.code);
         }
@@ -583,7 +603,8 @@ class PyPrezEditor extends HTMLElement{
     }
     run(){
         if (this.code){
-            let sep = "\n____________________\nRunning...\n"
+            let sep = "\n____________________\n"
+            this.message = "Running..."
             this.executed = this.code.split(sep)[0];
             this.start.style.color = "yellow"
             this.code = this.executed;
@@ -597,7 +618,8 @@ class PyPrezEditor extends HTMLElement{
 
                 promise = pyprez.loadAndRunAsync(code);
                 promise.then(r=>{
-                    this.code += "\n>>> " + (r?r.toString():"")  + "\n\n# (Double-Click to Re-Run)";
+                    this.message = "Complete! (Double-Click to Re-Run)"
+                    this.code += "\n>>> " + (r?r.toString():"");
                     this.start.style.color = "red";
 //                    this.start.innerHTML = "↻";
                     this.start.innerHTML = "&#8635";
