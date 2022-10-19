@@ -19,6 +19,8 @@ let pyprezConfig = {
     
     importPyodide: true,
     pyodideCDN: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
+
+    help: true,
 }
 for (let [k, v] of Object.entries(pyprezConfig)){
     if (window[k] === undefined){
@@ -56,6 +58,7 @@ let domContentLoaded = new DeferredPromise();
 let codemirrorImported = new DeferredPromise();
 let pyodideImported = new DeferredPromise();
 let pyprezScript = document.currentScript;
+window.help= pyprezScript.hasAttribute("help")?pyprezScript.getAttribute("help")==="true":window.help;
 document.addEventListener('DOMContentLoaded', domContentLoaded.resolve)
 
 if (document.readyState === "complete" || document.readyState === "loaded") {
@@ -522,12 +525,24 @@ class PyPrezEditor extends HTMLElement{
         let githublink = this.hasAttribute("githublink")?this.getAttribute("githublink")==="true":false
         let gh = githublink?'<a href="https://modularizer.github.io/pyprez"><img src="https://github.com/favicon.ico" height="15px"/></a>':"<div></div>"
 
-        this.innerHTML = `
-        <div style="color:green">&#10148;</div>
-        <div style="background-color:#d3d3d3;border-color:#808080;border-radius:3px;display:flex">
+        let help= this.hasAttribute("help")?this.getAttribute("help")==="true":window.help;
+
+        let top = ""
+        if (help){
+            top = `<div style="background-color:#d3d3d3;border-color:#808080;border-radius:3px;display:flex">
             ${gh}
             <div style="margin-left:10px;overflow:hidden;"></div>
-        </div>
+        </div>`
+        }else{
+            top = `<div>
+                ${gh}
+                <div style="display:none;margin-left:10px;overflow:hidden;"></div>
+            </div>`
+        }
+        let messageVis = help?"block":"none"
+        this.innerHTML = `
+        <div style="color:green">&#10148;</div>
+        ${top}
         <textarea style="height:auto;width:auto;">${this.initialCode}</textarea>
         `
         this.start = this.children[0]
