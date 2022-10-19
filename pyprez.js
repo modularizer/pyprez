@@ -11,9 +11,126 @@ This js file will import pyodide and codemirror dependencies for you, so all you
     np.random.rand(5)
 </script>
 */
+/* ___________________________________________ CONFIG _________________________________________________ */
+let pyprezConfig = {
+    importCodeMirror: true,
+    codemirrorCDN: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/",
+    loadedCodeMirrorStyles: ["default"],
+    
+    importPyodide: true,
+    pyodideCDN: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
+}
+for (let [k, v] of Object.entries(pyprezConfig)){
+    if (window[k] === undefined){
+        window[k] = v
+    }
+}
+
+
+/* ___________________________________________ DEFERRED PROMISES _________________________________________________ */
+class DeferredPromise{
+    constructor(){
+        this.promise = new Promise((resolve, reject)=>{
+            this.resolve = resolve
+            this.reject = reject
+        })
+    }
+    then(onfulfilled, onrejected){return this.promise.then(onfulfilled, onrejected)}
+    catch(onrejected){return this.promise.catch(onrejected)}
+}
+let domContentLoaded = new DeferredPromise();
+let codemirrorImported = new DeferredPromise();
+let pyodideImported = new DeferredPromise();
+
+document.addEventListener('DOMContentLoaded', domContentLoaded.resolve)
+
+/* ___________________________________________ DEFINE DEPENDENCIES _________________________________________________ */
+let jsDependencies = {
+    codemirror: {
+        src: codemirrorCDN + "codemirror.min.js",
+        check: ()=>{
+            if (!window.importCodeMirror){return true}
+            if (!window.CodeMirror){return false}
+            return true
+        },
+        tree: {
+            codemirrorPython: {
+                src: codemirrorCDN + "mode/python/python.min.js",
+                check: ()=>{
+                    if (!window.importCodeMirror){return true}
+                    if (!window.CodeMirror){return false}
+                    if (!window.CodeMirror.modes){return false}
+                    if (!window.CodeMirror.modes.python){return false}
+                    return true
+                },
+                then: codemirrorImported.resolve,
+            },
+        }
+    },
+    pyodide: {
+        src: pyodideCDN,
+        check: ()=>{
+            if (!window.importPyodide){return true} 
+            return window.loadPyodide
+        },
+        then: pyodideImported.resolve,
+    },
+}
+let cssDependencies = [
+    codemirrorCDN + "codemirror.min.css"
+]
+
 /* ___________________________________________ INTERPRET SCRIPT TAG _________________________________________________ */
-// first manipulate the contents of the script tag
-//document.addEventListener("DOMContentLoaded", () => {
+function loadScriptAsElement(script=document.currentScript, mode="editor", theme="default"){
+    script.display = "none";
+
+    // make a github img link
+    let a = document.createElement("a");
+    a.href="https://modularizer.github.io/pyprez"
+    a.innerHTML = `<img src="https://github.com/favicon.ico" height="15px"/>`
+
+    // add a real pyprez custom-element
+    if (script.hasAttribute("mode")){
+        mode = script.getAttribute("mode")
+    }
+    let el = document.createElement("pyprez-" + mode);
+    el.innerHTML = script.innerHTML;
+
+    if (script.hasAttribute("theme")){
+        theme = els.getAttribute("theme")
+    }
+    el.setAttribute("theme", theme)
+
+    // add to container
+    let div = document.createElement("div");
+    div.append(a);
+    div.append(el);
+
+    // insert into document after script
+    script.after(div);
+
+    // remove script content
+    script.innerHTML = ""
+}
+
+
+// if the user is using the script tag as a code block, add a real code block to the document
+if (document.currentScript.innerHTML){
+    loadScriptAsElement(document.currentScript)
+}else{
+    domContentLoaded.then(()=>{
+        if (document.scripts.length === 1 && Array.from(document.body.children).length === 1){
+            loadScriptAsElement(document.scripts[document.scripts.length - 1].innerText.trim());
+        }
+
+//        let stackEditor = document.createElement("div");
+//        console.log(document.body.outerHTML);
+//        document.body.appendChild(stackEditor);
+//        let demoCode = document.scripts[document.scripts.length - 1].innerText.trim();
+//        stackEditor.outerHTML = `<pyprez-editor runonload="true">${demoCode}</pyprez-editor>`;
+
+    })
+    //document.addEventListener("DOMContentLoaded", () => {
 //    if (location.href !== "https://github.com/modularizer/pyprez"){
 //        let stackEditor = document.createElement("div");
 //        console.log(document.body.outerHTML);
@@ -22,37 +139,6 @@ This js file will import pyodide and codemirror dependencies for you, so all you
 //        stackEditor.outerHTML = `<pyprez-editor runonload="true">${demoCode}</pyprez-editor>`;
 //    }
 //})
-
-// first hide the innerHTML of the <script> tag if any is present
-document.currentScript.display = "none";
-
-// if the user is using the script tag as a code block, add a real code block to the document
-if (document.currentScript.innerHTML){
-    // make a github img link
-    let a = document.createElement("a");
-    a.href="https://modularizer.github.io/pyprez"
-    a.innerHTML = `<img src="https://github.com/favicon.ico" height="15px"/>`
-
-    // add a real pyprez custom-element
-    let mode = document.currentScript.getAttribute("mode")
-    mode = mode?mode:"editor";
-    let el = document.createElement("pyprez-" + mode);
-    el.innerHTML = document.currentScript.innerHTML;
-
-    if (document.currentScript.hasAttribute("theme")){
-        el.setAttribute("theme", document.currentScript.getAttribute("theme"))
-    }
-
-    // add to container
-    let div = document.createElement("div");
-    div.append(a);
-    div.append(el);
-
-    // insert into document after script
-    document.currentScript.after(div);
-
-    // remove script content
-    document.currentScript.innerHTML = ""
 }
 
 // allow importing this script multiple times without raising an error
@@ -61,50 +147,20 @@ var pyprezInitStarted = true;// save this window variable to signal that this sc
 
 /* ___________________________________________ LOAD DEPENDENCIES ____________________________________________________ */
 // allow disabling dependency import if desired (people may want to do their own imports for clarity, speed, or to
-//  use another version of pyodide or codemirror
-let dependenciesEnabled = true;
-if (location.hash.includes("skipdep") || location.search.includes("skipdep") || document.currentScript.hasAttribute("skipdep")){
-    dependenciesEnabled = false;
-}
-
-// list dependencies
-let cmVersion = "6.65.7"
-let cmBase = "https://cdnjs.cloudflare.com/ajax/libs/codemirror/" + cmVersion + "/"
-let jsDependencies = {
-    codemirrorPython: {
-        src: cmBase + "mode/python/python.min.js",
-        check: false
-    },
-    codemirror: {
-        src: cmBase + "codemirror.min.js",
-        check: ()=>{
-            if (!window.CodeMirror){return false}
-            if (!window.CodeMirror.modes){return false}
-            if (!window.CodeMirror.modes.python){return false}
-            return true
-        },
-    },
-    pyodide: {
-        src: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
-        check: ()=>window.loadPyodide
-    },
-}
-let cssDependencies = [cmBase + "codemirror.min.css"]
-
 // tool to add css to document
-let addStyle = s=> {
+function addStyle(s){
     let style = document.createElement("style");
     style.innerHTML = s;
     document.head.appendChild(style);
 }
 
 // tools to import js dependencies
-function importScript(url, ){
-    console.log("attempting to import ", url)
+function importScript(url){
     let el = document.createElement("script");
     el.src = url;
     return new Promise((resolve, reject)=>{
-        document.addEventListener('DOMContentLoaded', ()=>{
+        domContentLoaded.then(()=>{
+            console.log("attempting to import ", url)
             document.body.appendChild(el)
             el.addEventListener("load", ()=>resolve(url))
         })
@@ -112,30 +168,41 @@ function importScript(url, ){
 }
 
 // function to get the text of css dependencies
-let get = src => fetch(src).then(r=>r.text())
+function get(src){return fetch(src).then(r=>r.text())}
 
 // function to load an external .css document into the page
-let importStyle = (url)=>{
+function importStyle(url){
     console.log("importing", url)
-    return get(src).then(addStyle)
+    return get(url).then(addStyle)
 }
 
 // recursively load dependency tree
-function _loadDependencies(tree, res){
+function _loadDependencies(tree){
     for (let [k, v] of Object.entries(tree)){
-       if (!v.check || !v.check()){
+       if ((!v.check) || (!v.check())){// if there is no check or the check fails, then import
+            console.log("importing", k)
             importScript(v.src).then(()=>{
-                if (v.then !== undefined){
-                    _loadDependencies(v.then, res)
+                console.log("imported", k)
+                if (v.tree !== undefined){
+                    console.log("loading nested dependencies", v.tree)
+                    _loadDependencies(v.tree)
+                }else if (v.then){
+                    console.log("calling", v.then)
+                    v.then(k);
                 }else{
-                    res(k);
+                    console.log("done loading", k)
                 }
-            })
-       }else{
-            if (v.then !== undefined){
-                _loadDependencies(v.then, res)
+            }).catch(()=>{console.error("error importing", k)})
+       }else{ // otherwise resolve
+            console.log("passed importing", k)
+            if (v.tree !== undefined){
+                console.log("loading nested dependencies", v.tree)
+                _loadDependencies(v.tree)
+            }else if (v.then){
+                console.log("calling", v.then)
+                v.then(k);
             }else{
-                res(k);
+                console.log("done loading", k)
             }
        }
     }
@@ -143,43 +210,14 @@ function _loadDependencies(tree, res){
 
 // recursively load dependency tree
 function loadDependencies(){
-    return new Promise((resolve, reject)=>{
-        // if not enabled don't bother trying to load dependencies
-        if (!dependenciesEnabled){
-            resolve();
-            return
-        }
-
-        let res = (k)=>{
-            console.log("loaded dependency: ", k)
-            if (k == "pyodide"){
-                addStyle(".CodeMirror { border: 1px solid #eee; height: auto; width: auto;}")
-                setTimeout(resolve, 1000)
-            }
-        }
-
-        // try to load css dependencies but don't wait on them
-        cssDependencies.map(src => get(src).then(addStyle).then(()=>res(src)))
-
-        _loadDependencies(jsDependencies, res)
-    })
+    // try to load css dependencies but don't wait on them
+    cssDependencies.map(importStyle)
+    addStyle('.CodeMirror { border: 1px solid #eee !important; height: auto !important; }')
+    
+    // loading js dependencies will cause deferred promises to resolve
+    _loadDependencies(jsDependencies)
 }
-
-var loaded = loadDependencies(); // promise which resolves 1 second after pyodide is loaded
-var loadedCMStyles = ["default"];
-
-/* ___________________________________________ CONFIGURE DEBUG ______________________________________________________ */
-var PYPREZ_DEBUG = true // whether to log to console.debug or not
-function pyprezDebug(){
-    if (PYPREZ_DEBUG){
-        console.debug(...arguments)
-    }
-}
-if (PYPREZ_DEBUG){ // if debugging, start some timers
-    console.time("pyprez-import load") // time how long it takes the pyprez environment to load (relative to when this script is run)
-    console.time("pyodide load") // time how long it takes the pyodide object to load(relative to when this script is run)
-}
-
+loadDependencies(jsDependencies);
 /* _______________________________________ LOAD AND EXTEND PYODIDE FUNCTIONALITY ____________________________________ */
 class PyPrez{
     /*class which loads pyoidide and provides utility to allow user to load packages and run code as soon as possible
@@ -236,12 +274,12 @@ class PyPrez{
             let requirementsLoaded;
             if (requirements === "detect"){
                 if (code){
-                    pyprezDebug("auto loading packages detected in code")
-                    pyprezDebug(code)
+                    console.debug("auto loading packages detected in code")
+                    console.debug(code)
                     requirementsLoaded = pyodide.loadPackagesFromImports(code)
                 }
             }else{
-                pyprezDebug("loading", requirements)
+                console.debug("loading", requirements)
                 requirementsLoaded = pyodide.loadPackage(requirements);
             }
             return requirementsLoaded
@@ -259,8 +297,8 @@ class PyPrez{
     }
     _runPythonAsync(pyodide, code){
         if (code){
-            pyprezDebug("running code asynchronously:")
-            pyprezDebug(code)
+            console.debug("running code asynchronously:")
+            console.debug(code)
             return pyodide.runPythonAsync(code).catch(this.stderr)
         }
     }
@@ -271,26 +309,24 @@ class PyPrez{
 
     _loadPyodide(config={}){
         /*load pyodide object once pyodide*/
-        loaded.then((()=>{
-            // setup the special config options to load pyodide with
-            let defaultConfig = {
-                stdout: (t=>{this.stdout(t)}).bind(this),
-                stderr: (t=>{this.stderr(t)}).bind(this),
-            }
-            config = Object.assign(defaultConfig, config)
-            // load pyodide then resolve or reject this.promise
-            loadPyodide(config).then(this._resolvePromise).catch(this._rejectPromise);
+        pyodideImported.then((()=>{
+            setTimeout((()=>{
+                // setup the special config options to load pyodide with
+                let defaultConfig = {
+                    stdout: (t=>{this.stdout(t)}).bind(this),
+                    stderr: (t=>{this.stderr(t)}).bind(this),
+                }
+                config = Object.assign(defaultConfig, config)
+                // load pyodide then resolve or reject this.promise
+                loadPyodide(config).then(this._resolvePromise).catch(this._rejectPromise);
+            }).bind(this), 10)
         }).bind(this))
-
-
         this.then(this._onload.bind(this));
         return this._pyodidePromise
     }
     _onload(pyodide){
         /*set the window variable and the class attribute of pyodide as soon as pyodide is loaded*/
-        if (PYPREZ_DEBUG){
-            console.timeEnd("pyodide load");
-        }
+        console.timeEnd("pyodide load");
         window.pyodide = pyodide;
         this.pyodide = pyodide;
     }
@@ -319,11 +355,10 @@ class PyPrezImport extends HTMLElement{
         this.style.display = "none";
         let requirements = [...this.innerText.matchAll(this.re)].map(v=>v[1]);
         if (requirements.length){
-            pyprezDebug("importing requirements ", requirements, " from <pyprez-import/>", this)
+            console.debug("importing requirements ", requirements, " from <pyprez-import/>", this)
             pyprez.then(pyo=>pyo.loadPackage(requirements)).then(()=>{
-                if (PYPREZ_DEBUG){
-                    console.timeEnd("pyprez-import load")
-                }});
+                console.timeEnd("pyprez-import load")
+            });
         }
         pyprez.addElement(this);
     }
@@ -351,7 +386,7 @@ class PyPrezScript extends HTMLElement{
         this.style.display = "none";
         this.run = this.run.bind(this);
         if (this.hasAttribute("src") && this.getAttribute("src")){
-            pyprezDebug("fetching script for pyprez-script src", this.getAttribute("src"))
+            console.debug("fetching script for pyprez-script src", this.getAttribute("src"))
             fetch(this.getAttribute("src")).then(r=>r.text()).then(this.run)
         }else{
             this.run(this.innerHTML);
@@ -359,7 +394,7 @@ class PyPrezScript extends HTMLElement{
         pyprez.addElement(this);
     }
     run(code){
-        pyprezDebug("running code from <pyprez-script>", code, this)
+        console.debug("running code from <pyprez-script>", code, this)
         this.innerHTML = code;
         this.promise = pyprez.loadAndRunAsync(code).then(v=>this.value=v?v.toString():"")
         return this.promise
@@ -406,7 +441,7 @@ class PyPrezEditor extends HTMLElement{
 
         if (this.hasAttribute("src") && this.getAttribute("src")){
             let src = this.getAttribute("src")
-            pyprezDebug("fetching script for pyprez-editor src", src)
+            console.debug("fetching script for pyprez-editor src", src)
             if (src.endsWith('.js')){
                 this.language = "javascript"
             }
@@ -421,6 +456,9 @@ class PyPrezEditor extends HTMLElement{
         pyprez.addElement(this);
         if (this.hasAttribute("theme")){
             this.theme = this.getAttribute("theme")
+        }
+        if (this.hasAttribute("runonload") & (this.getAttribute("runonload")==="true")){
+            this.run();
         }
     }
     keypressed(e){
@@ -448,14 +486,7 @@ class PyPrezEditor extends HTMLElement{
     }
     loadEditor(){
         this._loadEditor();
-        if (!window.CodeMirror){
-            let imports = Array.from(document.getElementsByTagName("script")).filter(el => el.src.endsWith("codemirror.js"))
-            if (imports.length){
-                imports[0].addEventListener("load", this._loadCodeMirror.bind(this))
-            }
-        }else{
-            this._loadCodeMirror();
-        }
+        codemirrorImported.then(this._loadCodeMirror.bind(this));
     }
     _loadEditor(){
     // ➤ is &#10148;
@@ -475,7 +506,7 @@ class PyPrezEditor extends HTMLElement{
         this.textarea.style.width = w  + "px"
         console.log(this.textarea.style.width, this.textarea)
 
-        this.loadPackages();
+        codemirrorImported.then((()=>{this.loadPackages()}).bind(this));
         this.start.addEventListener("click", this.startClicked.bind(this))
         if (window.CodeMirror){
         }
@@ -492,7 +523,6 @@ class PyPrezEditor extends HTMLElement{
 
         console.log("attaching dblclick", this.editor.display.lineDiv)
         this.editor.display.lineDiv.addEventListener("dblclick", this.dblclicked.bind(this))
-
     }
     get code(){
         return this.editor?this.editor.getValue():this.textarea.value
@@ -510,11 +540,17 @@ class PyPrezEditor extends HTMLElement{
     }
     get theme(){return this.editor.options.theme}
     set theme(v){
-        if (loadedCMStyles.includes(v)){this.editor.setOption("theme", v)}
-        else{
-            let src = cmBase + "theme/" + v + ".min.css"
-            get(src).then(addStyle).then((()=>{this.editor.setOption("theme", v)}).bind(this))
-        }
+        codemirrorImported.then((()=>{
+            if (window.loadedCodeMirrorStyles.includes(v)){
+                this.editor.setOption("theme", v)
+            }else{
+                let src = codemirrorCDN + "theme/" + v + ".min.css"
+                get(src).then(addStyle).then((()=>{
+                    this.editor.setOption("theme", v);
+                    window.loadedCodeMirrorStyles.push(v);
+                }).bind(this))
+            }
+        }).bind(this))
     }
     numImports = 0;
     loadPackages(){
@@ -535,7 +571,7 @@ class PyPrezEditor extends HTMLElement{
     }
     run(){
         if (this.code){
-            let sep = "\n____________________\nRunning...__________\n"
+            let sep = "\n____________________\nRunning...\n"
             this.executed = this.code.split(sep)[0];
             this.start.style.color = "yellow"
             this.code = this.executed;
