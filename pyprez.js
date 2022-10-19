@@ -62,6 +62,10 @@ if (location.hash.includes("skipdep") || location.search.includes("skipdep") || 
 let cmVersion = "6.65.7"
 let cmBase = "https://cdnjs.cloudflare.com/ajax/libs/codemirror/" + cmVersion + "/"
 let jsDependencies = {
+    codemirrorPython: {
+        src: cmBase + "mode/python/python.min.js",
+        check: false
+    },
     codemirror: {
         src: cmBase + "codemirror.min.js",
         check: ()=>{
@@ -70,12 +74,6 @@ let jsDependencies = {
             if (!window.CodeMirror.modes.python){return false}
             return true
         },
-        then: {
-            codemirrorPython: {
-                src: cmBase + "mode/python/python.min.js",
-                check: false
-            }
-        }
     },
     pyodide: {
         src: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
@@ -118,15 +116,15 @@ function _loadDependencies(tree, res){
     for (let [k, v] of Object.entries(tree)){
        if (!v.check || !v.check()){
             importScript(v.src).then(()=>{
-                if (v.tree){
-                    _loadDependencies(tree, res)
+                if (v.then !== undefined){
+                    _loadDependencies(v.then, res)
                 }else{
                     res(k);
                 }
             })
        }else{
-            if (v.tree){
-                _loadDependencies(tree, res)
+            if (v.then !== undefined){
+                _loadDependencies(v.then, res)
             }else{
                 res(k);
             }
@@ -528,19 +526,21 @@ class PyPrezEditor extends HTMLElement{
     }
     run(){
         if (this.code){
-            this.executed = this.code.split("\n____________________\n")[0];
+            let sep = "\n____________________\nRunning...__________\n"
+            this.executed = this.code.split(sep)[0];
+            this.start.style.color = "yellow"
             this.code = this.executed;
             let code = this.executed;
             let promise;
             if (this.language == "python"){
-                this.code += "\n____________________\n";
+                this.code += sep;
                 if (this.getAttribute("stdout") === "true"){
                     this.attachStd();
                 }
 
                 promise = pyprez.loadAndRunAsync(code);
                 promise.then(r=>{
-                    this.code += "\n>>> " + (r?r.toString():"");
+                    this.code += "\n>>> " + (r?r.toString():"")  + "\n\n# (Double-Click to Re-Run)";
                     this.start.style.color = "red";
 //                    this.start.innerHTML = "↻";
                     this.start.innerHTML = "&#8635";
