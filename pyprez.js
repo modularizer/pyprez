@@ -37,11 +37,11 @@ class DeferredPromise{
             this._reject = reject
         })
     }
-    _resolve(){
-        this.resolve().then((()=>{this.fulfilled=true}).bind(this))
+    resolve(){
+        this._resolve().then((()=>{this.fulfilled=true}).bind(this))
     }
-    _reject(){
-        this.reject().then((()=>{this.rejected=true}).bind(this))
+    reject(){
+        this._reject().then((()=>{this.rejected=true}).bind(this))
     }
     then(onfulfilled, onrejected){return this.promise.then(onfulfilled, onrejected)}
     catch(onrejected){return this.promise.catch(onrejected)}
