@@ -30,10 +30,18 @@ for (let [k, v] of Object.entries(pyprezConfig)){
 /* ___________________________________________ DEFERRED PROMISES _________________________________________________ */
 class DeferredPromise{
     constructor(){
+        this.fulfilled = false
+        this.rejected = false
         this.promise = new Promise((resolve, reject)=>{
-            this.resolve = resolve
-            this.reject = reject
+            this._resolve = resolve
+            this._reject = reject
         })
+    }
+    _resolve(){
+        this.resolve().then((()=>{this.fulfilled=true}).bind(this))
+    }
+    _reject(){
+        this.reject().then((()=>{this.rejected=true}).bind(this))
     }
     then(onfulfilled, onrejected){return this.promise.then(onfulfilled, onrejected)}
     catch(onrejected){return this.promise.catch(onrejected)}
@@ -471,6 +479,7 @@ class PyPrezEditor extends HTMLElement{
         if (this.hasAttribute("theme")){
             this.theme = this.getAttribute("theme")
         }
+        this.addEventListener("dblclick", this.dblclicked.bind(this))
         if (this.hasAttribute("runonload") & (this.getAttribute("runonload")==="true")){
             this.run();
         }
@@ -511,12 +520,16 @@ class PyPrezEditor extends HTMLElement{
         <div style="color:green">&#10148;</div>
         <div style="background-color:#d3d3d3;border-color:#808080;border-radius:3px;display:flex">
             ${gh}
-            <div style="margin-left:10px;overflow:hidden;">Loading</div>
+            <div style="margin-left:10px;overflow:hidden;"></div>
         </div>
         <textarea style="height:auto;width:auto;">${this.initialCode}</textarea>
         `
         this.start = this.children[0]
         this.messageBar = this.children[1].children[1]
+        if (!pyodideImported.promise.fullfilled){
+            this.message = "Loading pyodide"
+            pyodideImported.then((()=>{this.message = "Ready   (Double-Click to Run)"}).bind(this))
+        }
         this.textarea = this.children[2]
         this.textarea.style.height = this.textarea.scrollHeight +"px"
 
@@ -590,7 +603,7 @@ class PyPrezEditor extends HTMLElement{
         if (n && n.length !== this.numImports){
             this.message = "Loading packages..."
             this.numImports = n.length;
-            pyprez.load(this.code);
+            pyprez.load(this.code).then((()=>{this.message = "Ready...(Double-Click to Run)"}).bind(this))
         }
     }
     executed = false
