@@ -12,7 +12,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 
 ## Sample
 ```html
-<script src="https://modularizer.github.io/pyprez/pyprez.js">
+<script src="https://modularizer.github.io/pyprez/pyprez.min.js">
     print("2^4=",2**4)
 </script>
 ```
@@ -49,7 +49,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 1.  disable console logging
 2. paste the following into HTML or click `Add an external library` just the url
     ```text
-    <script src="https://modularizer.github.io/pyprez/so.js"></script>
+    <script src="https://modularizer.github.io/pyprez/pyprez.min.js"></script>
     ```
 3. write your python in the javascript box
   * make sure to add a comment or an import to the top of the python script (`# python` works). This will throw a javascript error and ensure the code runs only as python
@@ -69,7 +69,7 @@ Convert your code here then copy-paste result into your question/answer. [Conver
 ### StackOverflow Power User?
 1. Add a bookmark to your browser with the following text as the url.
     ```
-    javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    ");if (sel.startsWith('```python')){sel = sel.replace('```python', '').slice(0,-3)} navigator.clipboard.writeText('\n\n\x3C!-- begin snippet: js hide: false console: false babel: false -->\n\n\x3C!-- language: lang-js -->\n\n    # py\n    ' + sel + '\n\x3C!-- language: lang-html -->\n\n    \x3Cscript src="https://modularizer.github.io/pyprez/so.js">\x3C/script>\n\n\n\x3C!-- end snippet -->')})()
+    javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    ");if (sel.startsWith('```python')){sel = sel.replace('```python', '').slice(0,-3)} navigator.clipboard.writeText('\n\n\x3C!-- begin snippet: js hide: false console: false babel: false -->\n\n\x3C!-- language: lang-js -->\n\n    # py\n    ' + sel + '\n\x3C!-- language: lang-html -->\n\n    \x3Cscript src="https://modularizer.github.io/pyprez/pyprez.min.js">\x3C/script>\n\n\n\x3C!-- end snippet -->')})()
     ```
 2. highlight the python codeblock you want to use
 3. click on the bookmark
