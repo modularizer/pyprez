@@ -13,6 +13,15 @@ This js file will import pyodide and codemirror dependencies for you, so all you
 */
 /* ___________________________________________ INTERPRET SCRIPT TAG _________________________________________________ */
 // first manipulate the contents of the script tag
+//document.addEventListener("DOMContentLoaded", () => {
+//    if (location.href !== "https://github.com/modularizer/pyprez"){
+//        let stackEditor = document.createElement("div");
+//        console.log(document.body.outerHTML);
+//        document.body.appendChild(stackEditor);
+//        let demoCode = document.scripts[document.scripts.length - 1].innerText.trim();
+//        stackEditor.outerHTML = `<pyprez-editor runonload="true">${demoCode}</pyprez-editor>`;
+//    }
+//})
 
 // first hide the innerHTML of the <script> tag if any is present
 document.currentScript.display = "none";

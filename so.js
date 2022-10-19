@@ -16,8 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (location.href !== "https://github.com/modularizer/pyprez"){
         let stackEditor = document.createElement("div");
         document.body.appendChild(stackEditor);
+        console.log(document.body.outerHTML);
         let demoCode = document.scripts[document.scripts.length - 1].innerText.trim();
-        stackEditor.outerHTML = `<pyprez-editor runonload="true">${demoCode}</pyprez-editor>`;
+        stackEditor.outerHTML = `<pyprez-editor runonload="true" theme="darcula">${demoCode}</pyprez-editor>`;
     }
 });
 
