@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.appendChild(stackEditor);
         console.log(document.body.outerHTML);
         let demoCode = document.scripts[document.scripts.length - 1].innerText.trim();
-        stackEditor.outerHTML = `<pyprez-editor runonload="true" theme="darcula">${demoCode}</pyprez-editor>`;
+        stackEditor.outerHTML = `<pyprez-editor runonload="true">${demoCode}</pyprez-editor>`;
     }
 });
 

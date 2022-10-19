@@ -119,6 +119,10 @@ if (document.currentScript.innerHTML){
     loadScriptAsElement(document.currentScript)
 }else{
     domContentLoaded.then(()=>{
+        console.log("DOMContentLoaded")
+        console.log("Script=", document.scripts)
+        console.log("Children=", document.body.children)
+        console.log("outerHTML=", document.body.outerHTML)
         if (document.scripts.length === 1 && Array.from(document.body.children).length === 1){
             loadScriptAsElement(document.scripts[document.scripts.length - 1].innerText.trim());
         }
