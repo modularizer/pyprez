@@ -130,7 +130,8 @@ if (document.currentScript.innerHTML){
         let isFirstScript = pyprezScript === document.scripts[0]
         let scripts = document.scripts.length
         let bodyEls = document.body.children.length
-        let solo = isFirstScript & (((bodyEls === 2) & (pyprezScript.parent === document.body)) || (bodyEls === 1))
+        let solo = isFirstScript & (((bodyEls === 2) & (pyprezScript.parentElement === document.body)) || (bodyEls === 1))
+        console.log(solo, isFirstScript, bodyEls, pyprezScript.parentElement)
         let convert = pyprezScript.hasAttribute("convert")?pyprezScript.getAttribute("convert")==="true":solo
         let runonload = pyprezScript.hasAttribute("runonload")?pyprezScript.getAttribute("runonload"):"true"
         let mode = pyprezScript.hasAttribute("mode")?pyprezScript.getAttribute("mode"):"editor"
