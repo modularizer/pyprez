@@ -41,7 +41,7 @@ class DeferredPromise{
 let domContentLoaded = new DeferredPromise();
 let codemirrorImported = new DeferredPromise();
 let pyodideImported = new DeferredPromise();
-
+let pyprezScript = document.currentScript;
 document.addEventListener('DOMContentLoaded', domContentLoaded.resolve)
 
 /* ___________________________________________ DEFINE DEPENDENCIES _________________________________________________ */
@@ -81,7 +81,7 @@ let cssDependencies = [
 ]
 
 /* ___________________________________________ INTERPRET SCRIPT TAG _________________________________________________ */
-function loadScriptAsElement(script=document.currentScript, mode="editor", theme="default"){
+function loadScriptAsElement(script=document.currentScript, mode="editor", theme="default", runonload=false){
     script.display = "none";
 
     // make a github img link
@@ -95,6 +95,10 @@ function loadScriptAsElement(script=document.currentScript, mode="editor", theme
     }
     let el = document.createElement("pyprez-" + mode);
     el.innerHTML = script.innerHTML;
+    runonload = pyprezScript.hasAttribute("runonload")?pyprezScript.getAttribute("runonload"):runonload
+    if (mode === "editor"){
+        el.setAttribute("runonload", runonload)
+    }
 
     if (script.hasAttribute("theme")){
         theme = els.getAttribute("theme")
@@ -116,33 +120,36 @@ function loadScriptAsElement(script=document.currentScript, mode="editor", theme
 
 // if the user is using the script tag as a code block, add a real code block to the document
 if (document.currentScript.innerHTML){
-    loadScriptAsElement(document.currentScript)
+    let convert = pyprezScript.hasAttribute("convert")?pyprezScript.getAttribute("convert")==="true":true
+    if (convert){
+        loadScriptAsElement(document.currentScript)
+    }
 }else{
     domContentLoaded.then(()=>{
         console.log("DOMContentLoaded")
-        console.log("Script=", document.scripts)
-        console.log("Children=", document.body.children)
-        console.log("outerHTML=", document.body.outerHTML)
-        if (document.scripts.length === 1 && Array.from(document.body.children).length === 1){
-            loadScriptAsElement(document.scripts[document.scripts.length - 1].innerText.trim());
+        let isFirstScript = pyprezScript === document.scripts[0]
+        let scripts = document.scripts.length
+        let bodyEls = document.body.children.length
+        let solo = isFirstScript & (((bodyEls === 2) & (pyprezScript.parent === document.body)) || (bodyEls === 1))
+        let convert = pyprezScript.hasAttribute("convert")?pyprezScript.getAttribute("convert")==="true":solo
+        let runonload = pyprezScript.hasAttribute("runonload")?pyprezScript.getAttribute("runonload"):"true"
+        let mode = pyprezScript.hasAttribute("mode")?pyprezScript.getAttribute("mode"):"editor"
+        let theme = pyprezScript.hasAttribute("theme")?pyprezScript.getAttribute("theme"):"default"
+        let githublink = pyprezScript.hasAttribute("githublink")?pyprezScript.getAttribute("githublink")==="true":true
+        let lastScript = document.scripts[document.scripts.length - 1]
+        if (convert){
+            let demoCode = lastScript.innerHTML.trim()
+//            loadScriptAsElement(lastScript);
+            let stackEditor = document.createElement("div");
+            let gh = githublink?'<a href="https://modularizer.github.io/pyprez"><img src="https://github.com/favicon.ico" height="15px"/></a>':""
+
+            document.body.appendChild(stackEditor);
+            stackEditor.outerHTML = `
+                ${gh}
+                <pyprez-${mode} runonload="${runonload}" theme="${theme}">${demoCode}</pyprez-${mode}>
+            `;
         }
-
-//        let stackEditor = document.createElement("div");
-//        console.log(document.body.outerHTML);
-//        document.body.appendChild(stackEditor);
-//        let demoCode = document.scripts[document.scripts.length - 1].innerText.trim();
-//        stackEditor.outerHTML = `<pyprez-editor runonload="true">${demoCode}</pyprez-editor>`;
-
     })
-    //document.addEventListener("DOMContentLoaded", () => {
-//    if (location.href !== "https://github.com/modularizer/pyprez"){
-//        let stackEditor = document.createElement("div");
-//        console.log(document.body.outerHTML);
-//        document.body.appendChild(stackEditor);
-//        let demoCode = document.scripts[document.scripts.length - 1].innerText.trim();
-//        stackEditor.outerHTML = `<pyprez-editor runonload="true">${demoCode}</pyprez-editor>`;
-//    }
-//})
 }
 
 // allow importing this script multiple times without raising an error
