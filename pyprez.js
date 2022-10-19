@@ -597,10 +597,15 @@ class PyPrezEditor extends HTMLElement{
             this.editor.setValue(v);
             this.editor.doc.setGutterMarker(0, "start", this.start);
             let si = this.editor.getScrollInfo();
-            this.editor.scrollTo(0, si.height)
+            this.editor.scrollTo(0, si.height);
+
         }else{
             this.textarea.value = v;
             this.textarea.scrollTop = this.textarea.scrollHeight;
+        }
+        let bb = this.getBoundingClientRect();
+        if (bb.bottom > window.innerHeight){
+            window.scrollTo(0, bb.bottom)
         }
     }
     get theme(){return this.editor.options.theme}
