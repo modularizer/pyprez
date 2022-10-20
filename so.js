@@ -1,4 +1,20 @@
 /*
+DEPRECATED
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Pyodide is undeniably cool, and useful in niche cases. Pyscript is easy to use, but is bulky, slow, not especially
 easy to develop on, and is not really necessary seeing as 95+% of its utility comes from Pyodide. With Pyprez,
 99.9+% of utility comes from Pyodide. We're not claiming to do anything better, its just a simple script to get you

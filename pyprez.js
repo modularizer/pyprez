@@ -11,6 +11,7 @@ This js file will import pyodide and codemirror dependencies for you, so all you
     np.random.rand(5)
 </script>
 */
+console.log("loaded pyprez.js from", location.href)
 /* ___________________________________________ CONFIG _________________________________________________ */
 let pyprezConfig = {
     importCodeMirror: true,
