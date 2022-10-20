@@ -488,15 +488,24 @@ class PyPrezEditor extends HTMLElement{
         if (this.hasAttribute("theme")){
             this.theme = this.getAttribute("theme")
         }
+        this.done = false;
         this.addEventListener("dblclick", this.dblclicked.bind(this))
         if (this.hasAttribute("runonload") & (this.getAttribute("runonload")==="true")){
             this.run();
         }
     }
     keypressed(e){
-        if (e.shiftKey){
-            if (e.key == "Enter"){this.run(); e.preventDefault();}
-            else if (e.key == "Backspace"){this.reset(); e.preventDefault();}
+//        console.log("keypressed", e.key, e.shiftKey)
+        if (!this.done){
+            if (e.shiftKey){
+                if (e.key == "Enter"){this.run(); e.preventDefault();}
+                else if (e.key == "Backspace"){this.reset(); e.preventDefault();}
+            }
+        }else{
+            if (!e.shiftKey){
+                if (e.key == "Enter"){this.run(); e.preventDefault();}
+                else if (e.key == "Backspace"){this.reset(); e.preventDefault();}
+            }
         }
     }
     dblclicked(e){
@@ -641,7 +650,10 @@ class PyPrezEditor extends HTMLElement{
         }
     }
     run(){
-        if (this.code){
+        console.log("run", this.done)
+        if (this.done){
+            this.consoleRun()
+        }else if (this.code){
             let sep = "\n____________________\n"
             this.message = "Running..."
             this.executed = this.code.split(sep)[0];
@@ -657,6 +669,7 @@ class PyPrezEditor extends HTMLElement{
 
                 promise = pyprez.loadAndRunAsync(code);
                 promise.then(r=>{
+                    this.done = true
                     this.message = "Complete! (Double-Click to Re-Run)"
                     this.code += "\n>>> " + (r?r.toString():"");
                     this.start.style.color = "red";
@@ -669,6 +682,7 @@ class PyPrezEditor extends HTMLElement{
                 })
             }else if (this.language == "javascript"){
                 let r = eval(code)
+                this.done = true
                 this.code += "\n>>> " + JSON.stringify(r, null, 2);
                 this.start.style.color = "red";
 //                this.start.innerHTML = "↻";
@@ -680,9 +694,44 @@ class PyPrezEditor extends HTMLElement{
                     this.after(this.htmlResponse)
                 }
                 this.htmlResponse.innerHTML = this.code.replaceAll("&lt","<").replaceAll("&gt", ">");
+                this.done = true
             }
         }
 
+    }
+    consoleRun(){
+        let code = this.code.split(">>> ").pop().trim().replaceAll("...", "")
+        if (!code){
+            this.code += "\n>>> "
+        }else{
+            console.log("running console", code)
+            if (this.language === "python"){
+                if (this.getAttribute("stdout") === "true"){
+                    this.attachStd();
+                }
+                let r = pyprez.loadAndRunAsync(code).then(((r)=>{
+                    if (this.getAttribute("stdout") === "true"){
+                        this.detachStd();
+                    }
+                    this.printResult(r);
+                }).bind(this))
+                return r
+            }else if (this.language === "javascript"){
+                let r = eval(code)
+                return this.printResult(r)
+            }
+        }
+    }
+    printResult(r){
+        let res;
+        if (this.language === "python"){
+            res = r?r.toString():""
+        }else{
+             res = JSON.stringify(r, null, 2)
+        }
+        if (!this.code.endsWith("\n")){this.code += "\n"}
+        this.code += "[Out] " + res + "\n>>> "
+        return res
     }
     appendLine(v){
         this.code += "\n" + v
@@ -694,8 +743,10 @@ class PyPrezEditor extends HTMLElement{
         pyprez.stderr = this.appendLine.bind(this)
     }
     detachStd(r){
-        pyprez.stdout = this.oldstdout
-        pyprez.stderr = this.oldstderr
+        if (this.oldstdout){
+            pyprez.stdout = this.oldstdout
+            pyprez.stderr = this.oldstderr
+        }
         return r
     }
     reload(){
@@ -704,6 +755,7 @@ class PyPrezEditor extends HTMLElement{
         this.start.style.color = "green";
         this.code = this.executed;
         this.executed = false;
+        this.done = false
     }
 }
 window.addEventListener("load", ()=>{
