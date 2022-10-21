@@ -44,13 +44,15 @@ class DeferredPromise{
             this._reject = reject
         })
     }
-    resolve(){
-        this._resolve()
+    resolve(r){
         this.fulfilled=true;
+        this.result = r;
+        this._resolve(r);
     }
-    reject(){
-        this._reject()
+    reject(e){
+        this._reject(e)
         this.rejected=true;
+        this.error = e;
     }
     then(onfulfilled, onrejected){return this.promise.then(onfulfilled, onrejected)}
     catch(onrejected){return this.promise.catch(onrejected)}
@@ -250,6 +252,7 @@ function loadDependencies(){
     _loadDependencies(jsDependencies)
 }
 loadDependencies(jsDependencies);
+
 /* _______________________________________ LOAD AND EXTEND PYODIDE FUNCTIONALITY ____________________________________ */
 class PyPrez{
     /*class which loads pyoidide and provides utility to allow user to load packages and run code as soon as possible
@@ -275,6 +278,9 @@ class PyPrez{
     constructor(config={}){
         // bind the class methods to this instance
         this.load = this.load.bind(this);
+        this.inputCalled = this.inputCalled.bind(this);
+        this.inputReady = this.inputReady.bind(this);
+        this.getInput = this.getInput.bind(this);
         this.loadAndRunAsync = this.loadAndRunAsync.bind(this);
 
         // create a deferred promise that will be resolved later with the pyodide object
@@ -298,6 +304,30 @@ class PyPrez{
     // set the functions that will handle stdout, stderr from the python interpreter
     stdout = console.log
     stderr = console.error
+
+    inputPromise = new DeferredPromise();
+
+    input = ()=>{}
+    callInput(msg){
+        return prompt(msg)
+    }
+    inputCalled(msg){
+        console.log("input called", msg, this.input)
+//        this.inputPromise.resolve(prompt(msg))
+        this.input(msg).then(((p)=>{console.log("p", p);this.inputPromise.resolve(p)}).bind(this))
+    }
+    inputReady(){
+        console.log("checking ready", this.inputPromise.fulfilled)
+        return this.inputPromise.fulfilled
+    }
+    getInput(){
+        console.log("getting input", this.inputPromise.fulfilled, this.inputPromise.result)
+        if (this.inputPromise.fulfilled){
+            let r = '' + this.inputPromise.result
+            this.inputPromise = new DeferredPromise();
+            return r
+        }
+    }
 
     // utility methods used to load requirements and run code asynchronously as soon as pyodide is loaded
     load(code, requirements="detect"){
@@ -347,10 +377,35 @@ class PyPrez{
                 let defaultConfig = {
                     stdout: (t=>{this.stdout(t)}).bind(this),
                     stderr: (t=>{this.stderr(t)}).bind(this),
+//                    stdin: (t=>{this.stdin(t)}).bind(this),
                 }
                 config = Object.assign(defaultConfig, config)
+
+                window.input_called = this.inputCalled.bind(this)
+                window.input_ready = this.inputReady.bind(this)
+                window.get_input = this.getInput.bind(this)
+
+                window.call_input = this.callInput.bind(this)
                 // load pyodide then resolve or reject this.promise
-                loadPyodide(config).then(this._resolvePromise).catch(this._rejectPromise);
+                loadPyodide(config).then((p)=>{
+                   p.runPython(`
+                    from js import input_called, input_ready, get_input, call_input
+                    import time
+
+                    def new_input(msg):
+                        input_called(msg)
+                        timeout = 10
+                        t0 = time.time()
+                        while not input_ready():
+                            time.sleep(0.1)
+                            if time.time() > t0 + timeout:
+                                return 'timeout'
+                        return get_input()
+                    __builtins__.input = call_input
+                    `);
+                    return p
+
+                }).then(this._resolvePromise).catch(this._rejectPromise);
             }).bind(this), 10)
         }).bind(this))
         this.then(this._onload.bind(this));
@@ -604,7 +659,9 @@ class PyPrezEditor extends HTMLElement{
             v = v.replaceAll("<", "&lt").replaceAll(">", "gt")
         }
         if (this.editor){
+            console.warn("setting value", v)
             this.editor.setValue(v);
+            console.warn("set value")
             this.editor.doc.setGutterMarker(0, "start", this.start);
             let si = this.editor.getScrollInfo();
             this.editor.scrollTo(0, si.height);
@@ -650,9 +707,22 @@ class PyPrezEditor extends HTMLElement{
             this.reload();
         }
     }
+    input(msg){
+        console.warn('msg', msg)
+        this.code += '\n' + msg + '\n>? '
+        console.warn("updated code")
+        this.inputResponse = new DeferredPromise();
+        this.inputResponse.resolve(prompt(msg))
+        return this.inputResponse
+    }
+    respondToInput(){
+        this.inputResponse.then((()=>{this.inputResponse=false;return this.code.split('\n>? ').pop()}).bind(this))
+    }
     run(){
         console.log("run", this.done)
-        if (this.done){
+        if (this.inputResponse){
+            this.respondToInput();
+        }else if(this.done){
             this.consoleRun()
         }else if (this.code){
             let sep = "\n____________________\n"
@@ -740,13 +810,16 @@ class PyPrezEditor extends HTMLElement{
     attachStd(){
         this.oldstdout = pyprez.stdout
         this.oldstderr = pyprez.stderr
+        this.oldinput = pyprez.input
         pyprez.stdout = this.appendLine.bind(this)
         pyprez.stderr = this.appendLine.bind(this)
+        pyprez.input = ((msg)=>{return this.input(msg)}).bind(this)
     }
     detachStd(r){
         if (this.oldstdout){
             pyprez.stdout = this.oldstdout
             pyprez.stderr = this.oldstderr
+            pyprez.input = this.oldinput
         }
         return r
     }
