@@ -672,7 +672,7 @@ class PyPrezEditor extends HTMLElement{
                 promise.then(r=>{
                     this.done = true
                     this.message = "Complete! (Double-Click to Re-Run)"
-                    this.code += "\n>>> " + (r?r.toString():"");
+                    this.code += "\n[Out] " + (r?r.toString():"") + "\n>>> ";
                     this.start.style.color = "red";
 //                    this.start.innerHTML = "↻";
                     this.start.innerHTML = "&#8635";
