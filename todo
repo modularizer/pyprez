@@ -1,5 +1,9 @@
 - Use Webworkers to improve performance
-
+- Allow Ctrl + C to interrupt, signal to kill, possibly signal to pause
+- Load webworker init code from .py file (overwrite input, etc.)
+- implement matplotlib
+- test Flask
+- test multiprocessing
 - Give each element a separate scope/namespace
 - Modify `sys.excepthook` or maybe pyodide config to give error tracebacks more similar to a typical python interpreter
 - Recognize if every line starts with extra spaces and automatically remove them
