@@ -1,3 +1,5 @@
+- Use Webworkers to improve performance
+
 - Give each element a separate scope/namespace
 - Modify `sys.excepthook` or maybe pyodide config to give error tracebacks more similar to a typical python interpreter
 - Recognize if every line starts with extra spaces and automatically remove them

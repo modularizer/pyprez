@@ -22,6 +22,7 @@ let pyprezConfig = {
     pyodideCDN: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
 
     help: true,
+    useWorker: false,
 }
 for (let [k, v] of Object.entries(pyprezConfig)){
     if (window[k] === undefined){
@@ -62,6 +63,7 @@ let codemirrorImported = new DeferredPromise();
 let pyodideImported = new DeferredPromise();
 let pyprezScript = document.currentScript;
 window.help= pyprezScript.hasAttribute("help")?pyprezScript.getAttribute("help")==="true":window.help;
+window.useWorker= pyprezScript.hasAttribute("worker")?pyprezScript.getAttribute("worker")==="true":window.useWorker;
 document.addEventListener('DOMContentLoaded', domContentLoaded.resolve)
 
 if (document.readyState === "complete" || document.readyState === "loaded") {
@@ -92,15 +94,18 @@ let jsDependencies = {
             },
         }
     },
-    pyodide: {
+}
+if (!useWorker){
+    jsDependencies.pyodide={
         src: pyodideCDN,
         check: ()=>{
-            if (!window.importPyodide){return true} 
+            if (!window.importPyodide){return true}
             return window.loadPyodide
         },
         then: pyodideImported.resolve,
-    },
+    }
 }
+
 let cssDependencies = [
     codemirrorCDN + "codemirror.min.css"
 ]
@@ -249,9 +254,14 @@ function loadDependencies(){
     addStyle('.CodeMirror { border: 1px solid #eee !important; height: auto !important; }')
 
     // loading js dependencies will cause deferred promises to resolve
-    _loadDependencies(jsDependencies)
+    _loadDependencies(jsDependencies);
+
+    if (useWorker){
+        pyodideImported.resolve();
+    }
 }
 loadDependencies(jsDependencies);
+
 
 /* _______________________________________ LOAD AND EXTEND PYODIDE FUNCTIONALITY ____________________________________ */
 class PyPrez{
@@ -278,9 +288,6 @@ class PyPrez{
     constructor(config={}){
         // bind the class methods to this instance
         this.load = this.load.bind(this);
-        this.inputCalled = this.inputCalled.bind(this);
-        this.inputReady = this.inputReady.bind(this);
-        this.getInput = this.getInput.bind(this);
         this.loadAndRunAsync = this.loadAndRunAsync.bind(this);
 
         // create a deferred promise that will be resolved later with the pyodide object
@@ -305,29 +312,10 @@ class PyPrez{
     stdout = console.log
     stderr = console.error
 
-    inputPromise = new DeferredPromise();
-
-    input = ()=>{}
     callInput(msg){
         return prompt(msg)
     }
-    inputCalled(msg){
-        console.log("input called", msg, this.input)
-//        this.inputPromise.resolve(prompt(msg))
-        this.input(msg).then(((p)=>{console.log("p", p);this.inputPromise.resolve(p)}).bind(this))
-    }
-    inputReady(){
-        console.log("checking ready", this.inputPromise.fulfilled)
-        return this.inputPromise.fulfilled
-    }
-    getInput(){
-        console.log("getting input", this.inputPromise.fulfilled, this.inputPromise.result)
-        if (this.inputPromise.fulfilled){
-            let r = '' + this.inputPromise.result
-            this.inputPromise = new DeferredPromise();
-            return r
-        }
-    }
+
 
     // utility methods used to load requirements and run code asynchronously as soon as pyodide is loaded
     load(code, requirements="detect"){
@@ -369,47 +357,108 @@ class PyPrez{
     then(successCb, errorCb){return this.promise.then(successCb, errorCb)}
     catch(errorCb){return this.promise.catch(errorCB)}
 
+    _loadWorker(){
+        let worker = new Worker("./webworker.js");
+
+        let callbacks = {};
+
+        worker.onmessage = (event) => {
+          const { id, ...data } = event.data;
+          if (id === "stdout"){
+            this.stdout(data.message)
+          }else if (id === "stderr"){
+            this.stderr(data.message)
+          }else{
+              let [onSuccess, onError] = callbacks[id];
+              delete callbacks[id];
+              if (data.results){
+                onSuccess(data.results);
+              }else{
+                onError(data.error)
+              }
+
+          }
+        };
+
+        worker.runPythonAsync = (() => {
+          let id = 0; // identify a Promise
+          return (script, context) => {
+            // the id could be generated more carefully
+            id = (id + 1) % Number.MAX_SAFE_INTEGER;
+            return new Promise((onSuccess, onError) => {
+              let uid = "runPythonAsync" + id
+              callbacks[uid] = [onSuccess, onError];
+              console.log("setting on success", )
+              worker.postMessage({
+                ...context,
+                python: script,
+                method: "runPythonAsync",
+                id: uid,
+              });
+            });
+          };
+        })();
+
+        worker.loadPackagesFromImports = (() => {
+          let id = 0; // identify a Promise
+          return (script, context) => {
+            // the id could be generated more carefully
+            id = (id + 1) % Number.MAX_SAFE_INTEGER;
+            return new Promise((onSuccess, onError) => {
+              uid = "loadPackagesFromImports" + id
+              callbacks[uid] = [onSuccess, onError];
+              worker.postMessage({
+                ...context,
+                python: script,
+                method: "loadPackagesFromImports",
+                id: uid,
+              });
+            });
+          };
+        })();
+
+        return [worker, callbacks]
+    }
     _loadPyodide(config={}){
         /*load pyodide object once pyodide*/
-        pyodideImported.then((()=>{
-            setTimeout((()=>{
-                // setup the special config options to load pyodide with
-                let defaultConfig = {
-                    stdout: (t=>{this.stdout(t)}).bind(this),
-                    stderr: (t=>{this.stderr(t)}).bind(this),
-//                    stdin: (t=>{this.stdin(t)}).bind(this),
-                }
-                config = Object.assign(defaultConfig, config)
+        if (useWorker){
+            console.warn("here")
+            let [worker, pyodideCallbacks] = this._loadWorker();
+            window.pyodide = worker;
+            window.pyodideCallbacks = pyodideCallbacks;
+            console.warn("here", window.pyodide, window.pyodideCallbacks)
+            pyodide.runPythonAsync('2+2').then(r=>{
+                console.warn('2+2=',r);
+                return pyodide
+            }).then(this._resolvePromise).catch(this._rejectPromise);
+            this.then(this._onload.bind(this));
+            return this._pyodidePromise
+        }else{
+            console.warn("loading pyodide")
+            pyodideImported.then((()=>{
+                setTimeout((()=>{
+                    // setup the special config options to load pyodide with
+                    let defaultConfig = {
+                        stdout: (t=>{this.stdout(t)}).bind(this),
+                        stderr: (t=>{this.stderr(t)}).bind(this),
+                    }
+                    config = Object.assign(defaultConfig, config)
 
-                window.input_called = this.inputCalled.bind(this)
-                window.input_ready = this.inputReady.bind(this)
-                window.get_input = this.getInput.bind(this)
+                    window.call_input = this.callInput.bind(this)
+                    loadPyodide(config).then((p)=>{
+                       p.runPythonAsync(`
+                        from js import call_input
+                        __builtins__.input = call_input
+                        `);
+                        return p
 
-                window.call_input = this.callInput.bind(this)
-                // load pyodide then resolve or reject this.promise
-                loadPyodide(config).then((p)=>{
-                   p.runPython(`
-                    from js import input_called, input_ready, get_input, call_input
-                    import time
+                    }).then(this._resolvePromise).catch(this._rejectPromise);
+                }).bind(this), 10)
+            }).bind(this))
+            this.then(this._onload.bind(this));
+            return this._pyodidePromise
+        }
 
-                    def new_input(msg):
-                        input_called(msg)
-                        timeout = 10
-                        t0 = time.time()
-                        while not input_ready():
-                            time.sleep(0.1)
-                            if time.time() > t0 + timeout:
-                                return 'timeout'
-                        return get_input()
-                    __builtins__.input = call_input
-                    `);
-                    return p
-
-                }).then(this._resolvePromise).catch(this._rejectPromise);
-            }).bind(this), 10)
-        }).bind(this))
-        this.then(this._onload.bind(this));
-        return this._pyodidePromise
     }
     _onload(pyodide){
         /*set the window variable and the class attribute of pyodide as soon as pyodide is loaded*/
@@ -552,6 +601,12 @@ class PyPrezEditor extends HTMLElement{
     }
     keypressed(e){
 //        console.log("keypressed", e.key, e.shiftKey)
+        if (this.inputmode){
+            this.code += this.key;
+            pyprez.input += this.key;
+            e.preventDefault();
+            return
+        }
         if (!this.done){
             if (e.shiftKey){
                 if (e.key == "Enter"){this.run(); e.preventDefault();}
@@ -707,22 +762,22 @@ class PyPrezEditor extends HTMLElement{
             this.reload();
         }
     }
+    inputmode = false
     input(msg){
         console.warn('msg', msg)
         this.code += '\n' + msg + '\n>? '
         console.warn("updated code")
-        this.inputResponse = new DeferredPromise();
-        this.inputResponse.resolve(prompt(msg))
-        return this.inputResponse
+        this.inputmode = true
+//        this.inputResponse = new DeferredPromise();
+//        this.inputResponse.resolve(prompt(msg))
+//        return this.inputResponse
     }
-    respondToInput(){
-        this.inputResponse.then((()=>{this.inputResponse=false;return this.code.split('\n>? ').pop()}).bind(this))
-    }
+//    respondToInput(){
+//        this.inputResponse.then((()=>{this.inputResponse=false;return this.code.split('\n>? ').pop()}).bind(this))
+//    }
     run(){
         console.log("run", this.done)
-        if (this.inputResponse){
-            this.respondToInput();
-        }else if(this.done){
+        if(this.done){
             this.consoleRun()
         }else if (this.code){
             let sep = "\n____________________\n"
@@ -742,6 +797,7 @@ class PyPrezEditor extends HTMLElement{
                 promise.then(r=>{
                     this.done = true
                     this.message = "Complete! (Double-Click to Re-Run)"
+                    console.warn("r=", r)
                     this.code += "\n[Out] " + (r?r.toString():"") + "\n>>> ";
                     this.start.style.color = "red";
 //                    this.start.innerHTML = "↻";
@@ -810,16 +866,13 @@ class PyPrezEditor extends HTMLElement{
     attachStd(){
         this.oldstdout = pyprez.stdout
         this.oldstderr = pyprez.stderr
-        this.oldinput = pyprez.input
         pyprez.stdout = this.appendLine.bind(this)
         pyprez.stderr = this.appendLine.bind(this)
-        pyprez.input = ((msg)=>{return this.input(msg)}).bind(this)
     }
     detachStd(r){
         if (this.oldstdout){
             pyprez.stdout = this.oldstdout
             pyprez.stderr = this.oldstderr
-            pyprez.input = this.oldinput
         }
         return r
     }
