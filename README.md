@@ -27,6 +27,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 - [About](#about)
 - [Getting Started](#getting-started)
 - [Use Cases](#use-cases)
+- [Limitations](#limitations)  
 - [Tags](#pyprez-tags): [`<pyprez-editor>`](#pyprez-editor) , [`<pyprez-console>`](#pyprez-console), [`<pyprez-import>`](#pyprez-import), [`<pyprez-script>`](#pyprez-script)
 - [Custom Themes](#codemirror-themes)
 - [API](#pyprez-api)
@@ -134,6 +135,17 @@ Front-end Python will never replace back-end computations, but may be useful for
 * making Python tutorials (similar to `jupyter` of `CoLab`)
 * distributing results of scientific studies and allowing users to play around with data
 * troubleshooting of forums such as stackoverflow <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a><a href="https://stackoverflow.com">StackOverflow</a>
+
+# Limitations
+Unfortunately, there are currently many limitations of running Python in the browser, which stem from fundamental issues which are tricky to solve.
+Many of PyPrez's limitations stem from limitations of `Pyodide`, on which it is built, which in turn stem from limitiations of `js`, `Emscriptem`, `WebAssembly`, and browsers in general.
+Some such limitations are:
+* many packages are not supported
+* `time.sleep` is not supported
+* `threading` is not supported
+* cannot access the local file system ( but can still read and write temporary files in webassembly)
+* `__builtins__.input` is tricky. Currently I have only gotten it to work with the fully blocking `window.prompt` function
+
 
 # Pyprez Tags
 ## Pyprez-Editor

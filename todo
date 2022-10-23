@@ -1,19 +1,28 @@
-- Use Webworkers to improve performance
-- Allow Ctrl + C to interrupt, signal to kill, possibly signal to pause
-- Load webworker init code from .py file (overwrite input, etc.)
-- implement matplotlib
-- test Flask
-- test multiprocessing
-- Give each element a separate scope/namespace
+[Features]
+- Allow specifying namespace for each editor
 - Modify `sys.excepthook` or maybe pyodide config to give error tracebacks more similar to a typical python interpreter
-- Recognize if every line starts with extra spaces and automatically remove them
-- Make message bar sticky but only within the bounds of the parent element
+- Allow importing from multiple files
+    - make relative imports look for a relative src address
+    - allow importing from the namespace of another editor on the page
+- Allow Ctrl + C to interrupt, signal to kill, possibly signal to pause
+
+[Fundamental Issues]
+- get input function working when using webworker
+- Auto-warn if code contains threading, time.sleep, or other features/libraries not currently supported
+- fix or possibly work around time.sleep (pyodide issue)
+
+[IDE-type features]
 - Add in linting for common syntax errors
-- Continue adding IDE functionality
-- Use cookies to save configs, not sure if this will work in StackOverflow environment
+- Add in however help tooltips and typehinting
+
+[JS/CSS]
+- Make message bar sticky but only within the bounds of the parent element
 - Add Ctrl+s to download a `.py` file
+- Use cookies to save configs, not sure if this will work in StackOverflow environment
 - Add a bug reporting link
-- Make docs link obvious
-- Allow specifying package requirements using import script attributes
-- Auto-warn if code contains threading or other features/libraries not currently supported
+
+[Things to test]
+- Flask
+- multiprocessing
+
 
