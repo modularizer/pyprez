@@ -54,8 +54,7 @@ Use this [Converter Page](https://modularizer.github.io/pyprez/stackconverter.ht
 <img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
 
 ## Method 3
-### StackOverflow Power User?
-### Setup
+### Setup Bookmark
 Add a bookmark to your browser with the following text as the url.
 
 ```text
@@ -75,9 +74,9 @@ Add a bookmark to your browser with the following text as the url.
    * Ctrl + D to save bookmark of this page
    * Right click on existing bookmark of this page, click edit, then replace bookmark url with the text copied from above 
 
-#### Usage
-1. on any webpage highlight the python codeblock you want to use and click the bookmark to copy markdown to clipboard
-2. paste the markdown copied in step 2 in your stackoverflow answer
+#### Highlight->Click->Paste
+* on any webpage highlight the python codeblock you want to use and click the bookmark to copy markdown to clipboard
+* paste the markdown into your stackoverflow answer
 
 <img src="./sample_imgs/stack-bookmark.png"/>
    

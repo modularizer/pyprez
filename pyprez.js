@@ -696,6 +696,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             <li>Click red reload</li>
             <li>Shift + Backspace</li>
         </ul>
+        <b>Add to StackOverflow:</b>
+        Click <b>&lt/&gt</b> to copy markdown, then paste into your answer.
         `
         _loadEditor(){
             /* first load the editor as though codemirror does not and will not exist*/
