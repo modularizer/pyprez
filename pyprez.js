@@ -30,6 +30,9 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         help: true,
         useWorker: false,
         convert: true,
+        includeGithubLink: true,
+        showThemeSelect: true,
+        showNamespaceSelect: false,
     }
     let strConfig = {
         codemirrorCDN: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/",
@@ -418,6 +421,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this.load = this.load.bind(this);
             this._runPythonAsync = this._runPythonAsync.bind(this);
             this.loadAndRunAsync = this.loadAndRunAsync.bind(this);
+            this.recordNamespaceName = this.recordNamespaceName.bind(this);
             this.register = this.register.bind(this);
 
             // load pyodide or pyodide worker proxy
@@ -433,7 +437,9 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             }
         }
         loadPyodideInterface(){
-            loadPyodideInterface(this.config)
+            loadPyodideInterface(this.config).then(()=>{
+                this.getNamespace("global")
+            })
         }
         pending = []
 
@@ -477,6 +483,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             if (code){
                 console.debug("running code asynchronously:")
                 console.debug(code)
+                this.recordNamespaceName(namespace)
                 if (useWorker){
                     return pyodide.runPythonAsyncInNamespace(code, namespace).catch(this.stderr)
                 }else{
@@ -486,11 +493,23 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             }
         }
         namespaces = {}
-        getNamespace(name){
-            if (this.namespaces[name] === undefined){
-                this.namespaces[name] = pyodide.globals.get("dict")();
+        namespaceNames = ['global']
+        recordNamespaceName(name){
+            console.log(this, this.namespaceNames)
+            if (!this.namespaceNames.includes(name)){
+                this.namespaceNames = this.namespaceNames.concat([name])
             }
-            return this.namespaces[name]
+        }
+        getNamespace(name){
+            pyodidePromise.then((()=>{
+                if (this.namespaces[name] === undefined){
+                    if (!useWorker){
+                        this.namespaces[name] = pyodide.globals.get("dict")();
+                    }
+                }
+
+                return this.namespaces[name]
+            }).bind(this))
         }
 
         // utility methods used to load requirements and run code asynchronously as soon as pyodide is loaded
@@ -561,8 +580,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             }
             this.language = aliases[language]
 
-            this.namespace = this.hasAttribute("namespace")?this.getAttribute("namespace"):"global"
-
             // default is to print stdout into editor
             if (!this.hasAttribute("stdout")){this.setAttribute("stdout", "true")}
 
@@ -585,6 +602,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             }else{
                 this.loadEl();
             }
+            this.namespace = this.hasAttribute("namespace")?this.getAttribute("namespace"):"global"
+            pyprez.recordNamespaceName(this.namespace)
 
             // add listeners
             this.addEventListener("keydown", this.keypressed.bind(this));
@@ -656,23 +675,52 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this._loadEditor();
             codemirrorImported.then(this._loadCodeMirror.bind(this));
         }
+        helpInfo = `
+        <b>PyPrez</b> is powered by <i>Pyodide</i> and runs fully in your browser!<br/><br/>
+
+        <b>To run:</b>
+        <ul>
+            <li>Click green arrow</li>
+            <li>Shift + Enter</li>
+            <li>Double-Click</li>
+        </ul>
+        <b>To re-run:</b>
+        <ul>
+            <li>Shift + Enter</li>
+            <li>Double-Click</li>
+        </ul>
+        <b>To reload:</b>
+        <ul>
+            <li>Click red reload</li>
+            <li>Shift + Backspace</li>
+        </ul>
+        `
         _loadEditor(){
             /* first load the editor as though codemirror does not and will not exist*/
 
             // check whether to add github link to top based on attributes
-            let githublink = this.hasAttribute("githublink")?this.getAttribute("githublink")==="true":false
+            let githublink = this.hasAttribute("githublink")?this.getAttribute("githublink")==="true":includeGithubLink
             let gh = githublink?githublinkImage:"<div></div>"
 
             // check whether to add a message bar to the top of the element
             let help= this.hasAttribute("help")?this.getAttribute("help")==="true":window.help;
+
+            let snss = this.hasAttribute("showNamespaceSelect")?this.getAttribute("showNamespaceSelect"):window.showNamespaceSelect;
+            snss=snss?"block":"none";
+            let sts = this.hasAttribute("showThemeSelect")?this.getAttribute("showThemeSelect"):window.showThemeSelect;
+            sts = sts?"block":"none";
 
             // make top bar above codemirror
             let top = ""
             if (help){
                 top = `<div style="background-color:#d3d3d3;border-color:#808080;border-radius:3px;display:flex">
                     ${gh}
-                    <div style="margin-left:10px;overflow:hidden;"></div>
-                    <select style="order:2;margin-left:auto;background-color:#f0f0f0;border-radius:3px;">
+                    <div style="margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
+                    <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
+                    <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
+                        <option>global</option>
+                    </select>
+                    <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${sts};">
                         <option>default</option>
                         <option style="background-color:#2b2b2b;color:#a9b7c6;">darcula</option>
                         <option style="background-color:#d7d4f0;color:#30a;">eclipse</option>
@@ -684,8 +732,12 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             }else{
                 top = `<div>
                     ${gh}
-                    <div style="display:none;margin-left:10px;overflow:hidden;"></div>
-                    <select style="order:2;margin-left:auto;background-color:#f0f0f0;border-radius:3px;">
+                    <div style="display:none;margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
+                    <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
+                    <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
+                        <option>global</option>
+                    </select>
+                    <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${sts};">
                         <option>default</option>
                         <option style="background-color:#2b2b2b;color:#a9b7c6;">darcula</option>
                         <option style="background-color:#d7d4f0;color:#30a;">eclipse</option>
@@ -707,19 +759,23 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             `
             this.start = this.children[0] // start button
             this.messageBar = this.children[1].children[1] // top message bar to use to print status (Loading, Running, etc.)
-            this.select = this.children[1].children[2]
+            this.namespaceSelect = this.children[1].children[3]
+            this.themeSelect = this.children[1].children[4]
             this.textarea = this.children[2] // textarea in case codemirror does not load
             this.endSpace = this.children[3]
 
             // add click event to start button
             this.start.addEventListener("click", this.startClicked.bind(this))
-            this.select.addEventListener("change", ((e)=>{
-                this.theme = this.select.value;
+            this.themeSelect.addEventListener("change", ((e)=>{
+                this.theme = this.themeSelect.value;
                 try{
-                    localStorage.setItem("codemirrorTheme", this.select.value);
+                    localStorage.setItem("codemirrorTheme", this.themeSelect.value);
                 }catch{}
 
             }).bind(this))
+            this.namespaceSelect.addEventListener("click", ()=>{
+                this.refreshNamespaces();
+            })
 
             // size text area to fit initial code
             this.textarea.style.height = this.textarea.scrollHeight +"px" // set text area to full height
@@ -728,6 +784,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             let w = Math.min(window.innerWidth - 50, Math.ceil(longestLine * fontSize) + 200)
 //            this.children[1].style.width = w +"px"
 //            this.textarea.style.width = w  + "px"
+            this.style.maxWidth = "100%"
             this.style.width = stackMode?"100%":(w + "px")
 
             // Set initial messages
@@ -755,14 +812,36 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
 
             try{
                 if (!this.hasAttribute("theme")){
-                    this.select.value = this.theme;
+                    this.themeSelect.value = this.theme;
                     let cmt = localStorage.getItem("codemirrorTheme");
                     cmt = cmt?cmt:this.theme;
                     localStorage.setItem("codemirrorTheme", cmt);
-                    this.select.value = cmt;
+                    this.themeSelect.value = cmt;
                     this.theme = cmt;
                 }
             }catch{}
+        }
+        get selectedNamespace(){return this.namespaceSelect.value}
+        set selectedNamespace(name){
+            this.namespaceSelect.value = name;
+        }
+        get namespaces(){return Array.from(this.namespaceSelect.children).map(el=>el.innerHTML)}
+        set namespaces(namespaces){
+            console.warn(namespaces)
+            let sn = this.selectedNamespace;
+            this.namespaceSelect.innerHTML = namespaces.map(name=>`<option>${name}</option>`).join("")
+            this.namespaceSelect.value = sn;
+        }
+        refreshNamespaces(){
+            this.namespaces = pyprez.namespaceNames;
+        }
+        get namespace(){return this.selectedNamespace}
+        set namespace(name){
+            if (!this.namespaces.includes(name)){
+                console.warn(this.namespaces, name)
+                this.namespaces = this.namespaces.concat([name]);
+            }
+            this.selectedNamespace = name
         }
 
         /* ________________________ EVENTS _____________________________*/
@@ -770,7 +849,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             /* Shift + Enter to run, Shift + Backspace to reload */
             if (e.shiftKey){
                 if (e.key == "Enter"){this.run(); e.preventDefault();}
-                else if (e.key == "Backspace"){this.reset(); e.preventDefault();}
+                else if (e.key == "Backspace"){this.reload(); e.preventDefault();}
             }
         }
         dblclicked(e){
@@ -856,7 +935,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     }).bind(this))
                 }
             }).bind(this))
-            this.select.value = v;
+            this.themeSelect.value = v;
         }
 
         /* ________________________ PYTHON IMPORTS _____________________________*/
@@ -879,6 +958,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this.start.style.color = "green";
             this.code = this.executed;
             console.warn("Setting code to ", this.executed, this.code)
+            this.message = "Ready   (Double-Click to Run)";
             this.executed = false;
             this.done = false
         }
@@ -1046,6 +1126,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this.style.display = "none";
             this.run = this.run.bind(this);
             this.namespace = this.hasAttribute("namespace")?this.getAttribute("namespace"):"global"
+            pyprez.recordNamespaceName(this.namespace)
             if (this.hasAttribute("src") && this.getAttribute("src")){
                 console.debug("fetching script for pyprez-script src", this.getAttribute("src"))
                 fetch(this.getAttribute("src")).then(r=>r.text()).then(this.run)
@@ -1088,6 +1169,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this.printResult = this.printResult.bind(this);
             this.eval = this.eval.bind(this);
             this.namespace = this.hasAttribute("namespace")?this.getAttribute("namespace"):"global"
+            pyprez.recordNamespaceName(this.namespace)
 
             // set language to python(default), javascript, or html
             let language = this.hasAttribute("language")?this.getAttribute("language").toLowerCase():"python"
@@ -1330,6 +1412,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             let mode = this.hasAttribute("mode")?`mode=${this.getAttribute("mode")}`:"";
             let src = this.hasAttribute("src")?`src=${this.getAttribute("src")}`:"";
             let namespace = this.hasAttribute("namespace")?this.getAttribute("namespace"):"global";
+            pyprez.recordNamespaceName(this.namespace);
 
             this.innerHTML = `
             <div style="display:flex">
@@ -1341,7 +1424,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 </div>
             </div>
             <div style="display: flex">
-                <div style="flex:50%">
+                <div style="flex:50%;max-width:50%;">
                     <pyprez-editor ${mode} ${src} namespace="${namespace}">
                         ${ih}
                     </pyprez-editor>
@@ -1363,7 +1446,205 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
     window.addEventListener("load", ()=>{
         customElements.define("stack-converter",  StackOverflowConverter);
     })
+
+    /*__________________________________ TOOLTIPS _____________________________________________*/
+    class TOOLTIP{
+      empty={
+        id: 'tooltip',
+        innerHTML: '',
+        style: {
+            position: 'absolute',
+            'z-index': 100000,
+            top: 100,
+            left: 100,
+            display: 'none',
+            opacity: 0.999,
+        },
+      }
+      def={
+        style: {
+            position: 'relative',
+            'background-color': '#fff',
+            'border-color': '#606060',
+            'border-style': 'solid',
+            'border-width': '2px',
+            'border-radius': '5px',
+            margin: '5px',
+            padding: '5px',
+            opacity: 0.95,
+        }
+      }
+      trigger= 'mouseover'
+      attrNames= ['tooltip', 'learningtooltip']
+
+      hold= false
+
+      constructor(){
+        this.el = this.createElement(this.empty)
+        domContentLoaded.then(()=>{document.body.append(this.el)})
+        this.addEventListener()
+
+        let mouseDown = 0;
+        window.addEventListener("mousedown", (e)=>{
+            this.mousedown++;
+            this.onEvent(e, true);
+        })
+        window.addEventListener("mouseup", ()=>{
+            this.mousedown--
+        })
+
+        let enabled = localStorage.getItem("learningModeEnabled") === "true"
+         console.log("enabled=", enabled)
+         if (enabled){
+            this.enableLearningMode()
+         }else{
+            this.disableLearningMode()
+         }
+         this.keydownToggle = this.keydownToggle.bind(this)
+      }
+      mousedown = 0
+      hideBlocked = false
+
+      createElement(ob, innerHTML=-1){
+        if (innerHTML === -1){
+            innerHTML = ob.innerHTML
+        }
+        let el = document.createElement('div')
+        let toggleWarning = document.createElement('div')
+        toggleWarning.innerHTML = '<center style="font-size:10px"><pre>spacebar to toggle tooltip</pre></center>'
+        let inner = document.createElement('div')
+        el.id = ob.id
+        for (let [k, v] of Object.entries(ob.style)){
+            el.style[k] = v
+        }
+        inner.innerHTML = innerHTML
+
+
+        el.appendChild(inner)
+    //    el.appendChild(toggleWarning)
+        return el
+      }
+
+      getDefHTML(t, innerHTML){
+        let temp = this.createElement(this.def, t)
+        t = temp.outerHTML
+        return t
+      }
+
+      setInnerHTML(s, def=false){
+        if (s.endsWith('#def') | def){
+            s = this.getDefHTML(s.split('#def')[0])
+        }
+        this.el.innerHTML = s
+      }
+
+      show(s, clientY, clientX){
+        this.el.style.top = window.scrollY + clientY + 1 + "px"
+        let maxLeft = window.innerWidth - this.el.getBoundingClientRect().width - 200
+        this.el.style.left = Math.min(clientX + 1, maxLeft) + "px"
+        this.setInnerHTML(s)
+        this.el.style.display = 'block'
+        maxLeft = window.innerWidth - this.el.getBoundingClientRect().width
+        this.el.style.left = Math.min(clientX + 1, maxLeft) + "px"
+        this.hold = true
+        document.body.addEventListener("keydown", this.keydownToggle)
+        setTimeout(()=>{this.hold = false;}, 100 )
+      }
+
+      hide(){
+        if (!this.hold){
+          if(!this.mousedown){
+            this.hideBlocked = !this.hideBlocked
+          }
+          if (!this.hideBlocked){
+              this.el.style.top = 0
+              this.el.style.left = 0
+              this.el.style.display = 'none'
+              this.el.innerHTML = ''
+              this.hideTimer = false
+              document.body.removeEventListener("keydown", this.keydownToggle)
+          }
+
+        }
+      }
+
+      keydownToggle(e){
+      console.log(e.key)
+        if (e.key === " "){
+            this.toggleLearningMode()
+            e.preventDefault();
+        }
+      }
+
+      get learningMode(){
+        return this.attrNames.includes('learningtooltip')
+      }
+      enableLearningMode(){
+        if (!this.learningMode){
+            this.attrNames.push('learningtooltip')
+        }
+        localStorage.setItem("learningModeEnabled", true)
+      }
+      disableLearningMode(){
+        if (this.learningMode){
+            this.attrNames.splice(this.attrNames.indexOf('learningtooltip'),1)
+        }
+        this.hide()
+        localStorage.setItem("learningModeEnabled", false)
+      }
+      toggleLearningMode(){
+      console.log(this.attrNames)
+        if(this.learningMode){
+            this.disableLearningMode()
+        }else{
+            this.enableLearningMode()
+        }
+      }
+
+      onEvent(event, click=false){
+        let attrNames = this.attrNames
+        if (click){
+            attrNames = attrNames.concat(['clicktooltip'])
+        }
+
+        let p = event.path
+    //    console.log(p.map(el => el.id))
+          let i=0;
+          let found=false;
+          if (p.length>4){
+            while(!found && i<(p.length-4)){
+               let _found = false
+               for (let attrName of attrNames){
+                   if (p[i].hasAttribute){
+                    if (p[i].hasAttribute(attrName)){
+    //                  console.log(attrName, p[i], )
+                      _found = p[i]
+                      this.show(_found.getAttribute(attrName), event.clientY, event.clientX)
+                    }
+                  }
+               }
+               found = _found
+
+              i++;
+            }
+          }
+          if (!found){
+            this.hide()
+          }
+        }
+
+      addEventListener(){
+        window.addEventListener(this.trigger, this.onEvent.bind(this))
+
+      }
+    }
+
+    var tooltip = new TOOLTIP()
+
 }else{
     // if the user is using the script tag as a code block, add a real code block to the document
     pyprezConvert();
 }
+
+
+

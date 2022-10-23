@@ -39,7 +39,35 @@ Run **client-side python** in your browser to **prez**ent your code.
 <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
 <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534">View a real answer</a>
 
-## Method 1:
+## Method 1
+Convert your code here then copy-paste result into your question/answer. [Converter Page](https://modularizer.github.io/pyprez/stackconverter.html)
+<stack-converter id="stackplaceholder"></stack-converter>
+
+<img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
+
+**If** the viewer clicks `Run Code Snippet`, they will be able to edit and test a live python question or answer without leaving the page.
+
+**It will render something like this**
+<img src="./sample_imgs/stack-overflow-sample.png"/>
+
+## Method 2
+### StackOverflow Power User?
+### Setup
+Add a bookmark to your browser with the following text as the url.
+    ```
+    javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    ");if (sel.startsWith('```python')){sel = sel.replace('```python', '').slice(0,-3)};navigator.clipboard.writeText('\n\n\x3C!-- begin snippet: js hide: false console: false babel: false -->\n\n\x3C!-- language: lang-js -->\n\n    # py\n    ' + sel + '\n\x3C!-- language: lang-html -->\n\n    \x3Cscript src="https://modularizer.github.io/pyprez/pyprez.min.js">\x3C/script>\n\n\n\x3C!-- end snippet -->')})()
+    ```
+   * [Copy To Bookmarklet Clipboard](javascript:navigator.clipboard.writeText(`javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    ");if (sel.startsWith('`+'```'+ `python')){sel = sel.replace('`+'```'+`python', '').slice(0,-3)};navigator.clipboard.writeText('\n\n\x3C!-- begin snippet: js hide: false console: false babel: false -->\n\n\x3C!-- language: lang-js -->\n\n    # py\n    ' + sel + '\n\x3C!-- language: lang-html -->\n\n    \x3Cscript src="https://modularizer.github.io/pyprez/pyprez.min.js">\x3C/script>\n\n\n\x3C!-- end snippet -->')})()`))
+   * Ctrl + D to save bookmark of this page
+   * Right click on existing bookmark of this page, click edit, then replace bookmark url with the text copied above 
+
+#### Usage
+1. on any webpage highlight the python codeblock you want to use and click the bookmark to copy markdown to clipboard
+2. paste the markdown copied in step 2 in your stackoverflow answer
+
+<img src="./sample_imgs/stack-bookmark.png"/>
+   
+## Method 3:
 ### step 1
 <img src="./sample_imgs/stack-overflow-start.png"/>
 * click to add a runnable code segment
@@ -54,28 +82,6 @@ Run **client-side python** in your browser to **prez**ent your code.
     ```
 3. write your python in the javascript box
   * make sure to add a comment or an import to the top of the python script (`# python` works). This will throw a javascript error and ensure the code runs only as python
-
-## Method 2
-Convert your code here then copy-paste result into your question/answer. [Converter-Only Page](https://modularizer.github.io/pyprez/stackconverter.html)
-<stack-converter id="stackplaceholder"></stack-converter>
-
-<img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
-
-**If** the viewer clicks `Run Code Snippet`, they will be able to edit and test a live python question or answer without leaving the page.
-
-**It will render something like this**
-<img src="./sample_imgs/stack-overflow-sample.png"/>
-
-## Method 3 
-### StackOverflow Power User?
-1. Add a bookmark to your browser with the following text as the url.
-    ```
-    javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    ");if (sel.startsWith('```python')){sel = sel.replace('```python', '').slice(0,-3)} navigator.clipboard.writeText('\n\n\x3C!-- begin snippet: js hide: false console: false babel: false -->\n\n\x3C!-- language: lang-js -->\n\n    # py\n    ' + sel + '\n\x3C!-- language: lang-html -->\n\n    \x3Cscript src="https://modularizer.github.io/pyprez/pyprez.min.js">\x3C/script>\n\n\n\x3C!-- end snippet -->')})()
-    ```
-2. highlight the python codeblock you want to use
-3. click on the bookmark
-4. paste to replace the highlighted text
-<img src="./sample_imgs/stack-bookmark.png"/>
 
    
 ### Other options
