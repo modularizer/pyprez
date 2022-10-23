@@ -52,8 +52,6 @@ Run **client-side python** in your browser to **prez**ent your code.
 <a href="https://stackoverflow.com/search?q=pyprez"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
 <a href="https://stackoverflow.com/search?q=pyprez">View Real Answers</a>
 
-<a href="https://stackoverflow.com/questions/ask#"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
-<a href="https://stackoverflow.com/questions/ask#">Create a Draft Question</a>
 
 ## Method 1
 Using any `<prprez-editor>` element (such as the one [here](https://modularizer.github.io/pyprez/samples/stackconverter.html)) to modify your code, then click `</>` button on the top bar to convert your python 
