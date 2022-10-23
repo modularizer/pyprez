@@ -924,7 +924,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         }
 
         // get/set the codemirror theme, importing from cdn if needed
-        get theme(){return this.editor.options.theme}
+        _theme = "default"
+        get theme(){return this._theme}
         set theme(v){
             codemirrorImported.then((()=>{
                 if (loadedCodeMirrorStyles.includes(v)){
@@ -938,6 +939,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 }
             }).bind(this))
             this.themeSelect.value = v;
+            this._theme = v;
         }
 
         /* ________________________ PYTHON IMPORTS _____________________________*/
@@ -1384,8 +1386,10 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
     </pre>
             `
         }
+        theme="darcula"
         getRunnable(){
             let c = this.code.split("\n").map(line => "    " + line).join("\n")
+            let t = this.theme
             return `
 
 
@@ -1397,7 +1401,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
 ${c}
 &lt!-- language: lang-html --&gt
 
-    &ltscript src="https://modularizer.github.io/pyprez/pyprez.min.js"&gt&lt/script&gt
+    &ltscript src="https://modularizer.github.io/pyprez/pyprez.min.js" theme="${t}"&gt&lt/script&gt
 
 
 &lt!-- end snippet --&gt
@@ -1444,8 +1448,14 @@ ${c}
             this.stackOverflow = this.children[1].children[1].children[0]
             this.sync()
             this.pyprezEditor.addEventListener("keydown", (()=>{setTimeout(this.sync.bind(this), 10)}).bind(this))
+            this.pyprezEditor.themeSelect.addEventListener("change", (()=>{setTimeout(this.sync.bind(this), 10)}).bind(this))
+            codemirrorImported.then((()=>{
+                setTimeout(this.sync.bind(this), 1000)
+            }).bind(this))
         }
         sync(){
+            console.warn("syncing")
+            this.stackOverflow.theme = this.pyprezEditor.theme
             this.stackOverflow.code = this.pyprezEditor.code
         }
     }
