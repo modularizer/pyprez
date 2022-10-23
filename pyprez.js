@@ -739,13 +739,16 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             // set double click listener on editor as well because otherwise outer element listener does not get triggered
             this.editor.display.lineDiv.addEventListener("dblclick", this.dblclicked.bind(this))
 
-            this.select.value = this.theme;
+
             try{
-                let cmt = localStorage.getItem("codemirrorTheme");
-                cmt = cmt?cmt:this.theme;
-                localStorage.setItem("codemirrorTheme", cmt);
-                this.select.value = cmt;
-                this.theme = cmt;
+                if (!this.hasAttribute("theme")){
+                    this.select.value = this.theme;
+                    let cmt = localStorage.getItem("codemirrorTheme");
+                    cmt = cmt?cmt:this.theme;
+                    localStorage.setItem("codemirrorTheme", cmt);
+                    this.select.value = cmt;
+                    this.theme = cmt;
+                }
             }catch{}
         }
 
@@ -840,6 +843,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     }).bind(this))
                 }
             }).bind(this))
+            this.select.value = v;
         }
 
         /* ________________________ PYTHON IMPORTS _____________________________*/
