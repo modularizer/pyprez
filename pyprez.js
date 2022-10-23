@@ -19,6 +19,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
     var preferredPyPrezImportSrc = "https://modularizer.github.io/pyprez/pyprz.min.js";
     var githublinkImage = '<a href="https://modularizer.github.io/pyprez"><img src="https://github.com/favicon.ico" height="15px"/></a>';
 
+    var stackMode = false;
     var pyprezScript = document.currentScript; // get the HTML <script> element running this code
 
     /* ___________________________________________ CONFIG _________________________________________________ */
@@ -149,6 +150,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 let convertScript = pyprezScript.hasAttribute("convert")?pyprezScript.getAttribute("convert")==="true":convert
 
                 if (solo && convertScript){
+                    window.stackMode = true;
                     // use special attribute defaults in stack overflow
                     let mode = pyprezScript.hasAttribute("mode")?pyprezScript.getAttribute("mode"):"editor"
                     let specialAttributes = {
@@ -687,7 +689,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             let w = Math.min(window.innerWidth - 50, Math.ceil(longestLine * fontSize) + 50)
 //            this.children[1].style.width = w +"px"
 //            this.textarea.style.width = w  + "px"
-            this.style.width = w + "px"
+            this.style.width = stackMode?"100%":(w + "px")
 
             // Set initial messages
             if (!pyodideImported.promise.fullfilled){
