@@ -1,9 +1,9 @@
 if (!window.pyprezUpdateDate){{
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Sun Oct 23 2022 11:43:27 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "test custom commit script which labels code";
-    var pyprezPrevCommit = "development:commit 22d56c3f82f511935bb700780598c39ac3ed11f1";
+    var pyprezUpdateDate = new Date("Sun Oct 23 2022 12:28:21 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "fix js and html pyprez-editor elements";
+    var pyprezPrevCommit = "development:commit 2733bc44694cb1cf06c041b4edc1924c07a115a2";
 }}
 /*
 Pyodide is undeniably cool, and useful in niche cases. Pyscript is easy to use, but is bulky, slow, not especially
@@ -955,7 +955,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         set code(v){
             // escape html
             if (this.language == "html"){
-                v = v.replaceAll("<", "&lt").replaceAll(">", "gt")
+                v = v.replaceAll("<", "&lt").replaceAll(">", "&gt")
             }
 
             if (this.editor){
@@ -1016,7 +1016,9 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             /*reset editor to the state from before it was executed last*/
             this.start.innerHTML = this.startChar
             this.start.style.color = "green";
-            this.code = this.executed;
+            if (this.language !== "html"){
+                this.code = this.executed;
+            }
             console.warn("Setting code to ", this.executed, this.code)
             this.message = "Ready   (Double-Click to Run)";
             this.executed = false;
@@ -1030,10 +1032,10 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 this.message = "Running..."
                 let code = this.code.split(this.separator)[0];
                 this.executed = code;
-                this.code = code;
                 this.start.style.color = "yellow"
                 let promise;
                 if (this.language == "python"){
+                    this.code = code;
                     this.code += this.separator;
                     if (this.getAttribute("stdout") === "true"){
                         this.attachStd();
@@ -1052,14 +1054,11 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                         return r
                     })
                 }else if (this.language == "javascript"){
-                    console.warn(this)
-                    console.warn(code)
-                    console.warn(this.consoleOut)
+                    this.code = code;
                     let r = pyprez.namespaceEval(code, this.namespace)
                     this.done = true
                     this.message = "Complete! (Double-Click to Re-Run)"
-                    let s = "\n" + this.consoleOut + ((![null, undefined].includes(r))?JSON.stringify(r, null, 2):"") + "\n" + this.consolePrompt;
-                    console.warn(s)
+                    let s = "\n" + this.consoleOut + ((![null, undefined].includes(r))?JSON.stringify(r, null, 2):"");
                     this.code += s;
                     this.start.style.color = "red";
                     this.start.innerHTML = this.reloadChar;
@@ -1070,7 +1069,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                         this.after(this.htmlResponse)
                     }
                     this.htmlResponse.innerHTML = this.code.replaceAll("&lt","<").replaceAll("&gt", ">");
-                    this.done = true
                     this.done = true
                     this.message = "Complete! (Double-Click to Re-Run)"
                     this.start.style.color = "red";

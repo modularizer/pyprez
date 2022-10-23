@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PyPrez</title>
+
+    <script src="../pyprez.js"></script>
+</head>
+<body>
+    <h3>Python</h3><hr>
+    <pyprez-editor theme="eclipse" namespace="a">
+        x=5
+        print(f"{x=}")
+    </pyprez-editor>
+
+    <h3>JS</h3><hr>
+    <pyprez-editor language="js" theme="eclipse">
+        let x = 5;
+        console.warn("x=",x);
+        return x + 3
+    </pyprez-editor>
+
+    <h3>HTML</h3><hr>
+    <pyprez-editor language="html" theme="darcula" namespace="b">
+        <img src="../favicon.ico" height="45px"/>
+    </pyprez-editor>
+</body>
+</html>
