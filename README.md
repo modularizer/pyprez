@@ -44,7 +44,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 Using any `<prprez-editor>` element to modify your code, then click `</>` button on the top bar to convert your python 
 into markdown which can be pasted into your StackOverflow answer to create a runnable snippet.
 
-**It will render something like this**
+**The Question/Answer Editor will look something like this**
 <img src="./sample_imgs/stack-overflow-sample.png"/>
 
 ## Method 2
@@ -52,8 +52,6 @@ Use this [Converter Page](https://modularizer.github.io/pyprez/stackconverter.ht
 <stack-converter id="stackplaceholder"></stack-converter>
 
 <img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
-
-**If** the viewer clicks `Run Code Snippet`, they will be able to edit and test a live python question or answer without leaving the page.
 
 ## Method 3
 ### StackOverflow Power User?
