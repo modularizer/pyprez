@@ -4,12 +4,16 @@
 Run **client-side python** in your browser to **prez**ent your code.
 
 <a href="https://github.com/modularizer/pyprez"><img src="https://github.com/favicon.ico" height="30px"/></a>
-[GitHub](https://github.com/modularizer/pyprez) (view source code)<br/>
+[GitHub Project](https://github.com/modularizer/pyprez) (go to project)<br/>
+
+<a href="https://github.com/modularizer/pyprez"><img src="https://cdn1.iconfinder.com/data/icons/search-set-2/100/Inspect_Element-512.png" height="30px"/></a>
+[GitHub Source](https://github.com/modularizer/pyprez/blob/master/pyprez.js) (inspect code)<br/>
 
 <a href="https://modularizer.github.io/pyprez"><img src="./favicon.ico" height="30px"/></a>
 [GitHubPages](https://modularizer.github.io/pyprez) (interactive README)<br/>
 
-<a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments"><img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" height="30px"/></a><a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments">Contact</a> I'd love to hear feedback on ideas on how to make this better!
+<a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments"><img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" height="30px"/></a>
+<a href="mailto:modularizer@gmail.com&subject=PyPrez%20Comments">Contact</a>(I'd love to hear feedback on ideas on how to make this better!)
 
 
 ## Sample
