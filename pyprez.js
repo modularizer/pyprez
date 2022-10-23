@@ -1,11 +1,11 @@
-/*Sun Oct 23 2022 13:01:41 GMT -0700 (Pacific Daylight Time)*/
+/*Sun Oct 23 2022 13:08:41 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Sun Oct 23 2022 13:01:41 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "reduce deuplicat code in StackOverflowConverter";
-    var pyprezPrevCommit = "development:commit 5b62f52967695cf2380043492b9dcbf093bbc8f1";
+    var pyprezUpdateDate = new Date("Sun Oct 23 2022 13:08:41 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "move 'draft a question' link to StackOverflowConverter";
+    var pyprezPrevCommit = "development:commit d40260c3618575eda0212e52cc5b1239b6c7f309";
 }
 
 /*
@@ -1502,7 +1502,13 @@ ${this.header}
                     <b>Edit your python snippet here...</b>
                 </div>
                 <div style="flex:50%">
-                    <b>then copy-paste this auto-generated markdown into StackOverflow</b>
+                    <div style="display:flex">
+                        <b>then copy-paste this auto-generated markdown into StackOverflow</b>
+                        <div>
+                            <a href="https://stackoverflow.com/questions/ask#"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
+                            <a href="https://stackoverflow.com/questions/ask#">Draft a Question</a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div style="display: flex">
