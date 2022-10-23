@@ -1,12 +1,13 @@
-/*Sun Oct 23 2022 12:32:49 GMT -0700 (Pacific Daylight Time)*/
- 
-if (!window.pyprezUpdateDate){{
+/*Sun Oct 23 2022 12:37:10 GMT -0700 (Pacific Daylight Time)*/
+
+if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Sun Oct 23 2022 12:32:49 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "put date as comment at top";
-    var pyprezPrevCommit = "development:commit e18fce3e727f9b70db93dcff998c7d9672c5813e";
-}}
+    var pyprezUpdateDate = new Date("Sun Oct 23 2022 12:37:10 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "spacing";
+    var pyprezPrevCommit = "development:commit 60352ee9973d1a32f66966feed2f229956ede101";
+}
+
 /*
 Pyodide is undeniably cool, and useful in niche cases. Pyscript is easy to use, but is bulky, slow, not especially
 easy to develop on, and is not really necessary seeing as 95+% of its utility comes from Pyodide. With Pyprez,
@@ -20,6 +21,7 @@ This js file will import pyodide and codemirror dependencies for you, so all you
     np.random.rand(5)
 </script>
 */
+
 if (!window.pyprezInitStarted){// allow importing this script multiple times without raising an error
     console.log("loaded pyprez.js from", location.href);
 
