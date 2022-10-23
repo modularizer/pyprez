@@ -469,9 +469,5 @@ Pyscript seems to be so focused on making web development "accessible" to Python
             el.after(parent);
         })
 	</script>
-    <script>
-        let sp = document.getElementById("stackplaceholder");
-        sp.pyprezEditor.code = "#python\n\nx=5\nprint(f'{x=}')"
-    </script>
 </details>
  
