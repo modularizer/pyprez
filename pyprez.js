@@ -1,9 +1,11 @@
+/*Sun Oct 23 2022 12:32:49 GMT -0700 (Pacific Daylight Time)*/
+ 
 if (!window.pyprezUpdateDate){{
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Sun Oct 23 2022 12:28:21 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "fix js and html pyprez-editor elements";
-    var pyprezPrevCommit = "development:commit 2733bc44694cb1cf06c041b4edc1924c07a115a2";
+    var pyprezUpdateDate = new Date("Sun Oct 23 2022 12:32:49 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "put date as comment at top";
+    var pyprezPrevCommit = "development:commit e18fce3e727f9b70db93dcff998c7d9672c5813e";
 }}
 /*
 Pyodide is undeniably cool, and useful in niche cases. Pyscript is easy to use, but is bulky, slow, not especially
