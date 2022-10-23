@@ -1,11 +1,11 @@
-/*Sun Oct 23 2022 12:37:10 GMT -0700 (Pacific Daylight Time)*/
+/*Sun Oct 23 2022 13:01:41 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Sun Oct 23 2022 12:37:10 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "spacing";
-    var pyprezPrevCommit = "development:commit 60352ee9973d1a32f66966feed2f229956ede101";
+    var pyprezUpdateDate = new Date("Sun Oct 23 2022 13:01:41 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "reduce deuplicat code in StackOverflowConverter";
+    var pyprezPrevCommit = "development:commit 5b62f52967695cf2380043492b9dcbf093bbc8f1";
 }
 
 /*
@@ -1429,8 +1429,8 @@ ${c}
             if (!this.style.display){
                 this.style.display = "flex"
             }
-            this._header = "Run the javascript snippet below to see a runnable Python example:"
-            this._code = "# your code here"
+            this._header = "Run code snippet below to work with a runnable and editable python snippet"
+            this._runnable = "#!/usr/bin/env python"
             this.innerHTML = this.getInnerHTML()
             pyprez.register(this);
         }
@@ -1441,11 +1441,11 @@ ${c}
             this._header = header
             this.innerHTML = this.getInnerHTML()
         }
-        get code(){
-            return this._code
+        get runnable(){
+            return this._runnable
         }
-        set code(code){
-            this._code = code
+        set runnable(runnable){
+            this._runnable = runnable.replaceAll('<','&lt').replaceAll('>','&gt')
             this.innerHTML = this.getInnerHTML()
         }
         getInnerHTML(){
@@ -1474,30 +1474,10 @@ ${c}
            rx="2" />
       </g>
     </svg>
-    ${this.getRunnable()}
+${this.header}
+    ${this.runnable}
     </pre>
             `
-        }
-        theme="darcula"
-        getRunnable(){
-            let c = this.code.split("\n").map(line => "    " + line).join("\n")
-            let t = this.theme
-            return `
-
-
-&lt!-- begin snippet: js hide: false console: false babel: false --&gt
-
-&lt!-- language: lang-js -->
-
-    #!/usr/bin/env python
-${c}
-&lt!-- language: lang-html --&gt
-
-    &ltscript src="https://modularizer.github.io/pyprez/pyprez.min.js" theme="${t}"&gt&lt/script&gt
-
-
-&lt!-- end snippet --&gt
-</pre>`
         }
     }
     window.addEventListener("load", ()=>{
@@ -1547,8 +1527,7 @@ ${c}
         }
         sync(){
             console.warn("syncing")
-            this.stackOverflow.theme = this.pyprezEditor.theme
-            this.stackOverflow.code = this.pyprezEditor.code
+            this.stackOverflow.runnable = this.pyprezEditor.getRunnable();
         }
     }
     window.addEventListener("load", ()=>{
