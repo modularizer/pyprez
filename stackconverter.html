@@ -8,14 +8,12 @@
 <body>
 <stack-converter codeblock="false">
 import random
-
 x = 5
 
 if __name__=="__main__":
-        print(f"my random number is {random.random()}")
-
-        # now produce an error to debug
-        print(x[2])
+    print(f"my random number is {random.random()}")
+    print(f"{x=}")
+    raise Exception("this error is intentional but some will not be")
 </stack-converter>
 </body>
 </html>

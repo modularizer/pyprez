@@ -1385,19 +1385,23 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             `
         }
         getRunnable(){
-            return `${this.header}
-    &lt!-- begin snippet: js hide: false console: false babel: false --&gt
+            let c = this.code.split("\n").map(line => "    " + line).join("\n")
+            return `
 
-      &lt!-- language: lang-js --&gt
-        # keep this comment
-        ${this.code}
 
-     &lt!-- language: lang-html --&gt
+&lt!-- begin snippet: js hide: false console: false babel: false --&gt
 
-        &ltscript src=${preferredPyPrezImportSrc}&gt&lt/script&gt
+&lt!-- language: lang-js -->
 
-    &lt!-- end snippet --&gt
-    </pre>`
+    #!/usr/bin/env python
+${c}
+&lt!-- language: lang-html --&gt
+
+    &ltscript src="https://modularizer.github.io/pyprez/pyprez.min.js"&gt&lt/script&gt
+
+
+&lt!-- end snippet --&gt
+</pre>`
         }
     }
     window.addEventListener("load", ()=>{
