@@ -886,11 +886,13 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             else if (e.key == "Enter"){
                 if (e.shiftKey && !this.done){this.run(); e.preventDefault();}
                 if (this.done){
-                    if (!e.shiftKey){this.run(); e.preventDefault();}
+                    if (!(e.shiftKey || this.code.endsWith(':'))){this.run(); e.preventDefault();}
                     else{
                         let s = "\n" + this.consoleEscape
                         this.code += s;
                         e.preventDefault();
+                        let lines = this.code.split("\n")
+                        this.editor.setCursor({line: lines.length, ch: lines[lines.length-1].length})
                     }
                 }
             }
