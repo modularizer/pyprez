@@ -659,11 +659,27 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 top = `<div style="background-color:#d3d3d3;border-color:#808080;border-radius:3px;display:flex">
                     ${gh}
                     <div style="margin-left:10px;overflow:hidden;"></div>
+                    <select style="order:2;margin-left:auto;background-color:#f0f0f0;border-radius:3px;">
+                        <option>default</option>
+                        <option style="background-color:#2b2b2b;color:#a9b7c6;">darcula</option>
+                        <option style="background-color:#d7d4f0;color:#30a;">eclipse</option>
+                        <option style="background-color:rgba(37,59,118,.99);color:#ff6400;">blackboard</option>
+                        <option style="background-color:#d7d4f0;color:#0080ff;">xq-light</option>
+                        <option style="background-color:#0a001f;color:#f8f8f8;">xq-dark</option>
+                    </select>
                 </div>`
             }else{
                 top = `<div>
                     ${gh}
                     <div style="display:none;margin-left:10px;overflow:hidden;"></div>
+                    <select style="order:2;margin-left:auto;background-color:#f0f0f0;border-radius:3px;">
+                        <option>default</option>
+                        <option style="background-color:#2b2b2b;color:#a9b7c6;">darcula</option>
+                        <option style="background-color:#d7d4f0;color:#30a;">eclipse</option>
+                        <option style="background-color:rgba(37,59,118,.99);color:#ff6400;">blackboard</option>
+                        <option style="background-color:#d7d4f0;color:#0080ff;">xq-light</option>
+                        <option style="background-color:#0a001f;color:#f8f8f8;">xq-dark</option>
+                    </select>
                 </div>`
             }
             this.style.display="flex"
@@ -678,17 +694,22 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             `
             this.start = this.children[0] // start button
             this.messageBar = this.children[1].children[1] // top message bar to use to print status (Loading, Running, etc.)
+            this.select = this.children[1].children[2]
             this.textarea = this.children[2] // textarea in case codemirror does not load
             this.endSpace = this.children[3]
 
             // add click event to start button
             this.start.addEventListener("click", this.startClicked.bind(this))
+            this.select.addEventListener("change", ((e)=>{
+                localStorage.setItem("codemirrorTheme", this.select.value);
+                this.theme = this.select.value;
+            }).bind(this))
 
             // size text area to fit initial code
             this.textarea.style.height = this.textarea.scrollHeight +"px" // set text area to full height
             let longestLine = this.initialCode.split("\n").map(v=>v.length).reduce((a,b)=>a>b?a:b)
             let fontSize = 1 * window.getComputedStyle(this.textarea).fontSize.slice(0,-2)
-            let w = Math.min(window.innerWidth - 50, Math.ceil(longestLine * fontSize) + 50)
+            let w = Math.min(window.innerWidth - 50, Math.ceil(longestLine * fontSize) + 200)
 //            this.children[1].style.width = w +"px"
 //            this.textarea.style.width = w  + "px"
             this.style.width = stackMode?"100%":(w + "px")
@@ -714,6 +735,11 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
 
             // set double click listener on editor as well because otherwise outer element listener does not get triggered
             this.editor.display.lineDiv.addEventListener("dblclick", this.dblclicked.bind(this))
+
+            let cmt = localStorage.getItem("codemirrorTheme");
+            cmt = cmt?cmt:this.theme;
+            localStorage.setItem("codemirrorTheme", cmt);
+            this.theme = cmt;
         }
 
         /* ________________________ EVENTS _____________________________*/
