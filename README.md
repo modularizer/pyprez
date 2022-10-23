@@ -36,8 +36,8 @@ Run **client-side python** in your browser to **prez**ent your code.
 
 # Use On Stack Overflow
 
-<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
-<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534">View a real answer</a>
+<a href="https://stackoverflow.com/search?q=pyprez"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
+<a href="https://stackoverflow.com/search?q=pyprez">View Real Answers</a>
 
 ## Method 1
 Convert your code here then copy-paste result into your question/answer. [Converter Page](https://modularizer.github.io/pyprez/stackconverter.html)
