@@ -1,3 +1,5 @@
+<script src="https://modularizer.github.io/pyprez/pyprez.js"></script>
+
 # Welcome to **pyprez!**
 Run **client-side python** in your browser to **prez**ent your code.
 
@@ -398,7 +400,6 @@ Pyscript seems to be so focused on making web development "accessible" to Python
 
 <details style="display:none">
 	<summary>Scripts which make GitHub Pages page interactive</summary>
-    <script src="https://modularizer.github.io/pyprez/pyprez.js"></script>
 	<script>
         let samples = Array.from(document.querySelectorAll('.nonrendered'));
         samples.map(el=>{el.style.display="none"});
