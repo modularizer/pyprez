@@ -629,8 +629,10 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             let nonemptylines = lines.filter(v=>v.trim().length)
             let leadingSpacesPerLine = nonemptylines.filter(v=>!v.trim().startsWith('#')).map(v=>v.match(/\s*/)[0].length); // count leading spaces of each line which has code
             let extraLeadingSpaces = Math.min(...leadingSpacesPerLine) - minIndent; // recognize if every line containing code starts with spaces
-            let extraIndent = " ".repeat(extraLeadingSpaces);// string representing extra indent to remove
-            code = lines.map(v=>v.startsWith(extraIndent)?v.replace(extraIndent, ""):v).join("\n") // remove extra space
+            if ((extraLeadingSpaces > 0) && (extraLeadingSpaces < 1000)){
+                let extraIndent = " ".repeat(extraLeadingSpaces);// string representing extra indent to remove
+                code = lines.map(v=>v.startsWith(extraIndent)?v.replace(extraIndent, ""):v).join("\n") // remove extra space
+            }
             return code
         }
         reformatIndentation(code){
