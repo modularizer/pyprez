@@ -1460,7 +1460,7 @@ ${c}
             </div>
             <div style="display: flex">
                 <div style="flex:50%;max-width:50%;">
-                    <pyprez-editor ${mode} ${src} namespace="${namespace}">
+                    <pyprez-editor ${mode} ${src} namespace="${namespace}" theme="darcula">
                         ${ih}
                     </pyprez-editor>
                 </div>
