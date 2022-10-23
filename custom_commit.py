@@ -31,13 +31,16 @@ if __name__ == "__main__":
 
     # set info the header lines we want to replace lineno: (assert_startswith, replace_middle, assert_endswith)
     header_details = {
-        0: ('if (!window.pyprezUpdateDate){', "", "{\n"),
-        1: ('/*', None, None),
-        2: (None, None, '*/\n'),
-        3: ('    var pyprezUpdateDate = new Date("', dts, '");\n'),
-        4: ('    var pyprezCommitMessage = "', msg0, '";\n'),
-        5: ('    var pyprezPrevCommit = "', f'{branch}:{prev_commit_hash}', '";\n'),
-        6: ('}', '', '}\n'),
+        0: ('/*', dts, '*/\n'),
+        1: ("\n", None ,"\n"),
+        2: ("if (!window.pyprezUpdateDate){\n", None, "if (!window.pyprezUpdateDate){\n"),
+        3: ('/*', None, None),
+        4: (None, None, '*/\n'),
+        5: ('    var pyprezUpdateDate = new Date("', dts, '");\n'),
+        6: ('    var pyprezCommitMessage = "', msg0, '";\n'),
+        7: ('    var pyprezPrevCommit = "', f'{branch}:{prev_commit_hash}', '";\n'),
+        8: ('}', None, '}\n'),
+        9: ("\n", None, "\n"),
     }
     for lineno, (assert_startswith, replace_middle, assert_endswith) in header_details.items():
         # read the header line in question
