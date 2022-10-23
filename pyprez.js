@@ -674,10 +674,12 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             <div style="color:green">${this.startChar}</div>
             ${top}
             <textarea style="height:auto;">${this.initialCode}</textarea>
+            <pre></pre>
             `
             this.start = this.children[0] // start button
             this.messageBar = this.children[1].children[1] // top message bar to use to print status (Loading, Running, etc.)
             this.textarea = this.children[2] // textarea in case codemirror does not load
+            this.endSpace = this.children[3]
 
             // add click event to start button
             this.start.addEventListener("click", this.startClicked.bind(this))
@@ -690,6 +692,9 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
 //            this.children[1].style.width = w +"px"
 //            this.textarea.style.width = w  + "px"
             this.style.width = stackMode?"100%":(w + "px")
+            if (stackMode){
+                this.endSpace.style.height = "100px"
+            }
 
             // Set initial messages
             if (!pyodideImported.promise.fullfilled){
