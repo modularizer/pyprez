@@ -11,1082 +11,1640 @@ This js file will import pyodide and codemirror dependencies for you, so all you
     np.random.rand(5)
 </script>
 */
-console.log("loaded pyprez.js from", location.href)
-/* ___________________________________________ CONFIG _________________________________________________ */
-let pyprezConfig = {
-    importCodeMirror: true,
-    codemirrorCDN: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/",
-    loadedCodeMirrorStyles: ["default"],
-    
-    importPyodide: true,
-    pyodideCDN: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
+if (!window.pyprezInitStarted){// allow importing this script multiple times without raising an error
+    console.log("loaded pyprez.js from", location.href);
 
-    help: true,
-}
-for (let [k, v] of Object.entries(pyprezConfig)){
-    if (window[k] === undefined){
-        window[k] = v
+    /* ___________________________________________ CONSTANTS _________________________________________________ */
+    var pyprezInitStarted = true;// signal to duplicate imports not to try again
+    var preferredPyPrezImportSrc = "https://modularizer.github.io/pyprez/pyprz.min.js";
+    var githublinkImage = '<a href="https://modularizer.github.io/pyprez"><img src="https://github.com/favicon.ico" height="15px"/></a>';
+
+    var stackMode = false;
+    var pyprezScript = document.currentScript; // get the HTML <script> element running this code
+
+    /* ___________________________________________ CONFIG _________________________________________________ */
+    // set default configuration settings
+
+    //first separate config defaults by type to make validation easier
+    let boolConfig = {
+        help: true,
+        useWorker: false,
+        convert: true,
+        includeGithubLink: true,
+        showThemeSelect: true,
+        showNamespaceSelect: false,
     }
-}
-
-
-/* ___________________________________________ DEFERRED PROMISES _________________________________________________ */
-class DeferredPromise{
-    constructor(){
-        this.fulfilled = false
-        this.rejected = false
-        this.resolve = this.resolve.bind(this)
-        this.reject = this.reject.bind(this)
-        this._resolve = ()=>{}
-        this._reject = ()=>{}
-        this.promise = new Promise((resolve, reject)=>{
-            this._resolve = resolve
-            this._reject = reject
-        })
+    let strConfig = {
+        codemirrorCDN: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/",
+        pyodideCDN: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
+        consolePrompt: ">>> ",
+        consoleOut: "[Out] ",
+        consoleEscape: "...",
     }
-    resolve(r){
-        this.fulfilled=true;
-        this.result = r;
-        this._resolve(r);
-    }
-    reject(e){
-        this._reject(e)
-        this.rejected=true;
-        this.error = e;
-    }
-    then(onfulfilled, onrejected){return this.promise.then(onfulfilled, onrejected)}
-    catch(onrejected){return this.promise.catch(onrejected)}
-}
-let domContentLoaded = new DeferredPromise();
-let codemirrorImported = new DeferredPromise();
-let pyodideImported = new DeferredPromise();
-let pyprezScript = document.currentScript;
-window.help= pyprezScript.hasAttribute("help")?pyprezScript.getAttribute("help")==="true":window.help;
-document.addEventListener('DOMContentLoaded', domContentLoaded.resolve)
 
-if (document.readyState === "complete" || document.readyState === "loaded") {
-     // document is already ready to go
-     domContentLoaded.resolve()
-}
+    // construct default config
+    var pyprezConfig = {
+        ...boolConfig ,
+        ...strConfig,
+    }
 
-/* ___________________________________________ DEFINE DEPENDENCIES _________________________________________________ */
-let jsDependencies = {
-    codemirror: {
-        src: codemirrorCDN + "codemirror.min.js",
-        check: ()=>{
-            if (!window.importCodeMirror){return true}
-            if (!window.CodeMirror){return false}
-            return true
-        },
-        tree: {
-            codemirrorPython: {
-                src: codemirrorCDN + "mode/python/python.min.js",
-                check: ()=>{
-                    if (!window.importCodeMirror){return true}
-                    if (!window.CodeMirror){return false}
-                    if (!window.CodeMirror.modes){return false}
-                    if (!window.CodeMirror.modes.python){return false}
-                    return true
-                },
-                then: codemirrorImported.resolve,
-            },
+    // if there are globally defined config values in window, use those as default config
+    for (let k of Object.keys(pyprezConfig)){
+        if (window[k] !== undefined){
+            pyprezConfig[k] = window[k]
         }
-    },
-    pyodide: {
-        src: pyodideCDN,
-        check: ()=>{
-            if (!window.importPyodide){return true} 
-            return window.loadPyodide
-        },
-        then: pyodideImported.resolve,
-    },
-}
-let cssDependencies = [
-    codemirrorCDN + "codemirror.min.css"
-]
-
-/* ___________________________________________ INTERPRET SCRIPT TAG _________________________________________________ */
-function loadScriptAsElement(script=document.currentScript, mode="editor", theme="default", runonload=false){
-    script.display = "none";
-
-    // make a github img link
-    let a = document.createElement("a");
-    a.href="https://modularizer.github.io/pyprez"
-    a.innerHTML = `<img src="https://github.com/favicon.ico" height="15px"/>`
-
-    // add a real pyprez custom-element
-    if (script.hasAttribute("mode")){
-        mode = script.getAttribute("mode")
-    }
-    let el = document.createElement("pyprez-" + mode);
-    el.innerHTML = script.innerHTML;
-    runonload = pyprezScript.hasAttribute("runonload")?pyprezScript.getAttribute("runonload"):runonload
-    if (mode === "editor"){
-        el.setAttribute("runonload", runonload)
     }
 
-    if (script.hasAttribute("theme")){
-        theme = els.getAttribute("theme")
-    }
-    el.setAttribute("theme", theme)
-
-    // add to container
-    let div = document.createElement("div");
-    div.append(a);
-    div.append(el);
-
-    // insert into document after script
-    script.after(div);
-
-    // remove script content
-    script.innerHTML = ""
-}
-
-
-// if the user is using the script tag as a code block, add a real code block to the document
-if (document.currentScript.innerHTML){
-    let convert = pyprezScript.hasAttribute("convert")?pyprezScript.getAttribute("convert")==="true":true
-    if (convert){
-        loadScriptAsElement(document.currentScript)
-    }
-}else{
-    domContentLoaded.then(()=>{
-        console.log("DOMContentLoaded")
-        let isFirstScript = pyprezScript === document.scripts[0]
-        let scripts = document.scripts.length
-        let bodyEls = document.body.children.length
-        let solo = isFirstScript & (((bodyEls === 2) & (pyprezScript.parentElement === document.body)) || (bodyEls === 1))
-        console.log(solo, isFirstScript, bodyEls, pyprezScript.parentElement)
-        let convert = pyprezScript.hasAttribute("convert")?pyprezScript.getAttribute("convert")==="true":solo
-        let runonload = pyprezScript.hasAttribute("runonload")?pyprezScript.getAttribute("runonload"):"true"
-        let mode = pyprezScript.hasAttribute("mode")?pyprezScript.getAttribute("mode"):"editor"
-        let theme = pyprezScript.hasAttribute("theme")?pyprezScript.getAttribute("theme"):"default"
-        let githublink = pyprezScript.hasAttribute("githublink")?pyprezScript.getAttribute("githublink"):"true"
-        let lastScript = document.scripts[document.scripts.length - 1]
-        if (convert){
-            let demoCode = lastScript.innerHTML.trim()
-//            loadScriptAsElement(lastScript);
-            let stackEditor = document.createElement("div");
-            document.body.appendChild(stackEditor);
-            stackEditor.outerHTML = `
-                <pyprez-${mode} runonload="${runonload}" theme="${theme}" githublink="${githublink}">${demoCode}</pyprez-${mode}>
-            `;
-        }
-    })
-}
-
-// allow importing this script multiple times without raising an error
-if (!window.pyprezInitStarted){ // if this script has not already run
-var pyprezInitStarted = true;// save this window variable to signal that this script has run
-
-/* ___________________________________________ LOAD DEPENDENCIES ____________________________________________________ */
-// allow disabling dependency import if desired (people may want to do their own imports for clarity, speed, or to
-// tool to add css to document
-function addStyle(s){
-    let style = document.createElement("style");
-    style.innerHTML = s;
-    document.head.appendChild(style);
-}
-
-// tools to import js dependencies
-function importScript(url){
-    let el = document.createElement("script");
-    el.src = url;
-    return new Promise((resolve, reject)=>{
-        domContentLoaded.then(()=>{
-            console.log("attempting to import ", url)
-            document.body.appendChild(el)
-            el.addEventListener("load", ()=>resolve(url))
-        })
-    })
-}
-
-// function to get the text of css dependencies
-function get(src){return fetch(src).then(r=>r.text())}
-
-// function to load an external .css document into the page
-function importStyle(url){
-    console.log("importing", url)
-    return get(url).then(addStyle)
-}
-
-// recursively load dependency tree
-function _loadDependencies(tree){
-    for (let [k, v] of Object.entries(tree)){
-       if ((!v.check) || (!v.check())){// if there is no check or the check fails, then import
-            console.log("importing", k)
-            importScript(v.src).then(()=>{
-                console.log("imported", k)
-                if (v.tree !== undefined){
-                    console.log("loading nested dependencies", v.tree)
-                    _loadDependencies(v.tree)
-                }else if (v.then){
-                    console.log("calling", v.then)
-                    v.then(k);
+    // if any config values are defined as attributes by the script doing the import, make that override defaults
+    for (let k of Object.keys(pyprezConfig)){
+        if (pyprezScript.hasAttribute(k)){
+            let v = pyprezScript.getAttribute(k).toLowerCase();
+            if (Object.keys(boolConfig).includes(k)){
+                if (["true", "1", ""].includes(v)){
+                    pyprezConfig[k] = true
+                }else if (["false", "0"].includes(v)){
+                    pyprezConfig[k] = false
                 }else{
-                    console.log("done loading", k)
+                    console.error(`Invalid value '${v}' for attribute '${k}'. Value must be "true", "false", "1", "0", or ""`)
                 }
-            }).catch(()=>{console.error("error importing", k)})
-       }else{ // otherwise resolve
-            console.log("passed importing", k)
-            if (v.tree !== undefined){
-                console.log("loading nested dependencies", v.tree)
-                _loadDependencies(v.tree)
-            }else if (v.then){
-                console.log("calling", v.then)
-                v.then(k);
             }else{
-                console.log("done loading", k)
+                pyprezConfig[k] = v
             }
-       }
+        }
     }
-}
 
-// recursively load dependency tree
-function loadDependencies(){
-    // try to load css dependencies but don't wait on them
-    cssDependencies.map(importStyle)
-    addStyle('.CodeMirror { border: 1px solid #eee !important; height: auto !important; }')
+    Object.assign(window, pyprezConfig);
+    /* ___________________________________________ DEFERRED PROMISE _________________________________________________ */
+    class DeferredPromise{
+        /* this is an object which creates a promise in a different spot from where it will be resolve. It allows you
+        to say wait on athe completion of a task that you have not yet started. The interface is similar to
+        that of a promise (supports `then`, `catch` and if you wish you can access the true promise with
+        the `promise` attribute.*/
+        constructor(){
+            this.promise = new Promise((resolve, reject)=>{
+                this.resolve = resolve.bind()
+                this.reject = reject.bind()
+            })
+            this.then = this.promise.then.bind(this.promise)
+            this.catch = this.promise.catch.bind(this.promise)
+        }
+    }
 
-    // loading js dependencies will cause deferred promises to resolve
-    _loadDependencies(jsDependencies)
-}
-loadDependencies(jsDependencies);
 
-/* _______________________________________ LOAD AND EXTEND PYODIDE FUNCTIONALITY ____________________________________ */
-class PyPrez{
-    /*class which loads pyoidide and provides utility to allow user to load packages and run code as soon as possible
-    examples:
-        var pyprez = new Pyprez();
+    window.DeferredPromise = DeferredPromise;
+    /* ________________________________________ DEFINE STATE VARIABLES ______________________________________________ */
+    // define steps of the load that different tasks may depend on
+    var domContentLoaded = new DeferredPromise();
+    var pyodideImported = new DeferredPromise();
+    var codemirrorImported = new DeferredPromise();
+    var workerReady = new DeferredPromise();
+    var pyodidePromise = new DeferredPromise("pyodidePromise");
 
-        // use pyodide as soon as it loads
-        let promiseToFour = pyprez.then(pyodide => {
-                console.log("pyodide has loaded");
-                return pyodide.runPython("2+2")
+    var loadedCodeMirrorStyles = ["default"];
+
+    /* ___________________________________________ INTERPRET SCRIPT TAG _________________________________________________ */
+    // check if document is ready to go
+    if (document.readyState === "complete" || document.readyState === "loaded") {
+         // document is already ready to go
+         domContentLoaded.resolve()
+    }else{
+        // document is not ready, resolve deferred promise when it is
+        document.addEventListener('DOMContentLoaded', domContentLoaded.resolve)
+    }
+
+    // if the user is using the script tag as a code block, add a real code block to the document
+    function pyprezConvert(){
+        if (pyprezScript.innerHTML){
+            if (convert){
+                let script = pyprezScript;
+
+                // read script innerHTML then remove it
+                let ih = script.innerHTML;
+                script.innerHTML = "";
+
+                // make a real pyprez custom-element with the same attributes
+                let mode = "editor"
+                if (script.hasAttribute("mode")){
+                    mode = script.getAttribute("mode")
+                }
+                let el = document.createElement("pyprez-" + mode);
+                el.innerHTML = ih;
+                for (let k of script.getAttributeNames()){
+                    if (!["src"].includes(k)){
+                        el.setAttribute(k, script.getAttribute(k))
+                    }
+                }
+
+                // add to container and insert into document after script element
+                let div = document.createElement("div");
+                div.append(el);
+                script.after(div);
+            }
+        }else{
+            domContentLoaded.then(()=>{
+                console.log("DOMContentLoaded")
+                // try to identify if this script is running in a stack overflow demo (or other similar environment)
+                // if it is we will make a pyprez-editor which runs the code in the last script element
+                let isFirstScript = pyprezScript === document.scripts[0]
+                let numBodyEls = document.body.children.length
+                let singleBodyChild = numBodyEls === 1 && (document.body.children[0].tagName === "SCRIPT")
+                let twoDirectBodyChildren = (numBodyEls === 2) && (pyprezScript.parentElement === document.body)
+                let solo = isFirstScript && (twoDirectBodyChildren || singleBodyChild)
+                let convertScript = pyprezScript.hasAttribute("convert")?pyprezScript.getAttribute("convert")==="true":convert
+
+                if (solo && convertScript){
+                    window.stackMode = true;
+                    // use special attribute defaults in stack overflow
+                    let mode = pyprezScript.hasAttribute("mode")?pyprezScript.getAttribute("mode"):"editor"
+                    let specialAttributes = {
+                        runonload: "true",
+                        theme: "darcula",
+                        githublink: "true"
+                    }
+
+                    let a = ""
+                    for (let [k, defaultValue] of Object.entries(specialAttributes)){
+                        let v = pyprezScript.hasAttribute(k)?pyprezScript.getAttribute(k):defaultValue;
+                        a += ` ${k}="${v}"`
+                    }
+
+                    // get the code from the last script in the code demo
+                    let lastScript = document.scripts[document.scripts.length - 1]
+                    let demoCode = lastScript.innerHTML.trim()
+
+                    // add an element to hold the pyprez-editor
+                    let stackEditor = document.createElement("div");
+                    document.body.appendChild(stackEditor);
+
+                    // convert added element into pyprez-editor
+                    stackEditor.innerHTML = `
+                        <pyprez-${mode} ${a}>${demoCode}</pyprez-${mode}>
+                    `;
+                }
+            })
+        }
+    }
+
+    pyprezConvert();
+    /* _______________________________ SETUP TO LOAD DEPENDENCIES ____________________________________________________ */
+    // allow disabling dependency import if desired (people may want to do their own imports for clarity, speed, or to
+    // tool to add css to document
+    function addStyle(s){
+        let style = document.createElement("style");
+        style.innerHTML = s;
+        document.head.appendChild(style);
+    }
+
+    // tools to import js dependencies
+    function importScript(url){
+        let el = document.createElement("script");
+        el.src = url;
+        return new Promise((resolve, reject)=>{
+            domContentLoaded.then(()=>{
+                console.log("attempting to import ", url)
+                document.body.appendChild(el)
+                el.addEventListener("load", ()=>resolve(url))
+            })
+        })
+    }
+
+    // function to get the text of css dependencies
+    function get(src){return fetch(src).then(r=>r.text())}
+
+    // function to load an external .css document into the page
+    function importStyle(url){
+        console.log("importing", url)
+        return get(url).then(addStyle)
+    }
+
+    // make functions to import dependencies
+    function importPyodide(){
+        if (pyodideCDN && !useWorker && window.importPyodide && !window.pyodide){
+            importScript(pyodideCDN).then(()=>{pyodideImported.resolve(true)})
+        }
+    }
+    function importCodeMirror(){
+        if (codemirrorCDN && !window.CodeMirror){
+            importScript(codemirrorCDN + "codemirror.min.js").then(()=>{
+                importScript(codemirrorCDN + "mode/python/python.min.js").then(()=>{
+                    importStyle(codemirrorCDN + "codemirror.min.css").then(()=>{
+                        addStyle('.CodeMirror { border: 1px solid #eee !important; height: auto !important;}');
+                        codemirrorImported.resolve(CodeMirror)
+                    })
+                })
+            })
+        }
+    }
+
+    /* _______________________________ ACTUALLY LOAD DEPENDENCIES ____________________________________________________ */
+    importPyodide();
+    importCodeMirror();
+
+    /* _______________________________________ LOAD AND EXTEND PYODIDE FUNCTIONALITY ____________________________________ */
+    class PyodideWorker extends Worker{
+        constructor(src){
+            super(src);
+            this.parent = window;
+            // bind methods to scope, may be unnecessary
+            this.getMethod = this.getMethod.bind(this);
+            this.postResponse = this.postResponse.bind(this);
+            this.postError = this.postError.bind(this);
+            this.postRequest = this.postRequest.bind(this);
+            this.postCall = this.postCall.bind(this);
+            this.receiveResponse = this.receiveResponse.bind(this);
+            this.receiveCallRequest = this.receiveCallRequest.bind(this);
+            this.receiveRequest = this.receiveRequest.bind(this);
+            this.stdout = this.stdout.bind(this);
+            this.stderr = this.stderr.bind(this);
+            this.worker = this;
+            this.proxy = new Proxy(this, {
+                get(target, prop, receiver) {
+                    if (target[prop] !== undefined){return target[prop]}
+                    function callMethod(){
+                        return target.postRequest(prop, Array.from(arguments))
+                    }
+                    return callMethod
+                }
             });
+            return this.proxy
+        }
 
-        // load dependencies and run some code as soon as it loads
-        let promiseToRandom = pyprez.loadAndRunAsync(`
+        loadPackagesFromImports(){}
+        _id = 0
+        get id(){
+            let id = this._id
+            this._id = (id + 1) % Number.MAX_SAFE_INTEGER;
+            return id
+        }
+
+        pendingRequests = {}
+        receivemessage(event){
+            let data = event.data
+            let type = data.type
+            if (type === "response"){this.receiveResponse(data)}
+            else if (type === "call"){this.receiveCallRequest(data)}
+            else if (type === "request"){this.receiveRequest(data)}
+            else{this.postError(data, "unrecognized type")}
+        }
+        getMethod(methodName, scopes){
+            if (!scopes){scopes = [this.parent, this]}
+            for (let scope of scopes){
+                if (scope[methodName]){return scope[methodName]}
+                else if (methodName.includes(".")){
+                    let methodNames = methodName.split(".")
+                    for (let mn of methodNames){
+                        scope = scope[mn]
+                        if (!scope){return scope}
+                    }
+                    return scope
+                }
+            }
+        }
+
+        postResponse(data, results, error=null){
+            data.type = "response";
+            data.results = results;
+            data.error = error;
+            this.postMessage(data)
+        }
+        postError(data, error){this.postResponse(data, null, error)}
+        postRequest(method, args, type="request"){
+            let id = this.id;
+            let data = {id, type, method, args, results: null, error: null}
+            this.pendingRequests[id] = [new DeferredPromise(), data];
+            this.postMessage(data)
+            return this.pendingRequests[id][0]
+        }
+        postCall(method, args){this.postRequest(method, args, "call")}
+
+        receiveResponse(data){
+            if ( this.pendingRequests[data.id] === undefined){
+                console.error(data.id, data, this, this.pendingRequests);
+                return
+            }
+            let [deferredPromise, sentData] = this.pendingRequests[data.id];
+            delete this.pendingRequests[data.id];
+            if (data.results){deferredPromise.resolve(data.results)}
+            else{ deferredPromise.reject(data.error)}
+        }
+        receiveCallRequest(data){
+            let f = this.getMethod(data.method);
+            if (f){ return f(...data.args)}
+            else{this.postError(data, "method not found")}
+        }
+        receiveRequest(data){
+            try{
+                let results = this.receiveCallRequest(data);
+                if (results.then){
+                    results
+                    .then(r=>this.postResponse(data, r))
+                    .catch(e=>this.postError(data, e))
+                }
+                else{this.postResponse(data, results)}
+            }
+            catch(error){this.postError(data, error)}
+        }
+        stdout(...args){
+            console.log(args)
+        }
+        stderr(...args){
+            console.log(args)
+        }
+        stdin(){return ""}
+    }
+
+    function loadPyodideInterface(config){
+        if (useWorker){
+            window.pyodide = new PyodideWorker('./webworker.js');
+            pyodide.worker.onmessage = pyodide.worker.receivemessage
+            if (config.stdin){pyodide.stdin = config.stdin;}
+            if (config.stdout){pyodide.stdout = config.stdout;}
+            if (config.stderr){pyodide.stderr = config.stderr;}
+            pyodideImported.resolve(true)
+            workerReady.then(()=>{
+                pyodide.runPythonAsync("2+2").then(r=>{
+                    if (r == 4){
+                        console.error(pyodide)
+                        window.pyodide = pyodide;
+                        console.warn(window.pyodidePromise)
+                        window.pyodidePromise.resolve(true);
+                    }
+                })
+            })
+        }else{
+            pyodideImported.then(()=>{
+                loadPyodide(config).then(pyodide =>{
+                    pyodide.runPythonAsync(`
+                        from js import prompt
+                        __builtins__.input = prompt
+                        2+2
+                    `).then(r=>{
+                        if (r == 4){
+                            window.pyodide = pyodide;
+                            pyodidePromise.resolve(true);
+                        }
+                    })
+                })
+            })
+        }
+        return pyodidePromise
+    }
+    /* _______________________________________ LOAD AND EXTEND PYODIDE FUNCTIONALITY ____________________________________ */
+    class PyPrez{
+        /*class which loads pyoidide and provides utility to allow user to load packages and run code as soon as possible
+        examples:
+            var pyprez = new Pyprez();
+
+            // use pyodide as soon as it loads
+            let promiseToFour = pyprez.then(pyodide => {
+                    console.log("pyodide has loaded");
+                    return pyodide.runPython("2+2")
+                });
+
+            // load dependencies and run some code as soon as it loads
+            let promiseToRandom = pyprez.loadAndRunAsync(`
+                    import numpy as np
+                    np.random.rand(5)
+                `);
+
+            //reroute stdout to a new javascript function
+            pyprez.stdout = alert;
+            pyprez.loadAndRunAsync(`print("testing if this alerts on window")`);
+        */
+        constructor(config={}, load=true){
+            // bind the class methods to this instance
+            this._stdout = this._stdout.bind(this);
+            this._stderr = this._stderr.bind(this);
+            this._stdin = this._stdin.bind(this);
+            this.load = this.load.bind(this);
+            this.loadPyodideInterface = this.loadPyodideInterface.bind(this);
+            this.load = this.load.bind(this);
+            this._runPythonAsync = this._runPythonAsync.bind(this);
+            this.loadAndRunAsync = this.loadAndRunAsync.bind(this);
+            this.recordNamespaceName = this.recordNamespaceName.bind(this);
+            this.register = this.register.bind(this);
+
+            // load pyodide or pyodide worker proxy
+            Object.assign(this, config);
+            this.config = {
+                stdout: this._stdout,
+                stderr: this._stderr,
+                stdin: this._stdin
+            };
+
+            if (load){
+                this.loadPyodideInterface();
+            }
+        }
+        loadPyodideInterface(){
+            loadPyodideInterface(this.config).then(()=>{
+                this.getNamespace("global")
+            })
+        }
+        pending = []
+
+        // allow pyprez object to act a bit like a the promise to the pyodide object
+        then(successCb, errorCb){
+            return pyodidePromise.then(successCb, errorCb)
+        }
+        catch(errorCb){return pyodidePromise.catch(errorCB)}
+
+        // set the functions that will handle stdout, stderr from the python interpreter
+        stdout = console.log
+        stderr = console.error
+        stdin = ()=>""
+
+        // set parent functions which will call wrap and call stdout, stderr, stdin from the python interpreter
+        _stdout(...args){return this.stdout(...args)}
+        _stderr(...args){return this.stderr(...args)}
+        _stdin(...args){return this.stdin(...args)}
+
+        // store elements
+        elements = {};
+        editors = {};
+        consoles = {};
+        scripts = {};
+        imports = {};
+        overflows = {};
+
+        register(el){
+            let mode = el.tagName.toLowerCase().split("-").pop();
+            let m = this[mode + "s"]
+            this.elements[Object.keys(this.elements).length] = el;
+            m[Object.keys(m).length] = el;
+            if (el.id){
+                this.elements[el.id] = el;
+                m[el.id] = el;
+            }
+        }
+
+        _runPythonAsync(code, namespace){
+            /* internal function which runs the code */
+            if (code){
+                console.debug("running code asynchronously:")
+                console.debug(code)
+                this.recordNamespaceName(namespace)
+                if (useWorker){
+                    return pyodide.runPythonAsyncInNamespace(code, namespace).catch(this.stderr)
+                }else{
+                    return pyodide.runPythonAsync(code, {globals: this.getNamespace(namespace)}).catch(this.stderr)
+                }
+
+            }
+        }
+        namespaces = {}
+        namespaceNames = ['global']
+        recordNamespaceName(name){
+            console.log(this, this.namespaceNames)
+            if (!this.namespaceNames.includes(name)){
+                this.namespaceNames = this.namespaceNames.concat([name])
+            }
+        }
+        getNamespace(name){
+            pyodidePromise.then((()=>{
+                if (this.namespaces[name] === undefined){
+                    if (!useWorker){
+                        this.namespaces[name] = pyodide.globals.get("dict")();
+                    }
+                }
+
+                return this.namespaces[name]
+            }).bind(this))
+        }
+
+        // utility methods used to load requirements and run code asynchronously as soon as pyodide is loaded
+        load(code, requirements="detect"){
+            /*load required packages as soon as pyodide is loaded*/
+            return this.then(() =>{
+                let requirementsLoaded;
+                if (requirements === "detect"){
+                    if (code){
+                        console.debug("auto loading packages detected in code")
+                        console.debug(code)
+                        requirementsLoaded = window.pyodide.loadPackagesFromImports(code)
+                    }
+                }else{
+                    console.debug("loading", requirements)
+                    requirementsLoaded = window.pyodide.loadPackage(requirements);
+                }
+                return requirementsLoaded
+            })
+        }
+        loadAndRunAsync(code, namespace="global", requirements="detect"){
+            /* run a python script asynchronously as soon as pyodide is loaded and all required packages are imported*/
+            console.warn(pyodidePromise)
+            let p = this.then((() =>{
+                console.error("here")
+                if (code){
+                    return this.load(code, requirements)
+                        .then((r => this._runPythonAsync(code, namespace)).bind(this))
+                        .catch((e => this._runPythonAsync(code, namespace)).bind(this))
+                }
+            }).bind(this))
+            return p
+        }
+    }
+    var pyprez = new PyPrez(load=true);
+
+    /* ___________________________________________________ EDITOR ___________________________________________________ */
+    class PyPrezEditor extends HTMLElement{
+        /*
+        custom element which allows editing a block of python code, then when you are ready, pressing run to
+        load required packages and run the block of python code in the pyodide interpreter and see the result
+
+        example:
+            <pyprez-editor>
                 import numpy as np
                 np.random.rand(5)
-            `);
+            </pyprez-editor>
+            <pyprez-editor src="my-script.py"></pyprez-editor>
+        */
+        constructor(){
+            super();
+            this.classList.add("pyprez");
 
-        //reroute stdout to a new javascript function
-        pyprez.stdout = alert;
-        pyprez.loadAndRunAsync(`print("testing if this alerts on window")`);
-    */
-    constructor(config={}){
-        // bind the class methods to this instance
-        this.load = this.load.bind(this);
-        this.inputCalled = this.inputCalled.bind(this);
-        this.inputReady = this.inputReady.bind(this);
-        this.getInput = this.getInput.bind(this);
-        this.loadAndRunAsync = this.loadAndRunAsync.bind(this);
+            // bind functions
+            this.loadEl = this.loadEl.bind(this);
+            this.loadEditor = this.loadEditor.bind(this);
+            this.keypressed = this.keypressed.bind(this);
+            this.run = this.run.bind(this);
 
-        // create a deferred promise that will be resolved later with the pyodide object
-        this.promise = new Promise((resolve, reject)=>{this._resolvePromise = resolve; this._rejectPromise = reject;})
+            // set language to python(default), javascript, or html
+            let language = this.hasAttribute("language")?this.getAttribute("language").toLowerCase():"python"
+            let aliases = {
+                "python": "python",
+                "javascript": "javascript",
+                "html": "html",
+                "py": "python",
+                "js": "javascript",
+            }
+            this.language = aliases[language]
 
-        this._loadPyodide = this._loadPyodide.bind(this)
-        // load pyodide and resolve the promise
-        this._loadPyodide(config);
-    }
-    elementList = [];
-    elements = {};
+            // default is to print stdout into editor
+            if (!this.hasAttribute("stdout")){this.setAttribute("stdout", "true")}
 
-    addElement(el){
-        this.elements[this.elementList.length] = el;
-        this.elementList.push(el);
-        if (el.id){
-            this.elements[el.id] = el;
+            // allow loading code from an external source
+            if (this.hasAttribute("src") && this.getAttribute("src") && (this.getAttribute("src") !== pyprezScript.src)){
+                let src = this.getAttribute("src")
+                console.debug("fetching script for pyprez-editor src", src)
+                if (src.endsWith('.js')){
+                    this.language = "javascript"
+                }else if (src.endsWith('.py')){
+                    this.language = "python"
+                }else if (src.endsWith('.html')){
+                    this.language = "html"
+                }
+                fetch(src).then(r=>r.text()).then(code =>{
+                    console.warn("got", code)
+                    this.innerHTML = code;
+                    this.loadEl();
+                })
+            }else{
+                this.loadEl();
+            }
+            this.namespace = this.hasAttribute("namespace")?this.getAttribute("namespace"):"global"
+            pyprez.recordNamespaceName(this.namespace)
+
+            // add listeners
+            this.addEventListener("keydown", this.keypressed.bind(this));
+            this.addEventListener("dblclick", this.dblclicked.bind(this))
+
+            // register
+            pyprez.register(this);
+
+            // runonload if told to
+            if (this.hasAttribute("runonload") & (this.getAttribute("runonload")==="true")){
+                this.run();
+            }
         }
-    }
-    
-    // set the functions that will handle stdout, stderr from the python interpreter
-    stdout = console.log
-    stderr = console.error
+        /* ________________________ LOAD _____________________________*/
+        unindent(code, minIndent=0){
+            // read innerHTML and remove extra leading spaces
+            let firstFound=false;
+            let lines = code.replaceAll("\t","    ").split("\n").filter((v,i)=>{
+                if (firstFound){return true}
+                firstFound = v.trim().length > 0;
+                return firstFound
+            }); // replace tabs with spaces
+            let nonemptylines = lines.filter(v=>v.trim().length)
+            let leadingSpacesPerLine = nonemptylines.filter(v=>!v.trim().startsWith('#')).map(v=>v.match(/\s*/)[0].length); // count leading spaces of each line which has code
+            let extraLeadingSpaces = Math.min(...leadingSpacesPerLine) - minIndent; // recognize if every line containing code starts with spaces
+            let extraIndent = " ".repeat(extraLeadingSpaces);// string representing extra indent to remove
+            code = lines.map(v=>v.startsWith(extraIndent)?v.replace(extraIndent, ""):v).join("\n") // remove extra space
+            return code
+        }
+        reformatIndentation(code){
+            // deal with weird edge case where python comments use html tags and get auto-closed
+            while(code.endsWith('>')){
+                let newCode = code.replace(/<\/[a-z-]*>$/,'')
+                if (newCode === code){
+                    break
+                }
+                code = newCode;
+            }
+            code = this.unindent(code)
+            let inem = '\nif __name__=="__main__":';
+            let blocks = code.split(inem);
+            if (blocks.length == 2){
+                let [pre, post] = blocks
+                post = this.unindent(post, 4)
+                code = pre + inem + post
+            }
+            return code
+        }
+        loadEl(){
+            /* load and format the html element */
+            let code=this.innerHTML?this.reformatIndentation(this.innerHTML):"";
 
-    inputPromise = new DeferredPromise();
+            this.initialCode = code;
+            this.innerHTML = `<pre>${code}</pre>`// set innerHTML to the cleanest builtin HTML
 
-    input = ()=>{}
-    callInput(msg){
-        return prompt(msg)
-    }
-    inputCalled(msg){
-        console.log("input called", msg, this.input)
-//        this.inputPromise.resolve(prompt(msg))
-        this.input(msg).then(((p)=>{console.log("p", p);this.inputPromise.resolve(p)}).bind(this))
-    }
-    inputReady(){
-        console.log("checking ready", this.inputPromise.fulfilled)
-        return this.inputPromise.fulfilled
-    }
-    getInput(){
-        console.log("getting input", this.inputPromise.fulfilled, this.inputPromise.result)
-        if (this.inputPromise.fulfilled){
-            let r = '' + this.inputPromise.result
-            this.inputPromise = new DeferredPromise();
+            // load the editor
+            this.loadEditor();
+
+            // set theme
+            if (this.hasAttribute("theme")){
+                this.theme = this.getAttribute("theme")
+            }
+
+            // now load packages detected in code imports
+            this.loadPackages()
+        }
+        loadEditor(){
+            /* first load the editor as though codemirror does not and will not exist, then load codemirror*/
+            this._loadEditor();
+            codemirrorImported.then(this._loadCodeMirror.bind(this));
+        }
+        helpInfo = `
+        <b>PyPrez</b> is powered by <i>Pyodide</i> and runs fully in your browser!<br/><br/>
+
+        <b>To run:</b>
+        <ul>
+            <li>Click green arrow</li>
+            <li>Shift + Enter</li>
+            <li>Double-Click</li>
+        </ul>
+        <b>To re-run:</b>
+        <ul>
+            <li>Shift + Enter</li>
+            <li>Double-Click</li>
+        </ul>
+        <b>To reload:</b>
+        <ul>
+            <li>Click red reload</li>
+            <li>Shift + Backspace</li>
+        </ul>
+        `
+        _loadEditor(){
+            /* first load the editor as though codemirror does not and will not exist*/
+
+            // check whether to add github link to top based on attributes
+            let githublink = this.hasAttribute("githublink")?this.getAttribute("githublink")==="true":includeGithubLink
+            let gh = githublink?githublinkImage:"<div></div>"
+
+            // check whether to add a message bar to the top of the element
+            let help= this.hasAttribute("help")?this.getAttribute("help")==="true":window.help;
+
+            let snss = this.hasAttribute("showNamespaceSelect")?this.getAttribute("showNamespaceSelect"):window.showNamespaceSelect;
+            snss=snss?"block":"none";
+            let sts = this.hasAttribute("showThemeSelect")?this.getAttribute("showThemeSelect"):window.showThemeSelect;
+            sts = sts?"block":"none";
+
+            // make top bar above codemirror
+            let top = ""
+            if (help){
+                top = `<div style="background-color:#d3d3d3;border-color:#808080;border-radius:3px;display:flex">
+                    ${gh}
+                    <div style="margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
+                    <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
+                    <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
+                        <option>global</option>
+                    </select>
+                    <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${sts};">
+                        <option>default</option>
+                        <option style="background-color:#2b2b2b;color:#a9b7c6;">darcula</option>
+                        <option style="background-color:#d7d4f0;color:#30a;">eclipse</option>
+                        <option style="background-color:rgba(37,59,118,.99);color:#ff6400;">blackboard</option>
+                        <option style="background-color:#d7d4f0;color:#0080ff;">xq-light</option>
+                        <option style="background-color:#0a001f;color:#f8f8f8;">xq-dark</option>
+                    </select>
+                </div>`
+            }else{
+                top = `<div>
+                    ${gh}
+                    <div style="display:none;margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
+                    <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
+                    <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
+                        <option>global</option>
+                    </select>
+                    <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${sts};">
+                        <option>default</option>
+                        <option style="background-color:#2b2b2b;color:#a9b7c6;">darcula</option>
+                        <option style="background-color:#d7d4f0;color:#30a;">eclipse</option>
+                        <option style="background-color:rgba(37,59,118,.99);color:#ff6400;">blackboard</option>
+                        <option style="background-color:#d7d4f0;color:#0080ff;">xq-light</option>
+                        <option style="background-color:#0a001f;color:#f8f8f8;">xq-dark</option>
+                    </select>
+                </div>`
+            }
+            this.style.display="flex"
+            this.style["flex-direction"] = "column"
+            this.style.resize = "both"
+            this.style.overflow = "auto"
+            this.innerHTML = `
+            <div style="color:green">${this.startChar}</div>
+            ${top}
+            <textarea style="height:auto;">${this.initialCode}</textarea>
+            <pre></pre>
+            `
+            this.start = this.children[0] // start button
+            this.messageBar = this.children[1].children[1] // top message bar to use to print status (Loading, Running, etc.)
+            this.namespaceSelect = this.children[1].children[3]
+            this.themeSelect = this.children[1].children[4]
+            this.textarea = this.children[2] // textarea in case codemirror does not load
+            this.endSpace = this.children[3]
+
+            // add click event to start button
+            this.start.addEventListener("click", this.startClicked.bind(this))
+            this.themeSelect.addEventListener("change", ((e)=>{
+                this.theme = this.themeSelect.value;
+                try{
+                    localStorage.setItem("codemirrorTheme", this.themeSelect.value);
+                }catch{}
+
+            }).bind(this))
+            this.namespaceSelect.addEventListener("click", ()=>{
+                this.refreshNamespaces();
+            })
+
+            // size text area to fit initial code
+            this.textarea.style.height = this.textarea.scrollHeight +"px" // set text area to full height
+            let longestLine = this.initialCode.split("\n").map(v=>v.length).reduce((a,b)=>a>b?a:b)
+            let fontSize = 1 * window.getComputedStyle(this.textarea).fontSize.slice(0,-2)
+            let w = Math.min(window.innerWidth - 50, Math.ceil(longestLine * fontSize) + 200)
+//            this.children[1].style.width = w +"px"
+//            this.textarea.style.width = w  + "px"
+            this.style.maxWidth = "100%"
+            this.style.width = stackMode?"100%":(w + "px")
+
+            // Set initial messages
+            if (!pyodideImported.promise.fullfilled){
+                this.message = "Loading pyodide"
+                pyodideImported.then((()=>{this.message = "Ready   (Double-Click to Run)"}).bind(this))
+            }
+        }
+        _loadCodeMirror(){
+            // make codemirror editor from textarea
+            this.editor = CodeMirror.fromTextArea(this.textarea, {
+                lineNumbers: true,
+                mode: this.language,
+                viewportMargin: Infinity,
+                gutters: ["Codemirror-linenumbers", "start"],
+            });
+//            this.editor.setSize(1*this.textarea.style.width.slice(0,-2))
+
+            // add start button in gutter
+            this.editor.doc.setGutterMarker(0, "start", this.start);
+
+            // set double click listener on editor as well because otherwise outer element listener does not get triggered
+            this.editor.display.lineDiv.addEventListener("dblclick", this.dblclicked.bind(this))
+
+
+            try{
+                if (!this.hasAttribute("theme")){
+                    this.themeSelect.value = this.theme;
+                    let cmt = localStorage.getItem("codemirrorTheme");
+                    cmt = cmt?cmt:this.theme;
+                    localStorage.setItem("codemirrorTheme", cmt);
+                    this.themeSelect.value = cmt;
+                    this.theme = cmt;
+                }
+            }catch{}
+        }
+        get selectedNamespace(){return this.namespaceSelect.value}
+        set selectedNamespace(name){
+            this.namespaceSelect.value = name;
+        }
+        get namespaces(){return Array.from(this.namespaceSelect.children).map(el=>el.innerHTML)}
+        set namespaces(namespaces){
+            console.warn(namespaces)
+            let sn = this.selectedNamespace;
+            this.namespaceSelect.innerHTML = namespaces.map(name=>`<option>${name}</option>`).join("")
+            this.namespaceSelect.value = sn;
+        }
+        refreshNamespaces(){
+            this.namespaces = pyprez.namespaceNames;
+        }
+        get namespace(){return this.selectedNamespace}
+        set namespace(name){
+            if (!this.namespaces.includes(name)){
+                console.warn(this.namespaces, name)
+                this.namespaces = this.namespaces.concat([name]);
+            }
+            this.selectedNamespace = name
+        }
+
+        /* ________________________ EVENTS _____________________________*/
+        keypressed(e){
+            /* Shift + Enter to run, Shift + Backspace to reload */
+            if (e.shiftKey){
+                if (e.key == "Enter"){this.run(); e.preventDefault();}
+                else if (e.key == "Backspace"){this.reload(); e.preventDefault();}
+            }
+        }
+        dblclicked(e){
+            /* always run or re-run on double click*/
+            if (this.done){
+                this.reload();
+            }
+
+            this.run();
+            e.stopPropagation();
+        }
+        startClicked(){
+            /* when the start button is clicked either run code or reload to the last code that was executed*/
+            if (!this.executed){
+                this.run();
+            }else{
+                this.reload();
+            }
+        }
+
+        /* ________________________ STATE _____________________________*/
+        done = false
+        executed = false // store the code that was executed last from this element
+
+        /* ________________________ CONFIG _____________________________*/
+        separator = "\n____________________\n"
+        startChar = "&#10148" // ➤
+        reloadChar = "&#8635" //"↻"
+        consolePrompt = consolePrompt
+        consoleOut = consoleOut
+
+        /* ________________________ PROPERTIES _____________________________*/
+        // get/set the message in the top message bar (which can be hidden if desired)
+        get message(){
+            return this.messageBar.innerHTML
+        }
+        set message(v){
+            this.messageBar.innerHTML = v
+        }
+
+        // get/set the code content
+        get code(){
+            return this.editor?this.editor.getValue():this.textarea.value
+        }
+        set code(v){
+            // escape html
+            if (this.language == "html"){
+                v = v.replaceAll("<", "&lt").replaceAll(">", "gt")
+            }
+
+            if (this.editor){
+                this.editor.setValue(v);
+                this.editor.doc.setGutterMarker(0, "start", this.start);
+
+                // scroll to bottom of element
+                let si = this.editor.getScrollInfo();
+                this.editor.scrollTo(0, si.height);
+            }else{
+                this.textarea.value = v;
+
+                // scroll to bottom of element
+                this.textarea.scrollTop = this.textarea.scrollHeight;
+            }
+
+            // scroll down on page until bottom of element is in view
+            let bb = this.getBoundingClientRect();
+            if (bb.bottom > window.innerHeight){
+                window.scrollTo(0, bb.bottom)
+            }
+        }
+
+        // get/set the codemirror theme, importing from cdn if needed
+        get theme(){return this.editor.options.theme}
+        set theme(v){
+            codemirrorImported.then((()=>{
+                if (loadedCodeMirrorStyles.includes(v)){
+                    this.editor.setOption("theme", v)
+                }else{
+                    let src = codemirrorCDN + "theme/" + v + ".min.css"
+                    get(src).then(addStyle).then((()=>{
+                        this.editor.setOption("theme", v);
+                        loadedCodeMirrorStyles.push(v);
+                    }).bind(this))
+                }
+            }).bind(this))
+            this.themeSelect.value = v;
+        }
+
+        /* ________________________ PYTHON IMPORTS _____________________________*/
+        numImports = 0; // number of import statements we have already tried to auto-load
+        loadPackages(){
+            /* autodetect if new import statements have been added to code, and if so try to install them*/
+            let code = this.code;
+            let n = code.match(/import/g);
+            if (n && n.length !== this.numImports){
+                this.message = "Loading packages..."
+                this.numImports = n.length;
+                pyprez.load(this.code).then((()=>{this.message = "Ready...(Double-Click to Run)"}).bind(this))
+            }
+        }
+
+        /* ________________________ RUN CODE _____________________________*/
+        reload(){
+            /*reset editor to the state from before it was executed last*/
+            this.start.innerHTML = this.startChar
+            this.start.style.color = "green";
+            this.code = this.executed;
+            console.warn("Setting code to ", this.executed, this.code)
+            this.message = "Ready   (Double-Click to Run)";
+            this.executed = false;
+            this.done = false
+        }
+        run(){
+            console.log("run", this.done)
+            if(this.done){
+                this.consoleRun()
+            }else if (this.code){
+                this.message = "Running..."
+                let code = this.code.split(this.separator)[0];
+                this.executed = code;
+                this.code = code;
+                this.start.style.color = "yellow"
+                let promise;
+                if (this.language == "python"){
+                    this.code += this.separator;
+                    if (this.getAttribute("stdout") === "true"){
+                        this.attachStd();
+                    }
+                    promise = pyprez.loadAndRunAsync(code, this.namespace);
+                    promise.then(r=>{
+                        this.done = true
+                        this.message = "Complete! (Double-Click to Re-Run)"
+                        let s = "\n" + this.consoleOut + (r?r.toString():"") + "\n" + this.consolePrompt;
+                        this.code += s;
+                        this.start.style.color = "red";
+                        this.start.innerHTML = this.reloadChar;
+                        if (this.getAttribute("stdout") === "true"){
+                            this.detachStd();
+                        }
+                        return r
+                    })
+                }else if (this.language == "javascript"){
+                    let r = eval(code)
+                    this.done = true
+                    this.code += "\n" + this.consolePrompt + JSON.stringify(r, null, 2);
+                    this.start.style.color = "red";
+                    this.start.innerHTML = this.reloadChar;
+                    return r
+                }else if (this.language == "html"){
+                    if (!this.htmlResponse){
+                        this.htmlResponse = document.createElement("div");
+                        this.after(this.htmlResponse)
+                    }
+                    this.htmlResponse.innerHTML = this.code.replaceAll("&lt","<").replaceAll("&gt", ">");
+                    this.done = true
+                }
+            }
+
+        }
+
+        /* ________________________ POST-RUN CONSOLE _____________________________*/
+        consoleRun(){
+            let code = this.code.split(this.consolePrompt).pop().trim().replaceAll(this.consoleEscape, "")
+            if (!code){
+                this.code += "\n" + this.consolePrompt
+            }else{
+                if (this.language === "python"){
+                    if (this.getAttribute("stdout") === "true"){
+                        this.attachStd();
+                    }
+                    let r = pyprez.loadAndRunAsync(code, this.namespace).then(((r)=>{
+                        if (this.getAttribute("stdout") === "true"){
+                            this.detachStd();
+                        }
+                        this.printResult(r);
+                    }).bind(this))
+                    return r
+                }else if (this.language === "javascript"){
+                    let r = eval(code)
+                    return this.printResult(r)
+                }
+            }
+        }
+        printResult(r){
+            let res;
+            if (this.language === "python"){
+                if (r === null){
+                    r = ""
+                }else{
+                    res = r?r.toString():""
+                }
+            }else{
+                 res = JSON.stringify(r, null, 2)
+            }
+            if (!this.code.endsWith("\n")){this.code += "\n"}
+            this.code += this.consoleOut + res + "\n" + this.consolePrompt
+            return res
+        }
+        appendLine(v){
+            if (v !== null){
+                this.code += "\n" + v
+            }
+        }
+
+        /* ________________________ STDOUT/STDERR _____________________________*/
+        attachStd(){
+            this.oldstdout = pyprez.stdout
+            this.oldstderr = pyprez.stderr
+            pyprez.stdout = this.appendLine.bind(this)
+            pyprez.stderr = this.appendLine.bind(this)
+        }
+        detachStd(r){
+            if (this.oldstdout){
+                pyprez.stdout = this.oldstdout
+                pyprez.stderr = this.oldstderr
+            }
             return r
         }
     }
+    window.addEventListener("load", ()=>{
+        customElements.define("pyprez-editor", PyPrezEditor);
+    })
 
-    // utility methods used to load requirements and run code asynchronously as soon as pyodide is loaded
-    load(code, requirements="detect"){
-        /*load required packages as soon as pyodide is loaded*/
-        return this.then(pyodide =>{
-            let requirementsLoaded;
-            if (requirements === "detect"){
-                if (code){
-                    console.debug("auto loading packages detected in code")
-                    console.debug(code)
-                    requirementsLoaded = pyodide.loadPackagesFromImports(code)
-                }
+    /* ___________________________________________________ IMPORT ___________________________________________________ */
+    class PyPrezImport extends HTMLElement{
+        /*
+        custom element with the <pyprez-import></pyprez-import> tag which is used to load required packages into pyodide
+
+        examples:
+            <pyprez-import>
+                numpy
+                matplotlib
+            </pyprez-import>
+            <pyprez-import>
+                -scipy
+                -asyncio
+            </pyprez-import>
+            <pyprez-import src="requirements.txt"></pyprez-import>
+        */
+        constructor(){
+            super();
+            this.classList.add("pyprez");
+            this.style.display = "none";
+            let requirements = [...this.innerText.matchAll(this.re)].map(v=>v[1]);
+            if (requirements.length){
+                console.debug("importing requirements ", requirements, " from <pyprez-import/>", this)
+                pyprez.then(()=>{window.pyodide.loadPackage(requirements)}).then(()=>{
+                    console.timeEnd("pyprez-import load")
+                });
+            }
+            pyprez.register(this);
+        }
+        re = /\s*-?\s*(.*?)\s*[==[0-9|.]*]?\s*[,|;|\n]/g
+    }
+    window.addEventListener("load", ()=>{
+        customElements.define("pyprez-import", PyPrezImport);
+    })
+
+    /* ___________________________________________________ SCRIPT ___________________________________________________ */
+    class PyPrezScript extends HTMLElement{
+        /*
+        custom element which loads required packages and runs a block of python code in the pyodide interpreter
+
+        example:
+            <pyprez-script>
+                import numpy as np
+                np.random.rand(5)
+            </pyprez-script>
+            <pyprez-script src="my-script.py"></pyprez-script>
+        */
+        constructor(){
+            super();
+            this.classList.add("pyprez");
+            this.style.display = "none";
+            this.run = this.run.bind(this);
+            this.namespace = this.hasAttribute("namespace")?this.getAttribute("namespace"):"global"
+            pyprez.recordNamespaceName(this.namespace)
+            if (this.hasAttribute("src") && this.getAttribute("src")){
+                console.debug("fetching script for pyprez-script src", this.getAttribute("src"))
+                fetch(this.getAttribute("src")).then(r=>r.text()).then(this.run)
             }else{
-                console.debug("loading", requirements)
-                requirementsLoaded = pyodide.loadPackage(requirements);
+                this.run(this.innerHTML);
             }
-            return requirementsLoaded
-        })
-    }
-    loadAndRunAsync(code, requirements="detect"){
-        /* run a python script asynchronously as soon as pyodide is loaded and all required packages are imported*/
-        return this.then(pyodide =>{
-            if (code){
-                return this.load(code, requirements)
-                    .then(r => this._runPythonAsync(pyodide, code))
-                    .catch(e => this._runPythonAsync(pyodide, code))
-            }
-        })
-    }
-    _runPythonAsync(pyodide, code){
-        if (code){
-            console.debug("running code asynchronously:")
-            console.debug(code)
-            return pyodide.runPythonAsync(code).catch(this.stderr)
+            pyprez.register(this);
         }
-    }
-
-    // allow pyprez object to act a bit like a the promise to the pyodide object
-    then(successCb, errorCb){return this.promise.then(successCb, errorCb)}
-    catch(errorCb){return this.promise.catch(errorCB)}
-
-    _loadPyodide(config={}){
-        /*load pyodide object once pyodide*/
-        pyodideImported.then((()=>{
-            setTimeout((()=>{
-                // setup the special config options to load pyodide with
-                let defaultConfig = {
-                    stdout: (t=>{this.stdout(t)}).bind(this),
-                    stderr: (t=>{this.stderr(t)}).bind(this),
-//                    stdin: (t=>{this.stdin(t)}).bind(this),
-                }
-                config = Object.assign(defaultConfig, config)
-
-                window.input_called = this.inputCalled.bind(this)
-                window.input_ready = this.inputReady.bind(this)
-                window.get_input = this.getInput.bind(this)
-
-                window.call_input = this.callInput.bind(this)
-                // load pyodide then resolve or reject this.promise
-                loadPyodide(config).then((p)=>{
-                   p.runPython(`
-                    from js import input_called, input_ready, get_input, call_input
-                    import time
-
-                    def new_input(msg):
-                        input_called(msg)
-                        timeout = 10
-                        t0 = time.time()
-                        while not input_ready():
-                            time.sleep(0.1)
-                            if time.time() > t0 + timeout:
-                                return 'timeout'
-                        return get_input()
-                    __builtins__.input = call_input
-                    `);
-                    return p
-
-                }).then(this._resolvePromise).catch(this._rejectPromise);
-            }).bind(this), 10)
-        }).bind(this))
-        this.then(this._onload.bind(this));
-        return this._pyodidePromise
-    }
-    _onload(pyodide){
-        /*set the window variable and the class attribute of pyodide as soon as pyodide is loaded*/
-        console.timeEnd("pyodide load");
-        window.pyodide = pyodide;
-        this.pyodide = pyodide;
-    }
-}
-var pyprez = new PyPrez();
-
-/* ___________________________________________________ IMPORT ___________________________________________________ */
-class PyPrezImport extends HTMLElement{
-    /*
-    custom element with the <pyprez-import></pyprez-import> tag which is used to load required packages into pyodide
-
-    examples:
-        <pyprez-import>
-            numpy
-            matplotlib
-        </pyprez-import>
-        <pyprez-import>
-            -scipy
-            -asyncio
-        </pyprez-import>
-        <pyprez-import src="requirements.txt"></pyprez-import>
-    */
-    constructor(){
-        super();
-        this.classList.add("pyprez");
-        this.style.display = "none";
-        let requirements = [...this.innerText.matchAll(this.re)].map(v=>v[1]);
-        if (requirements.length){
-            console.debug("importing requirements ", requirements, " from <pyprez-import/>", this)
-            pyprez.then(pyo=>pyo.loadPackage(requirements)).then(()=>{
-                console.timeEnd("pyprez-import load")
-            });
-        }
-        pyprez.addElement(this);
-    }
-    re = /\s*-?\s*(.*?)\s*[==[0-9|.]*]?\s*[,|;|\n]/g
-}
-window.addEventListener("load", ()=>{
-    customElements.define("pyprez-import", PyPrezImport);
-})
-
-/* ___________________________________________________ SCRIPT ___________________________________________________ */
-class PyPrezScript extends HTMLElement{
-    /*
-    custom element which loads required packages and runs a block of python code in the pyodide interpreter
-
-    example:
-        <pyprez-script>
-            import numpy as np
-            np.random.rand(5)
-        </pyprez-script>
-        <pyprez-script src="my-script.py"></pyprez-script>
-    */
-    constructor(){
-        super();
-        this.classList.add("pyprez");
-        this.style.display = "none";
-        this.run = this.run.bind(this);
-        if (this.hasAttribute("src") && this.getAttribute("src")){
-            console.debug("fetching script for pyprez-script src", this.getAttribute("src"))
-            fetch(this.getAttribute("src")).then(r=>r.text()).then(this.run)
-        }else{
-            this.run(this.innerHTML);
-        }
-        pyprez.addElement(this);
-    }
-    run(code){
-        console.debug("running code from <pyprez-script>", code, this)
-        this.innerHTML = code;
-        this.promise = pyprez.loadAndRunAsync(code).then(v=>this.value=v?v.toString():"")
-        return this.promise
-    }
-}
-window.addEventListener("load", ()=>{
-    customElements.define("pyprez-script", PyPrezScript);
-})
-
-/* ___________________________________________________ EDITOR ___________________________________________________ */
-class PyPrezEditor extends HTMLElement{
-    /*
-    custom element which allows editing a block of python code, then when you are ready, pressing run to
-    load required packages and run the block of python code in the pyodide interpreter and see the result
-
-    example:
-        <pyprez-editor>
-            import numpy as np
-            np.random.rand(5)
-        </pyprez-editor>
-        <pyprez-editor src="my-script.py"></pyprez-editor>
-    */
-    constructor(){
-        super();
-//        alert("loading" + this.innerHTML)
-//        console.log("this=", this)
-        this.classList.add("pyprez");
-        this.loadEl = this.loadEl.bind(this);
-        this.loadEditor = this.loadEditor.bind(this);
-        this.language = "python"
-        if (this.hasAttribute("language") && this.getAttribute("language")){
-            this.language = this.getAttribute("language").toLowerCase()
-        }
-        if (!this.hasAttribute("stdout")){
-            this.setAttribute("stdout", "true")
-        }
-        let aliases = {
-            "py": "python",
-            "js": "javascript",
-        }
-        if (aliases[this.language]){
-            this.language = aliases[this.language]
-        }
-
-        if (this.hasAttribute("src") && this.getAttribute("src")){
-            let src = this.getAttribute("src")
-            console.debug("fetching script for pyprez-editor src", src)
-            if (src.endsWith('.js')){
-                this.language = "javascript"
-            }
-            fetch(src).then(r=>r.text()).then(code =>{
-                this.innerHTML = code;
-                this.loadEl();
+        run(code){
+            console.debug("running code from <pyprez-script>", code, this)
+            this.innerHTML = code;
+            this.promise = pyprez.loadAndRunAsync(code, this.namespace).then(v=>{
+                this.value = v;
+                this.innerHTML=v?v.toString():"";
+                return v
             })
-        }else{
-            this.loadEl();
-        }
-        this.addEventListener("keydown", this.keypressed.bind(this));
-        pyprez.addElement(this);
-        if (this.hasAttribute("theme")){
-            this.theme = this.getAttribute("theme")
-        }
-        this.done = false;
-        this.addEventListener("dblclick", this.dblclicked.bind(this))
-        if (this.hasAttribute("runonload") & (this.getAttribute("runonload")==="true")){
-            this.run();
+            return this.promise
         }
     }
-    keypressed(e){
-//        console.log("keypressed", e.key, e.shiftKey)
-        if (!this.done){
-            if (e.shiftKey){
-                if (e.key == "Enter"){this.run(); e.preventDefault();}
-                else if (e.key == "Backspace"){this.reset(); e.preventDefault();}
+    window.addEventListener("load", ()=>{
+        customElements.define("pyprez-script", PyPrezScript);
+    })
+
+    /* ___________________________________________________ CONSOLE ___________________________________________________ */
+    class PyPrezConsole extends HTMLElement{
+        /*
+        simple and customizable Python REPL terminal emulator
+
+        examples:
+            <pyprez-console></pyprez-console>
+            <pyprez-console style="background-color:yellow;color:black"></pyprez-console>
+        */
+        constructor(){
+            super();
+            this.classList.add("pyprez");
+
+            // bind functions
+            this.attachStd = this.attachStd.bind(this)
+            this.detachStd = this.detachStd.bind(this)
+            this.printResult = this.printResult.bind(this);
+            this.eval = this.eval.bind(this);
+            this.namespace = this.hasAttribute("namespace")?this.getAttribute("namespace"):"global"
+            pyprez.recordNamespaceName(this.namespace)
+
+            // set language to python(default), javascript, or html
+            let language = this.hasAttribute("language")?this.getAttribute("language").toLowerCase():"python"
+            let aliases = {
+                "python": "python",
+                "javascript": "javascript",
+                "html": "html",
+                "py": "python",
+                "js": "javascript",
             }
-        }else{
-            if (!e.shiftKey){
-                if (e.key == "Enter"){this.run(); e.preventDefault();}
-                else if (e.key == "Backspace"){this.reset(); e.preventDefault();}
+            this.language = aliases[language]
+
+            // get attributes
+            let cols = this.hasAttribute("cols")?this.getAttribute("cols"):this.defaultCols
+            let rows = this.hasAttribute("rows")?this.getAttribute("rows"):this.defaultRows
+            let bg = this.style["background-color"]?this.style["background-color"]:this.defaultBackgroundColor
+            let c = this.style["color"]?this.style["color"]:this.defaultTextColor
+
+            // set innerHTML
+            this.innerHTML = `<textarea cols="${cols}" rows="${rows}" style="background-color:${bg};color:${c};height:100%;"></textarea>`
+
+            // save child element
+            this.textarea = this.children[0]
+
+
+            // allow loading code from an external source
+            let src = false
+            if (this.hasAttribute("src") && this.getAttribute("src") && (this.getAttribute("src") !== pyprezScript.src)){
+                src = this.getAttribute("src")
+                console.debug("fetching script for pyprez-editor src", src)
+                if (src.endsWith('.js')){
+                    this.language = "javascript"
+                }else if (src.endsWith('.py')){
+                    this.language = "python"
+                }else if (src.endsWith('.html')){
+                    this.language = "html"
+                }
             }
-        }
-    }
-    dblclicked(e){
-        console.log("double clicked")
-        this.run();
-    }
-    loadEl(){
-        let code="";
-        if (this.innerHTML){
-            let lines = this.innerHTML.replaceAll("\t","    ").split("\n")
-            let indent = " ".repeat(Math.min(...lines.filter(v=>v).map(v=>v.match(/\s*/)[0].length)));
-            code = lines.map(v=>v.startsWith(indent)?v.replace(indent, ""):v).join("\n")
-        }
 
-        this.initialCode = code;
-        console.log("initial code", this.initialCode)
-        this.innerHTML = `<pre>${code}</pre>`
-        this.loadEditor();
-    }
-    loadEditor(){
-        this._loadEditor();
-        codemirrorImported.then(this._loadCodeMirror.bind(this));
-    }
-    _loadEditor(){
-    // ➤ is &#10148;
-        let githublink = this.hasAttribute("githublink")?this.getAttribute("githublink")==="true":false
-        let gh = githublink?'<a href="https://modularizer.github.io/pyprez"><img src="https://github.com/favicon.ico" height="15px"/></a>':"<div></div>"
+            this.startup();
 
-        let help= this.hasAttribute("help")?this.getAttribute("help")==="true":window.help;
-
-        let top = ""
-        if (help){
-            top = `<div style="background-color:#d3d3d3;border-color:#808080;border-radius:3px;display:flex">
-            ${gh}
-            <div style="margin-left:10px;overflow:hidden;"></div>
-        </div>`
-        }else{
-            top = `<div>
-                ${gh}
-                <div style="display:none;margin-left:10px;overflow:hidden;"></div>
-            </div>`
-        }
-        let messageVis = help?"block":"none"
-        this.innerHTML = `
-        <div style="color:green">&#10148;</div>
-        ${top}
-        <textarea style="height:auto;width:auto;">${this.initialCode}</textarea>
-        `
-        this.start = this.children[0]
-        this.messageBar = this.children[1].children[1]
-        if (!pyodideImported.promise.fullfilled){
-            this.message = "Loading pyodide"
-            pyodideImported.then((()=>{this.message = "Ready   (Double-Click to Run)"}).bind(this))
-        }
-        this.textarea = this.children[2]
-        this.textarea.style.height = this.textarea.scrollHeight +"px"
-
-        console.log("initial code", this.initialCode.split("\n").map(v=>v.length).reduce((a,b)=>a>b?a:b))
-        let longestLine = this.initialCode.split("\n").map(v=>v.length).reduce((a,b)=>a>b?a:b)
-        let fontSize = 1 * window.getComputedStyle(this.textarea).fontSize.slice(0,-2)
-        let w = Math.ceil(longestLine * fontSize * 0.7)
-        console.log(longestLine, fontSize, w + "px")
-        this.textarea.style.width = w  + "px"
-        console.log(this.textarea.style.width, this.textarea)
-
-        codemirrorImported.then((()=>{this.loadPackages()}).bind(this));
-        this.start.addEventListener("click", this.startClicked.bind(this))
-        if (window.CodeMirror){
-        }
-    }
-    _loadCodeMirror(){
-        this.editor = CodeMirror.fromTextArea(this.textarea, {
-            lineNumbers: true,
-            mode: this.language,
-            viewportMargin: Infinity,
-            gutters: ["Codemirror-linenumbers", "start"],
-        });
-        this.editor.on("keydown", this.loadPackages.bind(this));
-        this.editor.doc.setGutterMarker(0, "start", this.start);
-
-        console.log("attaching dblclick", this.editor.display.lineDiv)
-        this.editor.display.lineDiv.addEventListener("dblclick", this.dblclicked.bind(this))
-    }
-    get message(){
-        return this.messageBar.innerHTML
-    }
-    set message(v){
-        this.messageBar.innerHTML = v
-    }
-    get code(){
-        return this.editor?this.editor.getValue():this.textarea.value
-    }
-    set code(v){
-        if (this.mode == "html"){
-            v = v.replaceAll("<", "&lt").replaceAll(">", "gt")
-        }
-        if (this.editor){
-            console.warn("setting value", v)
-            this.editor.setValue(v);
-            console.warn("set value")
-            this.editor.doc.setGutterMarker(0, "start", this.start);
-            let si = this.editor.getScrollInfo();
-            this.editor.scrollTo(0, si.height);
-
-        }else{
-            this.textarea.value = v;
-            this.textarea.scrollTop = this.textarea.scrollHeight;
-        }
-        let bb = this.getBoundingClientRect();
-        if (bb.bottom > window.innerHeight){
-            window.scrollTo(0, bb.bottom)
-        }
-    }
-    get theme(){return this.editor.options.theme}
-    set theme(v){
-        codemirrorImported.then((()=>{
-            if (window.loadedCodeMirrorStyles.includes(v)){
-                this.editor.setOption("theme", v)
-            }else{
-                let src = codemirrorCDN + "theme/" + v + ".min.css"
-                get(src).then(addStyle).then((()=>{
-                    this.editor.setOption("theme", v);
-                    window.loadedCodeMirrorStyles.push(v);
+            // if src
+            if (src){
+                this.text += "\n" + this.consolePrompt + "# importing code from " + src
+                fetch(src).then(r=>r.text()).then(((code)=>{
+                    this.text += "\n" + this.consolePrompt + "# running code from " + src
+                    this.eval(code)
                 }).bind(this))
             }
-        }).bind(this))
-    }
-    numImports = 0;
-    loadPackages(){
-        let code = this.code;
-        let n = code.match(/import/g);
-        if (n && n.length !== this.numImports){
-            this.message = "Loading packages..."
-            this.numImports = n.length;
-            pyprez.load(this.code).then((()=>{this.message = "Ready...(Double-Click to Run)"}).bind(this))
-        }
-    }
-    executed = false
-    startClicked(){
-        if (!this.executed){
-            this.run();
-        }else{
-            this.reload();
-        }
-    }
-    input(msg){
-        console.warn('msg', msg)
-        this.code += '\n' + msg + '\n>? '
-        console.warn("updated code")
-        this.inputResponse = new DeferredPromise();
-        this.inputResponse.resolve(prompt(msg))
-        return this.inputResponse
-    }
-    respondToInput(){
-        this.inputResponse.then((()=>{this.inputResponse=false;return this.code.split('\n>? ').pop()}).bind(this))
-    }
-    run(){
-        console.log("run", this.done)
-        if (this.inputResponse){
-            this.respondToInput();
-        }else if(this.done){
-            this.consoleRun()
-        }else if (this.code){
-            let sep = "\n____________________\n"
-            this.message = "Running..."
-            this.executed = this.code.split(sep)[0];
-            this.start.style.color = "yellow"
-            this.code = this.executed;
-            let code = this.executed;
-            let promise;
-            if (this.language == "python"){
-                this.code += sep;
-                if (this.getAttribute("stdout") === "true"){
-                    this.attachStd();
-                }
 
-                promise = pyprez.loadAndRunAsync(code);
-                promise.then(r=>{
-                    this.done = true
-                    this.message = "Complete! (Double-Click to Re-Run)"
-                    this.code += "\n[Out] " + (r?r.toString():"") + "\n>>> ";
-                    this.start.style.color = "red";
-//                    this.start.innerHTML = "↻";
-                    this.start.innerHTML = "&#8635";
-                    if (this.getAttribute("stdout") === "true"){
-                        this.detachStd();
-                    }
-                    return r
-                })
-            }else if (this.language == "javascript"){
-                let r = eval(code)
-                this.done = true
-                this.code += "\n>>> " + JSON.stringify(r, null, 2);
-                this.start.style.color = "red";
-//                this.start.innerHTML = "↻";
-                this.start.innerHTML = "&#8635";
-                return r
-            }else if (this.language == "html"){
-                if (!this.htmlResponse){
-                    this.htmlResponse = document.createElement("div");
-                    this.after(this.htmlResponse)
-                }
-                this.htmlResponse.innerHTML = this.code.replaceAll("&lt","<").replaceAll("&gt", ">");
-                this.done = true
-            }
-        }
+            // attach listener
+            this.textarea.addEventListener("keydown", this.keydown.bind(this));
 
-    }
-    consoleRun(){
-        let code = this.code.split(">>> ").pop().trim().replaceAll("...", "")
-        if (!code){
-            this.code += "\n>>> "
-        }else{
-            console.log("running console", code)
+            pyprez.register(this);
+        }
+        defaultCols = 120
+        defaultRows = 20
+        defaultBackgroundColor = "#000"
+        defaultTextColor = "#fff"
+        consolePrompt = consolePrompt
+        consoleOut = consoleOut
+        consoleEscape = consoleEscape
+
+        /* ___________________________________ STARTUP ________________________________ */
+        startup(){
             if (this.language === "python"){
-                if (this.getAttribute("stdout") === "true"){
-                    this.attachStd();
-                }
-                let r = pyprez.loadAndRunAsync(code).then(((r)=>{
-                    if (this.getAttribute("stdout") === "true"){
-                        this.detachStd();
-                    }
-                    this.printResult(r);
-                }).bind(this))
+                pyprez.loadAndRunAsync(`
+                    import sys
+                    s = f"""Python{sys.version}
+                    Type "help", "copyright", "credits" or "license" for more information."""
+                    s
+                `, this.namespace).then(v=>{this.text = v + "\n" + this.consolePrompt})
+            }else if (this.language === "javascript"){
+                this.text += "Simple Javascript Console\n" + this.consolePrompt
+            }
+        }
+
+        /* ___________________________________ EVENT LISTENERS ________________________________ */
+        keydown(e){
+          let k = e.key;
+          if (k === "Tab"){this.text += "    "; e.preventDefault();}
+          if (k === "Enter"){
+            if (e.shiftKey || this.text.trim().endsWith(":")){
+                this.text += "\n... "
+                e.preventDefault();
+            }else{
+                this.run();
+                e.preventDefault();
+            }
+          }
+          if (k === "Backspace" && (this.text.endsWith(this.consolePrompt) || this.text.endsWith(this.consoleEscape + " "))){
+            e.preventDefault();
+          }
+        }
+
+        /* ___________________________________ PROPERTIES ________________________________ */
+        get text(){return this.textarea.value}
+        set text(v){this.textarea.value = v}
+
+        /* ___________________________________ METHODS ________________________________ */
+        appendLine(v){
+            this.text += "\n" + v
+        }
+        print(v){
+            this.text += v;
+            this.appendLine(this.consolePrompt);
+        }
+        printResult(r){
+            let res;
+            if (this.language === "python"){
+                res = r?r.toString():""
+            }else{
+                 res = JSON.stringify(r, null, 2)
+            }
+            if (!this.text.endsWith("\n")){this.text += "\n"}
+            this.print(this.consoleOut + res)
+            return res
+        }
+        attachStd(){
+            this.oldstdout = pyprez.stdout
+            this.oldstderr = pyprez.stderr
+            pyprez.stdout = this.appendLine.bind(this)
+            pyprez.stderr = this.appendLine.bind(this)
+        }
+        detachStd(r){
+            pyprez.stdout = this.oldstdout
+            pyprez.stderr = this.oldstderr
+            return r
+        }
+        eval(code){
+            if (this.language === "python"){
+                this.attachStd()
+                let r = pyprez.loadAndRunAsync(code, this.namespace)
+                .then(this.detachStd, this.detachStd)
+                .then(this.printResult)
                 return r
             }else if (this.language === "javascript"){
                 let r = eval(code)
                 return this.printResult(r)
             }
-        }
-    }
-    printResult(r){
-        let res;
-        if (this.language === "python"){
-            res = r?r.toString():""
-        }else{
-             res = JSON.stringify(r, null, 2)
-        }
-        if (!this.code.endsWith("\n")){this.code += "\n"}
-        this.code += "[Out] " + res + "\n>>> "
-        return res
-    }
-    appendLine(v){
-        this.code += "\n" + v
-    }
-    attachStd(){
-        this.oldstdout = pyprez.stdout
-        this.oldstderr = pyprez.stderr
-        this.oldinput = pyprez.input
-        pyprez.stdout = this.appendLine.bind(this)
-        pyprez.stderr = this.appendLine.bind(this)
-        pyprez.input = ((msg)=>{return this.input(msg)}).bind(this)
-    }
-    detachStd(r){
-        if (this.oldstdout){
-            pyprez.stdout = this.oldstdout
-            pyprez.stderr = this.oldstderr
-            pyprez.input = this.oldinput
-        }
-        return r
-    }
-    reload(){
-//        this.start.innerHTML = "➤";
-        this.start.innerHTML = "&#10148";
-        this.start.style.color = "green";
-        this.code = this.executed;
-        this.executed = false;
-        this.done = false
-    }
-}
-window.addEventListener("load", ()=>{
-customElements.define("pyprez-editor", PyPrezEditor);
-})
 
-/* ___________________________________________________ CONSOLE ___________________________________________________ */
-class PyPrezConsole extends HTMLElement{
-    /*
-    simple and customizable Python REPL terminal emulator
-
-    examples:
-        <pyprez-console></pyprez-console>
-        <pyprez-console style="background-color:yellow;color:black"></pyprez-console>
-    */
-    constructor(){
-        super();
-        this.classList.add("pyprez");
-        this.attachStd = this.attachStd.bind(this)
-        this.detachStd = this.detachStd.bind(this)
-        this.id = 'console' + Math.floor(10000*Math.random())
-        let cols = this.hasAttribute("cols")?this.getAttribute("cols"):120
-        let rows = this.hasAttribute("rows")?this.getAttribute("rows"):20
-        let bg = this.style["background-color"]?this.style["background-color"]:"#000"
-        let c = this.style["color"]?this.style["color"]:"#fff"
-
-
-        this.language = "python"
-        if (this.hasAttribute("language") && this.getAttribute("language")){
-            this.language = this.getAttribute("language").toLowerCase()
         }
-        let aliases = {
-            "py": "python",
-            "js": "javascript"
+        run(){
+            let code = this.text.split(this.consolePrompt).pop().trim().replaceAll(this.consoleEscape, "")
+            if (!code){
+                this.text += "\n" + this.consolePrompt
+            }
+            return this.eval(code)
         }
-        if (aliases[this.language]){
-            this.language = aliases[this.language]
-        }
+    }
+    window.addEventListener("load", ()=>{
+        customElements.define("pyprez-console", PyPrezConsole);
+    })
 
-        this.innerHTML = `<textarea cols="${cols}" rows="${rows}" style="background-color:${bg};color:${c};height:100%;"></textarea>`
-        this.textarea = this.children[0]
-        this.printResult = this.printResult.bind(this);
-        this.eval = this.eval.bind(this);
-
-        if (this.language === "python"){
-            pyprez.loadAndRunAsync(`
-                import sys
-                s = f"""Python{sys.version}
-                Type "help", "copyright", "credits" or "license" for more information."""
-                s
-            `).then(v=>{this.text = v + "\n>>> "})
-        }else if (this.language === "javascript"){
-            this.text += "Simple Javascript Console\n>>> "
+    /* _________________________________  STACK OVERFLOW RUNNABLE ___________________________________________________ */
+    class StackOverflow extends HTMLElement{
+        /* element which shows the markdown which can be used to add runnable snippet to stack overflow */
+        constructor(){
+            super();
+            this.classList.add("pyprez");
+            if (!this.style.display){
+                this.style.display = "flex"
+            }
+            this._header = "Run the javascript snippet below to see a runnable Python example:"
+            this._code = "# your code here"
+            this.innerHTML = this.getInnerHTML()
+            pyprez.register(this);
         }
-
-        this.textarea.addEventListener("keydown", this.keydown.bind(this));
-        pyprez.addElement(this);
-    }
-    startup(){
-        let code = `
-            import sys
-            s = f"""Python{sys.version}
-            Type "help", "copyright", "credits" or "license" for more information."""
-            s
-        `
-        pyprez.loadAndRunAsync(code).then(this.print)
-    }
-    get text(){return this.textarea.value}
-    set text(v){this.textarea.value = v}
-    appendLine(v){
-        this.text += "\n" + v
-    }
-    print(v){
-        this.text += v;
-        this.appendLine(">>> ");
-    }
-    printResult(r){
-        let res;
-        if (this.language === "python"){
-            res = r?r.toString():""
-        }else{
-             res = JSON.stringigy(r, null, 2)
+        get header(){
+            return this._header
         }
-        if (!this.text.endsWith("\n")){this.text += "\n"}
-        this.print("[Out] " + res)
-        return res
-    }
-    attachStd(){
-        this.oldstdout = pyprez.stdout
-        this.oldstderr = pyprez.stderr
-        pyprez.stdout = this.appendLine.bind(this)
-        pyprez.stderr = this.appendLine.bind(this)
-    }
-    detachStd(r){
-        pyprez.stdout = this.oldstdout
-        pyprez.stderr = this.oldstderr
-        return r
-    }
-    eval(code){
-        if (this.language === "python"){
-            this.attachStd()
-            let r = pyprez.loadAndRunAsync(code)
-            .then(this.detachStd, this.detachStd)
-            .then(this.printResult)
-            return r
-        }else if (this.language === "javascript"){
-            let r = eval(code)
-            return this.printResult(r)
+        set header(header){
+            this._header = header
+            this.innerHTML = this.getInnerHTML()
         }
+        get code(){
+            return this._code
+        }
+        set code(code){
+            this._code = code
+            this.innerHTML = this.getInnerHTML()
+        }
+        getInnerHTML(){
+            return `
+    <pre style="background:#d3d3d3;border-radius:0.5em;padding:1%;margin:1%;" contenteditable="true">
+        <svg
+            id="copy"
+            height="40px"
+            width="30px"
+            viewBox="0 0 22 27"
+            xmlns="http://www.w3.org/2000/svg"
+            style="float:right;order: 2;margin-bottom:-40px;cursor:pointer;"
+            onclick="navigator.clipboard.writeText(this.parentElement.innerText)">
+      <g>
+        <path
+           style="fill:none;stroke:#000;stroke-width:1;"
+           d="M 5,22 h -1 a 2 2 0 0 1 -2 -2 v -16 a 2 2 0 0 1 2 -2 h 11 a 2 2 0 0 1 2 2 v 1"
+           id="bottom" />
+        <rect
+           style="fill:none;stroke:#000;stroke-width:1;"
+           id="top"
+           width="15"
+           height="20"
+           x="5"
+           y="5"
+           rx="2" />
+      </g>
+    </svg>
+    ${this.getRunnable()}
+    </pre>
+            `
+        }
+        getRunnable(){
+            return `${this.header}
+    &lt!-- begin snippet: js hide: false console: false babel: false --&gt
 
+      &lt!-- language: lang-js --&gt
+        # keep this comment
+        ${this.code}
+
+     &lt!-- language: lang-html --&gt
+
+        &ltscript src=${preferredPyPrezImportSrc}&gt&lt/script&gt
+
+    &lt!-- end snippet --&gt
+    </pre>`
+        }
     }
-    keydown(e){
-      let k = e.key;
-      if (k === "Tab"){this.text += "    "; e.preventDefault();}
-      if (k === "Enter"){
-        if (e.shiftKey || this.text.trim().endsWith(":")){
-            this.text += "\n... "
-            e.preventDefault();
-        }else{
-            this.run();
+    window.addEventListener("load", ()=>{
+        customElements.define("stack-overflow", StackOverflow);
+    })
+
+    /* _________________________________  STACK OVERFLOW CONVERTER___________________________________________________ */
+    class StackOverflowConverter extends HTMLElement{
+        /* element which allows live editing python on the left while generating the markdown needed to add runnable
+        script to stack overflow */
+        constructor(){
+            super();
+            let ih = this.innerHTML;
+            let mode = this.hasAttribute("mode")?`mode=${this.getAttribute("mode")}`:"";
+            let src = this.hasAttribute("src")?`src=${this.getAttribute("src")}`:"";
+            let namespace = this.hasAttribute("namespace")?this.getAttribute("namespace"):"global";
+            pyprez.recordNamespaceName(this.namespace);
+
+            this.innerHTML = `
+            <div style="display:flex">
+                <div style="flex:50%">
+                    <b>Edit your python snippet here...</b>
+                </div>
+                <div style="flex:50%">
+                    <b>then copy-paste this auto-generated markdown into StackOverflow</b>
+                </div>
+            </div>
+            <div style="display: flex">
+                <div style="flex:50%;max-width:50%;">
+                    <pyprez-editor ${mode} ${src} namespace="${namespace}">
+                        ${ih}
+                    </pyprez-editor>
+                </div>
+                <div style="flex:50%">
+                    <stack-overflow></stack-overflow>
+                </div>
+            </div>
+            `
+            this.pyprezEditor = this.children[1].children[0].children[0]
+            this.stackOverflow = this.children[1].children[1].children[0]
+            this.sync()
+            this.pyprezEditor.addEventListener("keydown", (()=>{setTimeout(this.sync.bind(this), 10)}).bind(this))
+        }
+        sync(){
+            this.stackOverflow.code = this.pyprezEditor.code
+        }
+    }
+    window.addEventListener("load", ()=>{
+        customElements.define("stack-converter",  StackOverflowConverter);
+    })
+
+    /*__________________________________ TOOLTIPS _____________________________________________*/
+    class TOOLTIP{
+      empty={
+        id: 'tooltip',
+        innerHTML: '',
+        style: {
+            position: 'absolute',
+            'z-index': 100000,
+            top: 100,
+            left: 100,
+            display: 'none',
+            opacity: 0.999,
+        },
+      }
+      def={
+        style: {
+            position: 'relative',
+            'background-color': '#fff',
+            'border-color': '#606060',
+            'border-style': 'solid',
+            'border-width': '2px',
+            'border-radius': '5px',
+            margin: '5px',
+            padding: '5px',
+            opacity: 0.95,
+        }
+      }
+      trigger= 'mouseover'
+      attrNames= ['tooltip', 'learningtooltip']
+
+      hold= false
+
+      constructor(){
+        this.el = this.createElement(this.empty)
+        domContentLoaded.then(()=>{document.body.append(this.el)})
+        this.addEventListener()
+
+        let mouseDown = 0;
+        window.addEventListener("mousedown", (e)=>{
+            this.mousedown++;
+            this.onEvent(e, true);
+        })
+        window.addEventListener("mouseup", ()=>{
+            this.mousedown--
+        })
+
+        let enabled = localStorage.getItem("learningModeEnabled") === "true"
+         console.log("enabled=", enabled)
+         if (enabled){
+            this.enableLearningMode()
+         }else{
+            this.disableLearningMode()
+         }
+         this.keydownToggle = this.keydownToggle.bind(this)
+      }
+      mousedown = 0
+      hideBlocked = false
+
+      createElement(ob, innerHTML=-1){
+        if (innerHTML === -1){
+            innerHTML = ob.innerHTML
+        }
+        let el = document.createElement('div')
+        let toggleWarning = document.createElement('div')
+        toggleWarning.innerHTML = '<center style="font-size:10px"><pre>spacebar to toggle tooltip</pre></center>'
+        let inner = document.createElement('div')
+        el.id = ob.id
+        for (let [k, v] of Object.entries(ob.style)){
+            el.style[k] = v
+        }
+        inner.innerHTML = innerHTML
+
+
+        el.appendChild(inner)
+    //    el.appendChild(toggleWarning)
+        return el
+      }
+
+      getDefHTML(t, innerHTML){
+        let temp = this.createElement(this.def, t)
+        t = temp.outerHTML
+        return t
+      }
+
+      setInnerHTML(s, def=false){
+        if (s.endsWith('#def') | def){
+            s = this.getDefHTML(s.split('#def')[0])
+        }
+        this.el.innerHTML = s
+      }
+
+      show(s, clientY, clientX){
+        this.el.style.top = window.scrollY + clientY + 1 + "px"
+        let maxLeft = window.innerWidth - this.el.getBoundingClientRect().width - 200
+        this.el.style.left = Math.min(clientX + 1, maxLeft) + "px"
+        this.setInnerHTML(s)
+        this.el.style.display = 'block'
+        maxLeft = window.innerWidth - this.el.getBoundingClientRect().width
+        this.el.style.left = Math.min(clientX + 1, maxLeft) + "px"
+        this.hold = true
+        document.body.addEventListener("keydown", this.keydownToggle)
+        setTimeout(()=>{this.hold = false;}, 100 )
+      }
+
+      hide(){
+        if (!this.hold){
+          if(!this.mousedown){
+            this.hideBlocked = !this.hideBlocked
+          }
+          if (!this.hideBlocked){
+              this.el.style.top = 0
+              this.el.style.left = 0
+              this.el.style.display = 'none'
+              this.el.innerHTML = ''
+              this.hideTimer = false
+              document.body.removeEventListener("keydown", this.keydownToggle)
+          }
+
+        }
+      }
+
+      keydownToggle(e){
+      console.log(e.key)
+        if (e.key === " "){
+            this.toggleLearningMode()
             e.preventDefault();
         }
       }
-      if (k === "Backspace" && (this.text.endsWith(">>> ") || this.text.endsWith("... "))){
-        e.preventDefault();
+
+      get learningMode(){
+        return this.attrNames.includes('learningtooltip')
+      }
+      enableLearningMode(){
+        if (!this.learningMode){
+            this.attrNames.push('learningtooltip')
+        }
+        localStorage.setItem("learningModeEnabled", true)
+      }
+      disableLearningMode(){
+        if (this.learningMode){
+            this.attrNames.splice(this.attrNames.indexOf('learningtooltip'),1)
+        }
+        this.hide()
+        localStorage.setItem("learningModeEnabled", false)
+      }
+      toggleLearningMode(){
+      console.log(this.attrNames)
+        if(this.learningMode){
+            this.disableLearningMode()
+        }else{
+            this.enableLearningMode()
+        }
+      }
+
+      onEvent(event, click=false){
+        let attrNames = this.attrNames
+        if (click){
+            attrNames = attrNames.concat(['clicktooltip'])
+        }
+
+        let p = event.path
+    //    console.log(p.map(el => el.id))
+          let i=0;
+          let found=false;
+          if (p.length>4){
+            while(!found && i<(p.length-4)){
+               let _found = false
+               for (let attrName of attrNames){
+                   if (p[i].hasAttribute){
+                    if (p[i].hasAttribute(attrName)){
+    //                  console.log(attrName, p[i], )
+                      _found = p[i]
+                      this.show(_found.getAttribute(attrName), event.clientY, event.clientX)
+                    }
+                  }
+               }
+               found = _found
+
+              i++;
+            }
+          }
+          if (!found){
+            this.hide()
+          }
+        }
+
+      addEventListener(){
+        window.addEventListener(this.trigger, this.onEvent.bind(this))
+
       }
     }
-    run(){
-        let code = this.text.split(">>> ").pop().trim().replaceAll("...", "")
-        if (!code){
-            this.text += "\n>>> "
-        }
-        return this.eval(code)
-    }
+
+    var tooltip = new TOOLTIP()
+
+}else{
+    // if the user is using the script tag as a code block, add a real code block to the document
+    pyprezConvert();
 }
-window.addEventListener("load", ()=>{
-    customElements.define("pyprez-console", PyPrezConsole);
-})
 
 
 
-class StackOverflow extends HTMLElement{
-    constructor(){
-        super();
-        this.classList.add("pyprez");
-        if (!this.style.display){
-            this.style.display = "flex"
-        }
-        this._header = "Run the javascript snippet below to see a runnable Python example:"
-        this._code = "# your code here"
-        this.innerHTML = this.getInnerHTML()
-        pyprez.addElement(this);
-    }
-    get header(){
-        return this._header
-    }
-    set header(header){
-        this._header = header
-        this.innerHTML = this.getInnerHTML()
-    }
-    get code(){
-        return this._code
-    }
-    set code(code){
-        this._code = code
-        this.innerHTML = this.getInnerHTML()
-    }
-    getInnerHTML(){
-        return `
-<pre style="background:#d3d3d3;border-radius:0.5em;padding:1%;margin:1%;" contenteditable="true">
-    <svg
-        id="copy"
-        height="40px"
-        width="30px"
-        viewBox="0 0 22 27"
-        xmlns="http://www.w3.org/2000/svg"
-        style="float:right;order: 2;margin-bottom:-40px;cursor:pointer;"
-        onclick="navigator.clipboard.writeText(this.parentElement.innerText)">
-  <g>
-    <path
-       style="fill:none;stroke:#000;stroke-width:1;"
-       d="M 5,22 h -1 a 2 2 0 0 1 -2 -2 v -16 a 2 2 0 0 1 2 -2 h 11 a 2 2 0 0 1 2 2 v 1"
-       id="bottom" />
-    <rect
-       style="fill:none;stroke:#000;stroke-width:1;"
-       id="top"
-       width="15"
-       height="20"
-       x="5"
-       y="5"
-       rx="2" />
-  </g>
-</svg>
-${this.getRunnable()}
-</pre>
-        `
-    }
-    getRunnable(){
-        return `${this.header}
-&lt!-- begin snippet: js hide: false console: false babel: false --&gt
-
-  &lt!-- language: lang-js --&gt
-    # keep this comment
-    ${this.code}
-
- &lt!-- language: lang-html --&gt
-
-    &ltscript src="https://modularizer.github.io/pyprez/so.js"&gt&lt/script&gt
-
-&lt!-- end snippet --&gt
-</pre>`
-    }
-}
-window.addEventListener("load", ()=>{
-    customElements.define("stack-overflow", StackOverflow);
-})
-
-
-class StackOverflowConverter extends HTMLElement{
-    constructor(){
-        super();
-        let ih = this.innerHTML;
-        console.warn("ih=", ih)
-        let mode = this.hasAttribute("mode")?`mode=${this.getAttribute("mode")}`:"";
-        let src = this.hasAttribute("src")?`src=${this.getAttribute("src")}`:"";
-        this.innerHTML = `
-        <div style="display:flex">
-            <div style="flex:50%">
-                <b>Edit your python snippet here...</b>
-            </div>
-            <div style="flex:50%">
-                <b>then copy-paste this auto-generated markdown into StackOverflow</b>
-            </div>
-        </div>
-        <div style="display: flex">
-            <div style="flex:50%">
-                <pyprez-editor ${mode} ${src}>
-                    ${ih}
-                </pyprez-editor>
-            </div>
-            <div style="flex:50%">
-                <stack-overflow></stack-overflow>
-            </div>
-        </div>
-        `
-        this.pyprezEditor = this.children[1].children[0].children[0]
-        this.stackOverflow = this.children[1].children[1].children[0]
-        this.sync()
-        this.pyprezEditor.addEventListener("keydown", (()=>{setTimeout(this.sync.bind(this), 10)}).bind(this))
-    }
-    sync(){
-        this.stackOverflow.code = this.pyprezEditor.code
-    }
-}
-window.addEventListener("load", ()=>{
-    customElements.define("stack-converter",  StackOverflowConverter);
-})
-
-
-}

@@ -27,6 +27,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 - [About](#about)
 - [Getting Started](#getting-started)
 - [Use Cases](#use-cases)
+- [Limitations](#limitations)  
 - [Tags](#pyprez-tags): [`<pyprez-editor>`](#pyprez-editor) , [`<pyprez-console>`](#pyprez-console), [`<pyprez-import>`](#pyprez-import), [`<pyprez-script>`](#pyprez-script)
 - [Custom Themes](#codemirror-themes)
 - [API](#pyprez-api)
@@ -35,10 +36,38 @@ Run **client-side python** in your browser to **prez**ent your code.
 
 # Use On Stack Overflow
 
-<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
-<a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534">View a real answer</a>
+<a href="https://stackoverflow.com/search?q=pyprez"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
+<a href="https://stackoverflow.com/search?q=pyprez">View Real Answers</a>
 
-## Method 1:
+## Method 1
+Convert your code here then copy-paste result into your question/answer. [Converter Page](https://modularizer.github.io/pyprez/stackconverter.html)
+<stack-converter id="stackplaceholder"></stack-converter>
+
+<img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
+
+**If** the viewer clicks `Run Code Snippet`, they will be able to edit and test a live python question or answer without leaving the page.
+
+**It will render something like this**
+<img src="./sample_imgs/stack-overflow-sample.png"/>
+
+## Method 2
+### StackOverflow Power User?
+### Setup
+Add a bookmark to your browser with the following text as the url.
+    ```
+    javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    ");if (sel.startsWith('```python')){sel = sel.replace('```python', '').slice(0,-3)};navigator.clipboard.writeText('\n\n\x3C!-- begin snippet: js hide: false console: false babel: false -->\n\n\x3C!-- language: lang-js -->\n\n    # py\n    ' + sel + '\n\x3C!-- language: lang-html -->\n\n    \x3Cscript src="https://modularizer.github.io/pyprez/pyprez.min.js">\x3C/script>\n\n\n\x3C!-- end snippet -->')})()
+    ```
+   * [Copy To Bookmarklet Clipboard](javascript:navigator.clipboard.writeText(`javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    ");if (sel.startsWith('`+'```'+ `python')){sel = sel.replace('`+'```'+`python', '').slice(0,-3)};navigator.clipboard.writeText('\n\n\x3C!-- begin snippet: js hide: false console: false babel: false -->\n\n\x3C!-- language: lang-js -->\n\n    # py\n    ' + sel + '\n\x3C!-- language: lang-html -->\n\n    \x3Cscript src="https://modularizer.github.io/pyprez/pyprez.min.js">\x3C/script>\n\n\n\x3C!-- end snippet -->')})()`))
+   * Ctrl + D to save bookmark of this page
+   * Right click on existing bookmark of this page, click edit, then replace bookmark url with the text copied above 
+
+#### Usage
+1. on any webpage highlight the python codeblock you want to use and click the bookmark to copy markdown to clipboard
+2. paste the markdown copied in step 2 in your stackoverflow answer
+
+<img src="./sample_imgs/stack-bookmark.png"/>
+   
+## Method 3:
 ### step 1
 <img src="./sample_imgs/stack-overflow-start.png"/>
 * click to add a runnable code segment
@@ -53,28 +82,6 @@ Run **client-side python** in your browser to **prez**ent your code.
     ```
 3. write your python in the javascript box
   * make sure to add a comment or an import to the top of the python script (`# python` works). This will throw a javascript error and ensure the code runs only as python
-
-## Method 2
-Convert your code here then copy-paste result into your question/answer. [Converter-Only Page](https://modularizer.github.io/pyprez/stackconverter.html)
-<stack-converter id="stackplaceholder"></stack-converter>
-
-<img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
-
-**If** the viewer clicks `Run Code Snippet`, they will be able to edit and test a live python question or answer without leaving the page.
-
-**It will render something like this**
-<img src="./sample_imgs/stack-overflow-sample.png"/>
-
-## Method 3 
-### StackOverflow Power User?
-1. Add a bookmark to your browser with the following text as the url.
-    ```
-    javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    ");if (sel.startsWith('```python')){sel = sel.replace('```python', '').slice(0,-3)} navigator.clipboard.writeText('\n\n\x3C!-- begin snippet: js hide: false console: false babel: false -->\n\n\x3C!-- language: lang-js -->\n\n    # py\n    ' + sel + '\n\x3C!-- language: lang-html -->\n\n    \x3Cscript src="https://modularizer.github.io/pyprez/pyprez.min.js">\x3C/script>\n\n\n\x3C!-- end snippet -->')})()
-    ```
-2. highlight the python codeblock you want to use
-3. click on the bookmark
-4. paste to replace the highlighted text
-<img src="./sample_imgs/stack-bookmark.png"/>
 
    
 ### Other options
@@ -134,6 +141,17 @@ Front-end Python will never replace back-end computations, but may be useful for
 * making Python tutorials (similar to `jupyter` of `CoLab`)
 * distributing results of scientific studies and allowing users to play around with data
 * troubleshooting of forums such as stackoverflow <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a><a href="https://stackoverflow.com">StackOverflow</a>
+
+# Limitations
+Unfortunately, there are currently many limitations of running Python in the browser, which stem from fundamental issues which are tricky to solve.
+Many of PyPrez's limitations stem from limitations of `Pyodide`, on which it is built, which in turn stem from limitiations of `js`, `Emscriptem`, `WebAssembly`, and browsers in general.
+Some such limitations are:
+* many packages are not supported
+* `time.sleep` is not supported
+* `threading` is not supported
+* cannot access the local file system ( but can still read and write temporary files in webassembly)
+* `__builtins__.input` is tricky. Currently I have only gotten it to work with the fully blocking `window.prompt` function
+
 
 # Pyprez Tags
 ## Pyprez-Editor
