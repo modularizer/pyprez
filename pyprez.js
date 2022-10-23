@@ -739,6 +739,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             let cmt = localStorage.getItem("codemirrorTheme");
             cmt = cmt?cmt:this.theme;
             localStorage.setItem("codemirrorTheme", cmt);
+            this.select.value = cmt;
             this.theme = cmt;
         }
 
