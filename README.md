@@ -35,6 +35,13 @@ Run **client-side python** in your browser to **prez**ent your code.
 - [API](#pyprez-api)
 - [Pyodide](#pyodide)
 - [PyScript](#pyscript)
+- Samples
+  - [Minimal](https://modularizer.github.io/pyprez/samples/min.html)
+  - [StackOverflow Converter](https://modularizer.github.io/pyprez/samples/stackconverter.html)
+  - [Editors](https://modularizer.github.io/pyprez/samples/console.html)
+  - [Namespaces](https://modularizer.github.io/pyprez/samples/namespaces.html)
+  - [Console](https://modularizer.github.io/pyprez/samples/console.html)
+  - [Script](https://modularizer.github.io/pyprez/samples/script.html)
 
 # Use On Stack Overflow
 
@@ -45,14 +52,14 @@ Run **client-side python** in your browser to **prez**ent your code.
 <a href="https://stackoverflow.com/questions/ask#">Create a Draft Question</a>
 
 ## Method 1
-Using any `<prprez-editor>` element (such as the one [here](https://modularizer.github.io/pyprez/stackconverter.html)) to modify your code, then click `</>` button on the top bar to convert your python 
+Using any `<prprez-editor>` element (such as the one [here](https://modularizer.github.io/pyprez/samples/stackconverter.html)) to modify your code, then click `</>` button on the top bar to convert your python 
 into markdown which can be pasted into your StackOverflow answer to create a **runnable and editable snippet**.
 
 **The Question/Answer Editor will look something like this**
 <img src="./sample_imgs/stack-overflow-sample.png"/>
 
 ## Method 2
-Use this [Converter Page](https://modularizer.github.io/pyprez/stackconverter.html)
+Use this [Converter Page](https://modularizer.github.io/pyprez/samples/stackconverter.html)
 <stack-converter id="stackplaceholder"></stack-converter>
 
 <img src="./sample_imgs/stack-converter.png" class="nonrendered"/>

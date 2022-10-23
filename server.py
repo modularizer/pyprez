@@ -15,7 +15,7 @@ if __name__ == "__main__":
     if sys.platform == 'win32':
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     app.listen(80)
-    print("go to http://localhost/pyprez.html in your browser")
+    print("go to http://localhost/samples/pyprez.html in your browser")
 
     try:
         tornado.ioloop.IOLoop.current().start()
