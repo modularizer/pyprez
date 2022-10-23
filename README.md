@@ -80,7 +80,7 @@ Add a bookmark to your browser with the following text as the url.
 
 <img src="./sample_imgs/stack-bookmark.png"/>
    
-## Method 3:
+## Method 4:
 ### step 1
 <img src="./sample_imgs/stack-overflow-start.png"/>
 * click to add a runnable code segment
@@ -100,7 +100,7 @@ Add a bookmark to your browser with the following text as the url.
 ### Other options
 [PySnippet](https://github.com/pysnippet/pysnippet) is a super concise package which also allows you to demo python code on stack overflow.
 
-## About
+# About
 **pyprez** is a minimal _javascript_ package which allows you to **present** runnable python samples in the browser.
  
 The functionality comes primarily from [**Pyodide**](#pyodide), 
