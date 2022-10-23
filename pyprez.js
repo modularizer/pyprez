@@ -1,11 +1,11 @@
-/*Sun Oct 23 2022 13:15:04 GMT -0700 (Pacific Daylight Time)*/
+/*Sun Oct 23 2022 13:19:02 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Sun Oct 23 2022 13:15:04 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "debug copy runnable button";
-    var pyprezPrevCommit = "development:commit a6c0b47ada7687b0f41e206f56985e6e8bf6cac1";
+    var pyprezUpdateDate = new Date("Sun Oct 23 2022 13:19:02 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "tidy converter";
+    var pyprezPrevCommit = "development:commit b8eda68046b80dbcb8882b9e247807eb1d8f45d1";
 }
 
 /*
@@ -1499,7 +1499,7 @@ ${this.header}
                 </div>
                 <div style="flex:50%">
                     <div style="display:flex">
-                        <b>then copy-paste this auto-generated markdown into StackOverflow</b>
+                        <b>then copy-paste this markdown into StackOverflow</b>
                         <div>
                             <a href="https://stackoverflow.com/questions/ask#"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
                             <a href="https://stackoverflow.com/questions/ask#">Draft a Question</a>
