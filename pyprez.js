@@ -1,11 +1,11 @@
-/*Sun Oct 23 2022 13:08:41 GMT -0700 (Pacific Daylight Time)*/
+/*Sun Oct 23 2022 13:15:04 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Sun Oct 23 2022 13:08:41 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "move 'draft a question' link to StackOverflowConverter";
-    var pyprezPrevCommit = "development:commit d40260c3618575eda0212e52cc5b1239b6c7f309";
+    var pyprezUpdateDate = new Date("Sun Oct 23 2022 13:15:04 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "debug copy runnable button";
+    var pyprezPrevCommit = "development:commit a6c0b47ada7687b0f41e206f56985e6e8bf6cac1";
 }
 
 /*
@@ -761,7 +761,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     ${gh}
                     <div style="margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
                     <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
-                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def">&lt/&gt</div>
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def" onclick="this.parentElement.parentElement.copyRunnable()">&lt/&gt</div>
                     <select style="order:2;margin-right:4px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
                         <option>global</option>
                     </select>
@@ -779,7 +779,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     ${gh}
                     <div style="display:none;margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
                     <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
-                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def">&lt/&gt</div>
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def" onclick="this.parentElement.parentElement.copyRunnable()">&lt/&gt</div>
                     <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
                         <option>global</option>
                     </select>
@@ -813,10 +813,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
 
             // add click event to start button
             this.start.addEventListener("click", this.startClicked.bind(this))
-            this.copyRunnableLink.addEventListener("mousedown", ((e)=>{
-                console.warn("Copy runnable clicked")
-                this.copyRunnable()
-            }).bind(this))
             this.themeSelect.addEventListener("change", ((e)=>{
                 this.theme = this.themeSelect.value;
                 try{
