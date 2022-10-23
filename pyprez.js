@@ -720,8 +720,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 top = `<div style="background-color:#d3d3d3;border-color:#808080;border-radius:3px;display:flex">
                     ${gh}
                     <div style="margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
-                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-left:auto;cursor:help;" tooltip="copy runnable markdown#def">&lt/&gt</div>
-                    <div style="order:2;margin-right:5px;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
+                    <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def">&lt/&gt</div>
                     <select style="order:2;margin-right:4px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
                         <option>global</option>
                     </select>
@@ -738,8 +738,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 top = `<div>
                     ${gh}
                     <div style="display:none;margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
-                    <div style="background-color:#f0f0f0;border-radius:4px;margin:2px;order:2;margin-left:auto;cursor:help;" tooltip="copy runnable markdown#def">&lt/&gt</div>
-                    <div style="order:2;margin-right:5px;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
+                    <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def">&lt/&gt</div>
                     <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
                         <option>global</option>
                     </select>
@@ -765,7 +765,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             `
             this.start = this.children[0] // start button
             this.messageBar = this.children[1].children[1] // top message bar to use to print status (Loading, Running, etc.)
-            this.copyRunnableLink = this.children[1].children[2]
+            this.copyRunnableLink = this.children[1].children[3]
             this.namespaceSelect = this.children[1].children[4]
             this.themeSelect = this.children[1].children[5]
             this.textarea = this.children[2] // textarea in case codemirror does not load
