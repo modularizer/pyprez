@@ -592,6 +592,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this.loadEditor = this.loadEditor.bind(this);
             this.keypressed = this.keypressed.bind(this);
             this.run = this.run.bind(this);
+            this.copyRunnable = this.copyRunnable.bind(this);
+            this.getRunnable = this.getRunnable.bind(this);
 
             // set language to python(default), javascript, or html
             let language = this.hasAttribute("language")?this.getAttribute("language").toLowerCase():"python"
@@ -800,7 +802,10 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
 
             // add click event to start button
             this.start.addEventListener("click", this.startClicked.bind(this))
-            this.copyRunnableLink.addEventListener("click", this.copyRunnable.bind(this))
+            this.copyRunnableLink.addEventListener("mousedown", ((e)=>{
+                console.warn("Copy runnable clicked")
+                this.copyRunnable()
+            }).bind(this))
             this.themeSelect.addEventListener("change", ((e)=>{
                 this.theme = this.themeSelect.value;
                 try{
@@ -1140,7 +1145,10 @@ ${c}
 <!-- end snippet -->`
         }
         copyRunnable(){
-            navigator.clipboard.writeText(this.getRunnable());
+            console.warn("copy runnable")
+            let s = this.getRunnable();
+            console.log(s);
+            navigator.clipboard.writeText(s);
             let originalColor = this.copyRunnableLink.style['background-color'];
             this.copyRunnableLink.style['background-color'] = 'rgb(149, 255, 162)';
             setTimeout((()=>{
