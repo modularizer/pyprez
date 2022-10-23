@@ -56,12 +56,23 @@ Convert your code here then copy-paste result into your question/answer. [Conver
 ### StackOverflow Power User?
 ### Setup
 Add a bookmark to your browser with the following text as the url.
-    ```
-    javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    ");if (sel.startsWith('```python')){sel = sel.replace('```python', '').slice(0,-3)};navigator.clipboard.writeText('\n\n\x3C!-- begin snippet: js hide: false console: false babel: false -->\n\n\x3C!-- language: lang-js -->\n\n    # py\n    ' + sel + '\n\x3C!-- language: lang-html -->\n\n    \x3Cscript src="https://modularizer.github.io/pyprez/pyprez.min.js">\x3C/script>\n\n\n\x3C!-- end snippet -->')})()
-    ```
-   * [Copy To Bookmarklet Clipboard](javascript:navigator.clipboard.writeText(`javascript:(()=>{let sel=window.getSelection().toString().split("\n").join("\n    ");if (sel.startsWith('`+'```'+ `python')){sel = sel.replace('`+'```'+`python', '').slice(0,-3)};navigator.clipboard.writeText('\n\n\x3C!-- begin snippet: js hide: false console: false babel: false -->\n\n\x3C!-- language: lang-js -->\n\n    # py\n    ' + sel + '\n\x3C!-- language: lang-html -->\n\n    \x3Cscript src="https://modularizer.github.io/pyprez/pyprez.min.js">\x3C/script>\n\n\n\x3C!-- end snippet -->')})()`))
+
+```text
+    javascript:(()=>{
+	let sel=window.getSelection().toString().split("\n").join("\n    ");
+	if (sel.startsWith('```python')){sel = sel.replace('```python', '').slice(0,-3)};
+	navigator.clipboard.writeText(`
+\x3C!-- begin snippet: js hide: false console: false babel: false -->
+\x3C!-- language: lang-js -->
+    #!/usr/bin/env python\n
+    ${sel}
+\x3C!-- language: lang-html -->
+    \x3Cscript src="https://modularizer.github.io/pyprez/pyprez.min.js" theme="darcula">\x3C/script>
+\x3C!-- end snippet -->
+`)})()
+```
    * Ctrl + D to save bookmark of this page
-   * Right click on existing bookmark of this page, click edit, then replace bookmark url with the text copied above 
+   * Right click on existing bookmark of this page, click edit, then replace bookmark url with the text copied from above 
 
 #### Usage
 1. on any webpage highlight the python codeblock you want to use and click the bookmark to copy markdown to clipboard
