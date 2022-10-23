@@ -718,8 +718,9 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 top = `<div style="background-color:#d3d3d3;border-color:#808080;border-radius:3px;display:flex">
                     ${gh}
                     <div style="margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
-                    <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
-                    <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-left:auto;cursor:help;" tooltip="copy runnable markdown#def">&lt/&gt</div>
+                    <div style="order:2;margin-right:5px;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
+                    <select style="order:2;margin-right:4px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
                         <option>global</option>
                     </select>
                     <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${sts};">
@@ -735,7 +736,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 top = `<div>
                     ${gh}
                     <div style="display:none;margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
-                    <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
+                    <div style="background-color:#f0f0f0;border-radius:4px;margin:2px;order:2;margin-left:auto;cursor:help;" tooltip="copy runnable markdown#def">&lt/&gt</div>
+                    <div style="order:2;margin-right:5px;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
                     <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
                         <option>global</option>
                     </select>
@@ -761,13 +763,15 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             `
             this.start = this.children[0] // start button
             this.messageBar = this.children[1].children[1] // top message bar to use to print status (Loading, Running, etc.)
-            this.namespaceSelect = this.children[1].children[3]
-            this.themeSelect = this.children[1].children[4]
+            this.copyRunnableLink = this.children[1].children[2]
+            this.namespaceSelect = this.children[1].children[4]
+            this.themeSelect = this.children[1].children[5]
             this.textarea = this.children[2] // textarea in case codemirror does not load
             this.endSpace = this.children[3]
 
             // add click event to start button
             this.start.addEventListener("click", this.startClicked.bind(this))
+            this.copyRunnableLink.addEventListener("click", this.copyRunnable.bind(this))
             this.themeSelect.addEventListener("change", ((e)=>{
                 this.theme = this.themeSelect.value;
                 try{
@@ -1071,6 +1075,27 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 pyprez.stderr = this.oldstderr
             }
             return r
+        }
+
+        getRunnable(){
+            let c = this.code.split("\n").map(line => "    " + line).join("\n")
+            let t = this.theme
+            return `
+<!-- begin snippet: js hide: false console: false babel: false -->
+  <!-- language: lang-js -->
+    #!/usr/bin/env python
+${c}
+<!-- language: lang-html -->
+<script src="https://modularizer.github.io/pyprez/pyprez.min.js" theme="${t}"></script>
+<!-- end snippet -->`
+        }
+        copyRunnable(){
+            navigator.clipboard.writeText(this.getRunnable());
+            let originalColor = this.copyRunnableLink.style['background-color'];
+            this.copyRunnableLink.style['background-color'] = 'rgb(149, 255, 162)';
+            setTimeout((()=>{
+                this.copyRunnableLink.style['background-color'] = originalColor;
+            }).bind(this),300)
         }
     }
     window.addEventListener("load", ()=>{

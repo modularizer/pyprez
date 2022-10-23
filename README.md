@@ -40,19 +40,22 @@ Run **client-side python** in your browser to **prez**ent your code.
 
 <a href="https://stackoverflow.com/search?q=pyprez"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
 <a href="https://stackoverflow.com/search?q=pyprez">View Real Answers</a>
-
 ## Method 1
-Convert your code here then copy-paste result into your question/answer. [Converter Page](https://modularizer.github.io/pyprez/stackconverter.html)
+Using any `<prprez-editor>` element to modify your code, then click `</>` button on the top bar to convert your python 
+into markdown which can be pasted into your StackOverflow answer to create a runnable snippet.
+
+**It will render something like this**
+<img src="./sample_imgs/stack-overflow-sample.png"/>
+
+## Method 2
+Use this [Converter Page](https://modularizer.github.io/pyprez/stackconverter.html)
 <stack-converter id="stackplaceholder"></stack-converter>
 
 <img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
 
 **If** the viewer clicks `Run Code Snippet`, they will be able to edit and test a live python question or answer without leaving the page.
 
-**It will render something like this**
-<img src="./sample_imgs/stack-overflow-sample.png"/>
-
-## Method 2
+## Method 3
 ### StackOverflow Power User?
 ### Setup
 Add a bookmark to your browser with the following text as the url.
