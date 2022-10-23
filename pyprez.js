@@ -1,10 +1,10 @@
-if (!window.pyprezUpdateDate){
+if (!window.pyprezUpdateDate){{
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Sun Oct 23 2022 11:19:53 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage="test custom commit script which labels code";
-    var pyprezPrevCommit="development:commit 1a93c69ccd4e4cd272264dc9bcd729158a1f36ea"
-}
+    var pyprezUpdateDate = new Date("Sun Oct 23 2022 11:43:27 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "test custom commit script which labels code";
+    var pyprezPrevCommit = "development:commit 22d56c3f82f511935bb700780598c39ac3ed11f1";
+}}
 /*
 Pyodide is undeniably cool, and useful in niche cases. Pyscript is easy to use, but is bulky, slow, not especially
 easy to develop on, and is not really necessary seeing as 95+% of its utility comes from Pyodide. With Pyprez,
