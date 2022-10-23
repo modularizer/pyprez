@@ -692,9 +692,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
 //            this.children[1].style.width = w +"px"
 //            this.textarea.style.width = w  + "px"
             this.style.width = stackMode?"100%":(w + "px")
-            if (stackMode){
-                this.endSpace.style.height = "100px"
-            }
 
             // Set initial messages
             if (!pyodideImported.promise.fullfilled){
