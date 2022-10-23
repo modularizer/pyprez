@@ -684,7 +684,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this.textarea.style.height = this.textarea.scrollHeight +"px" // set text area to full height
             let longestLine = this.initialCode.split("\n").map(v=>v.length).reduce((a,b)=>a>b?a:b)
             let fontSize = 1 * window.getComputedStyle(this.textarea).fontSize.slice(0,-2)
-            let w = Math.ceil(longestLine * fontSize * 0.5) + 100
+            let w = Math.min(window.innerWidth - 50, Math.ceil(longestLine * fontSize) + 50)
 //            this.children[1].style.width = w +"px"
 //            this.textarea.style.width = w  + "px"
             this.style.width = w + "px"
