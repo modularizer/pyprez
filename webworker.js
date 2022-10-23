@@ -49,6 +49,8 @@ class Interface{
             this.receiveResponse = this.receiveResponse.bind(this);
             this.receiveCallRequest = this.receiveCallRequest.bind(this);
             this.receiveRequest = this.receiveRequest.bind(this);
+            this.runPythonAsyncInNamespace = this.runPythonAsyncInNamespace.bind(this);
+            this.getNamespace = this.getNamespace.bind(this)
             this.stdout = this.stdout.bind(this);
             this.stderr = this.stderr.bind(this);
             this.worker = this;
@@ -143,6 +145,18 @@ class Interface{
             console.log(args)
         }
         stdin(){return ""}
+
+
+        namespaces = {}
+        getNamespace(name){
+            if (this.namespaces[name] === undefined){
+                this.namespaces[name] = pyodide.globals.get("dict")();
+            }
+            return this.namespaces[name]
+        }
+        runPythonAsyncInNamespace(code, namespace){
+            return pyodide.runPythonAsync(code, {globals: this.getNamespace(namespace)})
+        }
     }
 self.interface = new Interface();
 self.interface.postMessage = (data)=>{self.postMessage(data)}

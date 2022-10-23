@@ -1,5 +1,4 @@
 [Features]
-- Allow specifying namespace for each editor
 - Modify `sys.excepthook` or maybe pyodide config to give error tracebacks more similar to a typical python interpreter
 - Allow importing from multiple files
     - make relative imports look for a relative src address

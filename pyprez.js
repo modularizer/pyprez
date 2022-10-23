@@ -472,14 +472,25 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             }
         }
 
-        _runPythonAsync(code){
+        _runPythonAsync(code, namespace){
             /* internal function which runs the code */
             if (code){
                 console.debug("running code asynchronously:")
                 console.debug(code)
+                if (useWorker){
+                    return pyodide.runPythonAsyncInNamespace(code, namespace).catch(this.stderr)
+                }else{
+                    return pyodide.runPythonAsync(code, {globals: this.getNamespace(namespace)}).catch(this.stderr)
+                }
 
-                return pyodide.runPythonAsync(code).catch(this.stderr)
             }
+        }
+        namespaces = {}
+        getNamespace(name){
+            if (this.namespaces[name] === undefined){
+                this.namespaces[name] = pyodide.globals.get("dict")();
+            }
+            return this.namespaces[name]
         }
 
         // utility methods used to load requirements and run code asynchronously as soon as pyodide is loaded
@@ -500,15 +511,15 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 return requirementsLoaded
             })
         }
-        loadAndRunAsync(code, requirements="detect"){
+        loadAndRunAsync(code, namespace="global", requirements="detect"){
             /* run a python script asynchronously as soon as pyodide is loaded and all required packages are imported*/
             console.warn(pyodidePromise)
             let p = this.then((() =>{
                 console.error("here")
                 if (code){
                     return this.load(code, requirements)
-                        .then((r => this._runPythonAsync(code)).bind(this))
-                        .catch((e => this._runPythonAsync(code)).bind(this))
+                        .then((r => this._runPythonAsync(code, namespace)).bind(this))
+                        .catch((e => this._runPythonAsync(code, namespace)).bind(this))
                 }
             }).bind(this))
             return p
@@ -549,6 +560,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 "js": "javascript",
             }
             this.language = aliases[language]
+
+            this.namespace = this.hasAttribute("namespace")?this.getAttribute("namespace"):"global"
 
             // default is to print stdout into editor
             if (!this.hasAttribute("stdout")){this.setAttribute("stdout", "true")}
@@ -885,7 +898,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     if (this.getAttribute("stdout") === "true"){
                         this.attachStd();
                     }
-                    promise = pyprez.loadAndRunAsync(code);
+                    promise = pyprez.loadAndRunAsync(code, this.namespace);
                     promise.then(r=>{
                         this.done = true
                         this.message = "Complete! (Double-Click to Re-Run)"
@@ -927,7 +940,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     if (this.getAttribute("stdout") === "true"){
                         this.attachStd();
                     }
-                    let r = pyprez.loadAndRunAsync(code).then(((r)=>{
+                    let r = pyprez.loadAndRunAsync(code, this.namespace).then(((r)=>{
                         if (this.getAttribute("stdout") === "true"){
                             this.detachStd();
                         }
@@ -1032,6 +1045,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this.classList.add("pyprez");
             this.style.display = "none";
             this.run = this.run.bind(this);
+            this.namespace = this.hasAttribute("namespace")?this.getAttribute("namespace"):"global"
             if (this.hasAttribute("src") && this.getAttribute("src")){
                 console.debug("fetching script for pyprez-script src", this.getAttribute("src"))
                 fetch(this.getAttribute("src")).then(r=>r.text()).then(this.run)
@@ -1043,7 +1057,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         run(code){
             console.debug("running code from <pyprez-script>", code, this)
             this.innerHTML = code;
-            this.promise = pyprez.loadAndRunAsync(code).then(v=>{
+            this.promise = pyprez.loadAndRunAsync(code, this.namespace).then(v=>{
                 this.value = v;
                 this.innerHTML=v?v.toString():"";
                 return v
@@ -1073,7 +1087,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this.detachStd = this.detachStd.bind(this)
             this.printResult = this.printResult.bind(this);
             this.eval = this.eval.bind(this);
-
+            this.namespace = this.hasAttribute("namespace")?this.getAttribute("namespace"):"global"
 
             // set language to python(default), javascript, or html
             let language = this.hasAttribute("language")?this.getAttribute("language").toLowerCase():"python"
@@ -1113,16 +1127,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 }
             }
 
-            if (this.language === "python"){
-                pyprez.loadAndRunAsync(`
-                    import sys
-                    s = f"""Python{sys.version}
-                    Type "help", "copyright", "credits" or "license" for more information."""
-                    s
-                `).then(v=>{this.text = v + "\n" + this.consolePrompt})
-            }else if (this.language === "javascript"){
-                this.text += "Simple Javascript Console\n" + this.consolePrompt
-            }
+            this.startup();
 
             // if src
             if (src){
@@ -1154,7 +1159,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     s = f"""Python{sys.version}
                     Type "help", "copyright", "credits" or "license" for more information."""
                     s
-                `).then(v=>{this.text = v + "\n" + this.consolePrompt})
+                `, this.namespace).then(v=>{this.text = v + "\n" + this.consolePrompt})
             }else if (this.language === "javascript"){
                 this.text += "Simple Javascript Console\n" + this.consolePrompt
             }
@@ -1215,7 +1220,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         eval(code){
             if (this.language === "python"){
                 this.attachStd()
-                let r = pyprez.loadAndRunAsync(code)
+                let r = pyprez.loadAndRunAsync(code, this.namespace)
                 .then(this.detachStd, this.detachStd)
                 .then(this.printResult)
                 return r
@@ -1324,6 +1329,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             let ih = this.innerHTML;
             let mode = this.hasAttribute("mode")?`mode=${this.getAttribute("mode")}`:"";
             let src = this.hasAttribute("src")?`src=${this.getAttribute("src")}`:"";
+            let namespace = this.hasAttribute("namespace")?this.getAttribute("namespace"):"global";
+
             this.innerHTML = `
             <div style="display:flex">
                 <div style="flex:50%">
@@ -1335,7 +1342,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             </div>
             <div style="display: flex">
                 <div style="flex:50%">
-                    <pyprez-editor ${mode} ${src}>
+                    <pyprez-editor ${mode} ${src} namespace="${namespace}">
                         ${ih}
                     </pyprez-editor>
                 </div>
