@@ -389,6 +389,12 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         }
         return pyodidePromise
     }
+
+    /* _______________________________________ scopeEval ____________________________________ */
+    function scopeEval(script) {
+      return Function(( "with(this) { " + script + "}"))();
+    }
+
     /* _______________________________________ LOAD AND EXTEND PYODIDE FUNCTIONALITY ____________________________________ */
     class PyPrez{
         /*class which loads pyoidide and provides utility to allow user to load packages and run code as soon as possible
@@ -492,6 +498,24 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
 
             }
         }
+
+        jsNamespaces = {}
+        getJSNamespace(name){
+            if (this.jsNamespaces[name] === undefined){
+                let scope = {}
+                Object.assign(scope, window, {console, })
+                this.jsNamespaces[name] = [scope, scopeEval.bind(scope)]
+            }
+            return this.jsNamespaces[name]
+        }
+        namespaceEval(code, name){
+            //.replace(/(^|[;\s])(let)\s/gm,'$1var ')
+            let [scope, scopedEval] = this.getJSNamespace(name);
+            console.warn(scope)
+            return scopedEval(code)
+        }
+
+
         namespaces = {}
         namespaceNames = ['global']
         recordNamespaceName(name){
@@ -696,6 +720,9 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             <li>Click red reload</li>
             <li>Shift + Backspace</li>
         </ul>
+        <b>Post-Run Console</b>
+        After code executes, try the runnable console at the bottom!
+
         <b>Add to StackOverflow:</b>
         Click <b>&lt/&gt</b> to copy markdown, then paste into your answer.
         `
@@ -855,9 +882,17 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         /* ________________________ EVENTS _____________________________*/
         keypressed(e){
             /* Shift + Enter to run, Shift + Backspace to reload */
-            if (e.shiftKey){
-                if (e.key == "Enter"){this.run(); e.preventDefault();}
-                else if (e.key == "Backspace"){this.reload(); e.preventDefault();}
+            if (e.shiftKey && e.key == "Backspace"){this.reload(); e.preventDefault();}
+            else if (e.key == "Enter"){
+                if (e.shiftKey && !this.done){this.run(); e.preventDefault();}
+                if (this.done){
+                    if (!e.shiftKey){this.run(); e.preventDefault();}
+                    else{
+                        let s = "\n" + this.consoleEscape
+                        this.code += s;
+                        e.preventDefault();
+                    }
+                }
             }
         }
         dblclicked(e){
@@ -888,6 +923,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         reloadChar = "&#8635" //"↻"
         consolePrompt = consolePrompt
         consoleOut = consoleOut
+        consoleEscape = consoleEscape
 
         /* ________________________ PROPERTIES _____________________________*/
         // get/set the message in the top message bar (which can be hidden if desired)
@@ -1002,9 +1038,15 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                         return r
                     })
                 }else if (this.language == "javascript"){
-                    let r = eval(code)
+                    console.warn(this)
+                    console.warn(code)
+                    console.warn(this.consoleOut)
+                    let r = pyprez.namespaceEval(code, this.namespace)
                     this.done = true
-                    this.code += "\n" + this.consolePrompt + JSON.stringify(r, null, 2);
+                    this.message = "Complete! (Double-Click to Re-Run)"
+                    let s = "\n" + this.consoleOut + ((![null, undefined].includes(r))?JSON.stringify(r, null, 2):"") + "\n" + this.consolePrompt;
+                    console.warn(s)
+                    this.code += s;
                     this.start.style.color = "red";
                     this.start.innerHTML = this.reloadChar;
                     return r
@@ -1015,6 +1057,10 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     }
                     this.htmlResponse.innerHTML = this.code.replaceAll("&lt","<").replaceAll("&gt", ">");
                     this.done = true
+                    this.done = true
+                    this.message = "Complete! (Double-Click to Re-Run)"
+                    this.start.style.color = "red";
+                    this.start.innerHTML = this.reloadChar;
                 }
             }
 
@@ -1038,7 +1084,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     }).bind(this))
                     return r
                 }else if (this.language === "javascript"){
-                    let r = eval(code)
+                    let r = pyprez.namespaceEval(code, this.namespace)
                     return this.printResult(r)
                 }
             }
@@ -1338,7 +1384,7 @@ ${c}
                 .then(this.printResult)
                 return r
             }else if (this.language === "javascript"){
-                let r = eval(code)
+                let r = pyprez.namespaceEval(code, this.namespace)
                 return this.printResult(r)
             }
 
