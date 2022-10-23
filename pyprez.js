@@ -158,7 +158,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     let mode = pyprezScript.hasAttribute("mode")?pyprezScript.getAttribute("mode"):"editor"
                     let specialAttributes = {
                         runonload: "true",
-                        theme: "default",
+                        theme: "darcula",
                         githublink: "true"
                     }
 
