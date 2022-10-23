@@ -701,8 +701,11 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             // add click event to start button
             this.start.addEventListener("click", this.startClicked.bind(this))
             this.select.addEventListener("change", ((e)=>{
-                localStorage.setItem("codemirrorTheme", this.select.value);
                 this.theme = this.select.value;
+                try{
+                    localStorage.setItem("codemirrorTheme", this.select.value);
+                }catch{}
+
             }).bind(this))
 
             // size text area to fit initial code
