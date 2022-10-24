@@ -368,6 +368,8 @@ Making it interactive would be tough (but not impossible). Bokeh and Plotly are 
 </pyprez-editor>
 ```
 
+<img id="mpl" />
+
 <a href="https://modularizer.github.io/pyprez/#matplotlib" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
 <a href="https://modularizer.github.io/pyprez/#matplotlib" class="nonrendered">Try on live page</a><br/>
 <a href="https://modularizer.github.io/pyprez/#matplotlib" class="nonrendered">
