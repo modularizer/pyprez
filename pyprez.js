@@ -1,11 +1,11 @@
-/*Sun Oct 23 2022 13:19:02 GMT -0700 (Pacific Daylight Time)*/
+/*Sun Oct 23 2022 17:00:33 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Sun Oct 23 2022 13:19:02 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "tidy converter";
-    var pyprezPrevCommit = "development:commit b8eda68046b80dbcb8882b9e247807eb1d8f45d1";
+    var pyprezUpdateDate = new Date("Sun Oct 23 2022 17:00:33 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "add but do not enable matplotlib patch";
+    var pyprezPrevCommit = "development:commit 4761528997300406a375a25398ffab4a4ef73ea0";
 }
 
 /*
@@ -44,8 +44,10 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         includeGithubLink: true,
         showThemeSelect: true,
         showNamespaceSelect: false,
+        patch: false,
     }
     let strConfig = {
+        patchSrc: "https://modularizer.github.io/pyprez/patches.py",
         codemirrorCDN: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/",
         pyodideCDN: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
         consolePrompt: ">>> ",
@@ -110,6 +112,10 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
     var codemirrorImported = new DeferredPromise();
     var workerReady = new DeferredPromise();
     var pyodidePromise = new DeferredPromise("pyodidePromise");
+    var patches = new DeferredPromise();
+    if (patch){
+        patches = get(patchSrc);
+    }
 
     var loadedCodeMirrorStyles = ["default"];
 
@@ -389,12 +395,24 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                         from js import prompt
                         __builtins__.input = prompt
                         2+2
-                    `).then(r=>{
-                        if (r == 4){
+                    `).then(()=>{
+                        if (patch){
+                            patches.then(code =>{
+                                console.warn("applying patches", code)
+                                pyodide.runPythonAsync(code).then(()=>{
+                                    console.log("patched")
+                                    window.pyodide = pyodide;
+                                    pyodidePromise.resolve(true);
+                                })
+                            })
+                        }else{
                             window.pyodide = pyodide;
                             pyodidePromise.resolve(true);
                         }
+
                     })
+
+
                 })
             })
         }
