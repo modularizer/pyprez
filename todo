@@ -17,7 +17,6 @@
 [JS/CSS]
 - Make message bar sticky but only within the bounds of the parent element
 - Add Ctrl+s to download a `.py` file
-- Use cookies to save configs, not sure if this will work in StackOverflow environment
 - Add a bug reporting link
 
 [Things to test]

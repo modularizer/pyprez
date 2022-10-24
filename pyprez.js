@@ -1,3 +1,13 @@
+/*Sun Oct 23 2022 17:13:21 GMT -0700 (Pacific Daylight Time)*/
+
+if (!window.pyprezUpdateDate){
+/* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
+of code we are on */
+    var pyprezUpdateDate = new Date("Sun Oct 23 2022 17:13:21 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "enable matplotlib patch";
+    var pyprezPrevCommit = "development:commit d91d03acf42c046159fef0e46c896271cafb32fc";
+}
+
 /*
 Pyodide is undeniably cool, and useful in niche cases. Pyscript is easy to use, but is bulky, slow, not especially
 easy to develop on, and is not really necessary seeing as 95+% of its utility comes from Pyodide. With Pyprez,
@@ -11,6 +21,7 @@ This js file will import pyodide and codemirror dependencies for you, so all you
     np.random.rand(5)
 </script>
 */
+
 if (!window.pyprezInitStarted){// allow importing this script multiple times without raising an error
     console.log("loaded pyprez.js from", location.href);
 
@@ -33,8 +44,10 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         includeGithubLink: true,
         showThemeSelect: true,
         showNamespaceSelect: false,
+        patch: true,
     }
     let strConfig = {
+        patchSrc: "https://modularizer.github.io/pyprez/patches.py",
         codemirrorCDN: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/",
         pyodideCDN: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
         consolePrompt: ">>> ",
@@ -99,6 +112,10 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
     var codemirrorImported = new DeferredPromise();
     var workerReady = new DeferredPromise();
     var pyodidePromise = new DeferredPromise("pyodidePromise");
+    var patches = new DeferredPromise();
+    if (patch){
+        patches = get(patchSrc);
+    }
 
     var loadedCodeMirrorStyles = ["default"];
 
@@ -378,17 +395,35 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                         from js import prompt
                         __builtins__.input = prompt
                         2+2
-                    `).then(r=>{
-                        if (r == 4){
+                    `).then(()=>{
+                        if (patch){
+                            patches.then(code =>{
+                                console.warn("applying patches", code)
+                                pyodide.runPythonAsync(code).then(()=>{
+                                    console.log("patched")
+                                    window.pyodide = pyodide;
+                                    pyodidePromise.resolve(true);
+                                })
+                            })
+                        }else{
                             window.pyodide = pyodide;
                             pyodidePromise.resolve(true);
                         }
+
                     })
+
+
                 })
             })
         }
         return pyodidePromise
     }
+
+    /* _______________________________________ scopeEval ____________________________________ */
+    function scopeEval(script) {
+      return Function(( "with(this) { " + script + "}"))();
+    }
+
     /* _______________________________________ LOAD AND EXTEND PYODIDE FUNCTIONALITY ____________________________________ */
     class PyPrez{
         /*class which loads pyoidide and provides utility to allow user to load packages and run code as soon as possible
@@ -492,6 +527,24 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
 
             }
         }
+
+        jsNamespaces = {}
+        getJSNamespace(name){
+            if (this.jsNamespaces[name] === undefined){
+                let scope = {}
+                Object.assign(scope, window, {console, })
+                this.jsNamespaces[name] = [scope, scopeEval.bind(scope)]
+            }
+            return this.jsNamespaces[name]
+        }
+        namespaceEval(code, name){
+            //.replace(/(^|[;\s])(let)\s/gm,'$1var ')
+            let [scope, scopedEval] = this.getJSNamespace(name);
+            console.warn(scope)
+            return scopedEval(code)
+        }
+
+
         namespaces = {}
         namespaceNames = ['global']
         recordNamespaceName(name){
@@ -568,6 +621,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this.loadEditor = this.loadEditor.bind(this);
             this.keypressed = this.keypressed.bind(this);
             this.run = this.run.bind(this);
+            this.copyRunnable = this.copyRunnable.bind(this);
+            this.getRunnable = this.getRunnable.bind(this);
 
             // set language to python(default), javascript, or html
             let language = this.hasAttribute("language")?this.getAttribute("language").toLowerCase():"python"
@@ -629,8 +684,10 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             let nonemptylines = lines.filter(v=>v.trim().length)
             let leadingSpacesPerLine = nonemptylines.filter(v=>!v.trim().startsWith('#')).map(v=>v.match(/\s*/)[0].length); // count leading spaces of each line which has code
             let extraLeadingSpaces = Math.min(...leadingSpacesPerLine) - minIndent; // recognize if every line containing code starts with spaces
-            let extraIndent = " ".repeat(extraLeadingSpaces);// string representing extra indent to remove
-            code = lines.map(v=>v.startsWith(extraIndent)?v.replace(extraIndent, ""):v).join("\n") // remove extra space
+            if ((extraLeadingSpaces > 0) && (extraLeadingSpaces < 1000)){
+                let extraIndent = " ".repeat(extraLeadingSpaces);// string representing extra indent to remove
+                code = lines.map(v=>v.startsWith(extraIndent)?v.replace(extraIndent, ""):v).join("\n") // remove extra space
+            }
             return code
         }
         reformatIndentation(code){
@@ -694,6 +751,11 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             <li>Click red reload</li>
             <li>Shift + Backspace</li>
         </ul>
+        <b>Post-Run Console</b>
+        After code executes, try the runnable console at the bottom!
+
+        <b>Add to StackOverflow:</b>
+        Click <b>&lt/&gt</b> to copy markdown, then paste into your answer.
         `
         _loadEditor(){
             /* first load the editor as though codemirror does not and will not exist*/
@@ -717,7 +779,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     ${gh}
                     <div style="margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
                     <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
-                    <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def" onclick="this.parentElement.parentElement.copyRunnable()">&lt/&gt</div>
+                    <select style="order:2;margin-right:4px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
                         <option>global</option>
                     </select>
                     <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${sts};">
@@ -734,6 +797,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     ${gh}
                     <div style="display:none;margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
                     <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def" onclick="this.parentElement.parentElement.copyRunnable()">&lt/&gt</div>
                     <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
                         <option>global</option>
                     </select>
@@ -759,8 +823,9 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             `
             this.start = this.children[0] // start button
             this.messageBar = this.children[1].children[1] // top message bar to use to print status (Loading, Running, etc.)
-            this.namespaceSelect = this.children[1].children[3]
-            this.themeSelect = this.children[1].children[4]
+            this.copyRunnableLink = this.children[1].children[3]
+            this.namespaceSelect = this.children[1].children[4]
+            this.themeSelect = this.children[1].children[5]
             this.textarea = this.children[2] // textarea in case codemirror does not load
             this.endSpace = this.children[3]
 
@@ -847,9 +912,19 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         /* ________________________ EVENTS _____________________________*/
         keypressed(e){
             /* Shift + Enter to run, Shift + Backspace to reload */
-            if (e.shiftKey){
-                if (e.key == "Enter"){this.run(); e.preventDefault();}
-                else if (e.key == "Backspace"){this.reload(); e.preventDefault();}
+            if (e.shiftKey && e.key == "Backspace"){this.reload(); e.preventDefault();}
+            else if (e.key == "Enter"){
+                if (e.shiftKey && !this.done){this.run(); e.preventDefault();}
+                if (this.done){
+                    if (!(e.shiftKey || this.code.endsWith(':'))){this.run(); e.preventDefault();}
+                    else{
+                        let s = "\n" + this.consoleEscape
+                        this.code += s;
+                        e.preventDefault();
+                        let lines = this.code.split("\n")
+                        this.editor.setCursor({line: lines.length, ch: lines[lines.length-1].length})
+                    }
+                }
             }
         }
         dblclicked(e){
@@ -880,6 +955,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         reloadChar = "&#8635" //"↻"
         consolePrompt = consolePrompt
         consoleOut = consoleOut
+        consoleEscape = consoleEscape
 
         /* ________________________ PROPERTIES _____________________________*/
         // get/set the message in the top message bar (which can be hidden if desired)
@@ -897,7 +973,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         set code(v){
             // escape html
             if (this.language == "html"){
-                v = v.replaceAll("<", "&lt").replaceAll(">", "gt")
+                v = v.replaceAll("<", "&lt").replaceAll(">", "&gt")
             }
 
             if (this.editor){
@@ -922,7 +998,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         }
 
         // get/set the codemirror theme, importing from cdn if needed
-        get theme(){return this.editor.options.theme}
+        _theme = "default"
+        get theme(){return this._theme}
         set theme(v){
             codemirrorImported.then((()=>{
                 if (loadedCodeMirrorStyles.includes(v)){
@@ -936,6 +1013,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 }
             }).bind(this))
             this.themeSelect.value = v;
+            this._theme = v;
         }
 
         /* ________________________ PYTHON IMPORTS _____________________________*/
@@ -956,7 +1034,9 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             /*reset editor to the state from before it was executed last*/
             this.start.innerHTML = this.startChar
             this.start.style.color = "green";
-            this.code = this.executed;
+            if (this.language !== "html"){
+                this.code = this.executed;
+            }
             console.warn("Setting code to ", this.executed, this.code)
             this.message = "Ready   (Double-Click to Run)";
             this.executed = false;
@@ -970,10 +1050,10 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 this.message = "Running..."
                 let code = this.code.split(this.separator)[0];
                 this.executed = code;
-                this.code = code;
                 this.start.style.color = "yellow"
                 let promise;
                 if (this.language == "python"){
+                    this.code = code;
                     this.code += this.separator;
                     if (this.getAttribute("stdout") === "true"){
                         this.attachStd();
@@ -992,9 +1072,12 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                         return r
                     })
                 }else if (this.language == "javascript"){
-                    let r = eval(code)
+                    this.code = code;
+                    let r = pyprez.namespaceEval(code, this.namespace)
                     this.done = true
-                    this.code += "\n" + this.consolePrompt + JSON.stringify(r, null, 2);
+                    this.message = "Complete! (Double-Click to Re-Run)"
+                    let s = "\n" + this.consoleOut + ((![null, undefined].includes(r))?JSON.stringify(r, null, 2):"");
+                    this.code += s;
                     this.start.style.color = "red";
                     this.start.innerHTML = this.reloadChar;
                     return r
@@ -1005,6 +1088,9 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     }
                     this.htmlResponse.innerHTML = this.code.replaceAll("&lt","<").replaceAll("&gt", ">");
                     this.done = true
+                    this.message = "Complete! (Double-Click to Re-Run)"
+                    this.start.style.color = "red";
+                    this.start.innerHTML = this.reloadChar;
                 }
             }
 
@@ -1028,7 +1114,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     }).bind(this))
                     return r
                 }else if (this.language === "javascript"){
-                    let r = eval(code)
+                    let r = pyprez.namespaceEval(code, this.namespace)
                     return this.printResult(r)
                 }
             }
@@ -1067,6 +1153,30 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 pyprez.stderr = this.oldstderr
             }
             return r
+        }
+
+        getRunnable(){
+            let c = this.code.split("\n").map(line => "    " + line).join("\n")
+            let t = this.theme
+            return `
+<!-- begin snippet: js hide: false console: false babel: false -->
+  <!-- language: lang-js -->
+    #!/usr/bin/env python
+${c}
+<!-- language: lang-html -->
+<script src="https://modularizer.github.io/pyprez/pyprez.min.js" theme="${t}"></script>
+<!-- end snippet -->`
+        }
+        copyRunnable(){
+            console.warn("copy runnable")
+            let s = this.getRunnable();
+            console.log(s);
+            navigator.clipboard.writeText(s);
+            let originalColor = this.copyRunnableLink.style['background-color'];
+            this.copyRunnableLink.style['background-color'] = 'rgb(149, 255, 162)';
+            setTimeout((()=>{
+                this.copyRunnableLink.style['background-color'] = originalColor;
+            }).bind(this),300)
         }
     }
     window.addEventListener("load", ()=>{
@@ -1307,7 +1417,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 .then(this.printResult)
                 return r
             }else if (this.language === "javascript"){
-                let r = eval(code)
+                let r = pyprez.namespaceEval(code, this.namespace)
                 return this.printResult(r)
             }
 
@@ -1333,8 +1443,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             if (!this.style.display){
                 this.style.display = "flex"
             }
-            this._header = "Run the javascript snippet below to see a runnable Python example:"
-            this._code = "# your code here"
+            this._header = "Run code snippet below to work with a runnable and editable python snippet"
+            this._runnable = "#!/usr/bin/env python"
             this.innerHTML = this.getInnerHTML()
             pyprez.register(this);
         }
@@ -1345,11 +1455,11 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this._header = header
             this.innerHTML = this.getInnerHTML()
         }
-        get code(){
-            return this._code
+        get runnable(){
+            return this._runnable
         }
-        set code(code){
-            this._code = code
+        set runnable(runnable){
+            this._runnable = runnable.replaceAll('<','&lt').replaceAll('>','&gt')
             this.innerHTML = this.getInnerHTML()
         }
         getInnerHTML(){
@@ -1378,24 +1488,10 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
            rx="2" />
       </g>
     </svg>
-    ${this.getRunnable()}
+${this.header}
+    ${this.runnable}
     </pre>
             `
-        }
-        getRunnable(){
-            return `${this.header}
-    &lt!-- begin snippet: js hide: false console: false babel: false --&gt
-
-      &lt!-- language: lang-js --&gt
-        # keep this comment
-        ${this.code}
-
-     &lt!-- language: lang-html --&gt
-
-        &ltscript src=${preferredPyPrezImportSrc}&gt&lt/script&gt
-
-    &lt!-- end snippet --&gt
-    </pre>`
         }
     }
     window.addEventListener("load", ()=>{
@@ -1420,12 +1516,18 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     <b>Edit your python snippet here...</b>
                 </div>
                 <div style="flex:50%">
-                    <b>then copy-paste this auto-generated markdown into StackOverflow</b>
+                    <div style="display:flex">
+                        <b>then copy-paste this markdown into StackOverflow</b>
+                        <div>
+                            <a href="https://stackoverflow.com/questions/ask#"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a>
+                            <a href="https://stackoverflow.com/questions/ask#">Draft a Question</a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div style="display: flex">
                 <div style="flex:50%;max-width:50%;">
-                    <pyprez-editor ${mode} ${src} namespace="${namespace}">
+                    <pyprez-editor ${mode} ${src} namespace="${namespace}" theme="darcula">
                         ${ih}
                     </pyprez-editor>
                 </div>
@@ -1438,9 +1540,14 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this.stackOverflow = this.children[1].children[1].children[0]
             this.sync()
             this.pyprezEditor.addEventListener("keydown", (()=>{setTimeout(this.sync.bind(this), 10)}).bind(this))
+            this.pyprezEditor.themeSelect.addEventListener("change", (()=>{setTimeout(this.sync.bind(this), 10)}).bind(this))
+            codemirrorImported.then((()=>{
+                setTimeout(this.sync.bind(this), 1000)
+            }).bind(this))
         }
         sync(){
-            this.stackOverflow.code = this.pyprezEditor.code
+            console.warn("syncing")
+            this.stackOverflow.runnable = this.pyprezEditor.getRunnable();
         }
     }
     window.addEventListener("load", ()=>{

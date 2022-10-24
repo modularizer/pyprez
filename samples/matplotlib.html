@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title>Matplotlib</title>
+    <meta charset="utf-8">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <script src="../pyprez.js" patch="true"></script>
+    </head>
+    <body>
+      <pyprez-editor>
+import matplotlib.pyplot as plt
+import numpy as np
+
+p = int(input("how many points?"))
+fig = plt.figure()
+plt.plot(np.random.rand(p))
+      </pyprez-editor>
+      <img id="mpl" style="height:200px;"/>
+    </body>
+</html>
