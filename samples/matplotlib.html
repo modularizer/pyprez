@@ -7,16 +7,15 @@
     <script src="../pyprez.js" patch="true"></script>
     </head>
     <body>
-      <img id="out"/>
-
-      <pyprez-script>
+      <pyprez-editor>
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import numpy as np
 
-
+p = int(input("how many points?"))
 fig = plt.figure()
-plt.plot(np.random.rand(100))
-      </pyprez-script>
+plt.plot(np.random.rand(p))
+      </pyprez-editor>
+      <img id="mpl" style="height:200px;"/>
     </body>
 </html>
