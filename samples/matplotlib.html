@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <title>Matplotlib</title>
+    <meta charset="utf-8">
+    <link rel="icon" type="image/x-icon" href="../favicon.png">
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script src="../pyprez.js" patch="true"></script>
+    </head>
+    <body>
+      <img id="out"/>
+
+      <pyprez-script>
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+import numpy as np
+
+
+fig = plt.figure()
+plt.plot(np.random.rand(100))
+      </pyprez-script>
+    </body>
+</html>

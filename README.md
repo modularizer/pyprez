@@ -26,7 +26,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 <a href="https://modularizer.github.io/pyprez" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
 <a href="https://modularizer.github.io/pyprez" class="nonrendered">Try on live page</a>
 
-<img src="./sample_imgs/first.png" class="nonrendered"/>
+<a href="https://modularizer.github.io/pyprez" class="nonrendered"><img src="./sample_imgs/first.png" class="nonrendered"/></a>
 
 ## Quick Links:
 - [StackOverflow](#use-on-stackoverflow)
@@ -64,7 +64,9 @@ into markdown which can be pasted into your StackOverflow answer to create a **r
 Use this [Converter Page](https://modularizer.github.io/pyprez/samples/stackconverter.html)
 <stack-converter id="stackplaceholder"></stack-converter>
 
+<a href="https://modularizer.github.io/pyprez#method-2" class="nonrendered">
 <img src="./sample_imgs/stack-converter.png" class="nonrendered"/>
+</a>
 
 ## Method 3
 ### Setup Bookmark
@@ -84,7 +86,7 @@ Add a bookmark to your browser with the following text as the url.
 \x3C!-- end snippet -->
 `)})()
 ```
-   * Ctrl + D to save bookmark of this page
+   * `Ctrl + D` to save bookmark of this page (for Chrome)
    * Right click on existing bookmark of this page, click edit, then replace bookmark url with the text copied from above 
 
 #### Highlight->Click->Paste
@@ -134,9 +136,9 @@ pyodide also but introduced a [list of drawbacks](#pyscript-drawbacks) in the pr
     np.random.rand(5)
 </script>
 ```
-<a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
-<a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered">Try on live page</a>
-<a href="https://modularizer.github.io/pyprez/#gettingstarted" class="nonrendered">
+<a href="https://modularizer.github.io/pyprez/#getting-started" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
+<a href="https://modularizer.github.io/pyprez/#getting-started" class="nonrendered">Try on live page</a>
+<a href="https://modularizer.github.io/pyprez/#getting-started" class="nonrendered">
 <img src="./sample_imgs/getting-started-editor.png" />
 </a>
 
@@ -157,26 +159,30 @@ work on GitHub Pages, so if you click the static image it will take you to the w
 # Use Cases
 Some cool things about **pyodide** which **pyprez** takes advantage of are:
 * it runs a real python interpreter
-* a webpage visitor running python uses no server-side computational resources
-* no server is even needed, it will work if you open a `.html` document in your browser
-* code execution is sandboxed in the webpage visitor's browsers, making it _relatively safer_ for a webpage host to 
+* a webpage visitor running python uses no server-side computational resources after loading the page
+* no server is needed! it will work if you open a `.html` document in your browser
+* code execution is sandboxed in the webpage visitor's browsers, making it _relatively safe_ for a webpage host to 
   allow users to write and run their own code (because it runs on the client's machine it doesn't pose a security risk to the server)
 * allows combining python computations with pretty `HTML/JS/CSS`
 
-Front-end Python will never replace back-end computations, but may be useful for:
-* making Python tutorials (similar to `jupyter` of `CoLab`)
-* distributing results of scientific studies and allowing users to play around with data
-* troubleshooting of forums such as stackoverflow <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a><a href="https://stackoverflow.com">StackOverflow</a>
+I don't expect front-end python to replace back-end python or front-end javascript, but it does have some unique
+advantages for certain use cases:
+* **troubleshooting code** on forums such as stackoverflow <a href="https://stackoverflow.com/questions/67189446/difference-between-setattr-and-dict/67189534#67189534"><img src="https://stackoverflow.com/favicon.ico" height="15px"/></a><a href="https://stackoverflow.com">StackOverflow</a>
+* making Python **tutorials** (similar to `jupyter` of `CoLab`)
+* writing **articles** about new Python features
+* providing **interactive documentation** for a package
+* distributing results of **scientific studies** and allowing users to play around with data (this is what Pyodide was made for)
 
 # Limitations
-Unfortunately, there are currently many limitations of running Python in the browser, which stem from fundamental issues which are tricky to solve.
-Many of PyPrez's limitations stem from limitations of `Pyodide`, on which it is built, which in turn stem from limitiations of `js`, `Emscriptem`, `WebAssembly`, and browsers in general.
+Unfortunately, there are currently many limitations of running Python in the browser, which stem from fundamental issues.
+Many of PyPrez's limitations stem from limitations of `Pyodide`, the package on which it is built.
+Pyodide's limitations which in turn stem from limitiations of `js`, `Emscriptem`, `WebAssembly`, and browsers in general.
 Some such limitations are:
 * many packages are not supported
 * `time.sleep` is not supported
 * `threading` is not supported
 * cannot access the local file system ( but can still read and write temporary files in webassembly)
-* `__builtins__.input` is tricky. Currently I have only gotten it to work with the fully blocking `window.prompt` function
+* `__builtins__.input` is tricky. Currently it works with the fully blocking `window.prompt` function
 
 
 # Pyprez Tags
@@ -241,7 +247,7 @@ pyprez.loadAndRunAsync(`
 <pyprez-console rows="10" cols="80"></pyprez-console>
 ```
 <a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
-<a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered">Try on live page</a>
+<a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered">Try on live page</a><br/>
 <a href="https://modularizer.github.io/pyprez/#pyprez-console-example" class="nonrendered">
 <img src="./sample_imgs/console-2.png" />
 </a>
@@ -253,9 +259,9 @@ Accepted inputs are either innerHTML or a `src` attribute linking to a file like
 This tag is not totally necessary because the `pyprez.loadAndRunAsync` function handles loading package dependencies 
 via [`pyodide.loadPackageFromImports`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadpac#pyodide.loadPackagesFromImports).
 
-The package names are selected from the text using the 
-[regular expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions) 
-`/\s*-?\s*(.*?)\s*[==[0-9|.]*]?\s*[,|;|\n]/g`
+The package names are selected from the text using the regular expression
+[/\s*-?\s*(.*?)\s*[==[0-9|.]*]?\s*[,|;|\n]/g](https://regex101.com/r/fwHF7T/1) 
+
 
 **note**: *the `==version` syntax used by `pip freeze` is ignored by the RegExp above, 
 so specifying versions will not cause an error, but will not actually load that particular version, 
@@ -298,7 +304,11 @@ because this is not supported by pyodide*
 
 # CodeMirror Themes
 set the `theme` attribute of the `script` import element or `pyprez-editor` element to use a special CodeMirror theme, 
-e.g. `theme="darcula"`.
+e.g. `theme="darcula"`. You can also select from a few themes using the dropdown.
+
+## Let the user choose!!
+If `theme` is not specified on an element, the page will use `localStorage` to identify the last saved preferred theme of the client!
+Unfortunately on StackOverflow the code snippets are isolated in such a way that this does not work :/
 
 see available themes at https://codemirror.net/5/demo/theme.html 
 
@@ -319,21 +329,22 @@ see available themes at https://codemirror.net/5/demo/theme.html
 # Pyprez API
 ## elements
 Any html elements created by the pyprez custom tags get added to `pyprez.elements` object for easy retrieval.
+Further, `<pyprez-editor>` elements can be accessed from `pyprez.editors`, `<pyprez-console>` from `pyprez.consoles`, etc.
 
 ## then/catch
 When `pyprez.js` loads, the `pyprez` object (available at `window.pyprez`) creates a 
 [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) at `pyprez.promise`,
-which then resolves with the `pyodide` object when 
+which then resolves with `true` when 
 [`loadPyodide`](https://pyodide.org/en/stable/usage/api/js-api.html?highlight=loadPyodide#globalThis.loadPyodide) 
 finishes loading the `pyodide` object.
 
-`pyprez.then` and `pyprez.catch` are simply shortcuts to `pyprez.promise.then` and `pyprez.promise.catch`. 
+`pyprez.then` and `pyprez.catch` are simply shortcuts to `pyodidePromise.then` and `pyodidePromise.catch`. 
 Therefore, `pyprez.then` can be use be sure that pyodide has finished loading, then use it as soon as possible.
 
 #### javascript example
 
 ```javascript
-pyprez.then(pyodide => pyodide.runPythonAsync(`
+pyprez.then(() => window.pyodide.runPythonAsync(`
 	from js import alert
 	alert("pyodide object has loaded and is available at window.pyodide")
 `))
@@ -396,29 +407,49 @@ raise Exception("testing stderr")
 
 
 ## Pyodide
-[**Pyodide**](https://pyodide.org/en/stable/) is a super cool project which runs a [**CPython interpreter**](https://en.wikipedia.org/wiki/CPython) in the browser using [**WebAssembly**](https://webassembly.org/) and provides access to [**WebAPIs**](https://developer.mozilla.org/en-US/docs/Web/API) ( such as `window`, `document`, etc. ) and all of you **javascript** objects, functions, etc. from **Python** and vice-versa. **Pyodide** provides `~99.9%` of the utility of **Pyprez**.
+[**Pyodide**](https://pyodide.org/en/stable/) is a super cool project which uses
+[**Empscripten**](https://emscripten.org/index.html) to compile and run a
+[**CPython interpreter**](https://en.wikipedia.org/wiki/CPython) in the browser using 
+[**WebAssembly**](https://webassembly.org/).
+
+`pyodide` provides access to[**WebAPIs**](https://developer.mozilla.org/en-US/docs/Web/API) ( such as `window`, `document`, etc. ) and all of your
+**javascript** objects, functions, etc. from **Python** and also allows accessing and setting python variables from javascript.
+In reality, **Pyodide** provides `~99.9%` of the utility of **Pyprez**, which just provides a user interface.
 
 **Pyodide** is a great foundation  with cool features, [**great documentation**](https://pyodide.org/en/stable/) and lots of potential use cases mostly related to:
 
- - offloading computations to browsers to reduce server resources
- - speeding up slow client-side computations (especially ones which can be [vectorized](https://www.intel.com/content/www/us/en/developer/articles/technical/vectorization-a-key-tool-to-improve-performance-on-modern-cpus.html)) 
- - distributing research and data analysis documents (this was the goal of the now-deprecated [Iodide Project](https://github.com/iodide-project/iodide) from which Pyodide originated)
- - allowing Python developers to dabble in web development a bit easier
+ * offloading computations to browsers to reduce server resources
+ * speeding up slow client-side computations (especially ones which can be [vectorized](https://www.intel.com/content/www/us/en/developer/articles/technical/vectorization-a-key-tool-to-improve-performance-on-modern-cpus.html)) 
+ * distributing research and data analysis documents (this was the goal of the now-deprecated [Iodide Project](https://github.com/iodide-project/iodide) from which Pyodide originated)
+ * allowing Python developers to dabble in web development a bit easier
 
-Pyodide's main drawback is load time, with initial load time often taking ~2-6 seconds.
+Pyodide is not yet fully fledged, and is still working on features such as `threading`, 
+calling blocking functions such as `time.sleep`, and allowing using multiple web workers to run code.
   
 ## PyScript
-**Pyprez** is heavily inspired by [**PyScript**](https://pyscript.net/), a project recently endorsed by [Anaconda](https://anaconda.cloud/pyscript-python-in-the-browser) (May 2022), which is built on top of Pyodide and attempts to make Pyodide easier to use by providing [custom HTML tags](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements) such as `py-env`, `py-script` and `py-repl` and by allowing users to easily displayplots and graphs using [matplotlib](https://matplotlib.org/3.5.0/gallery/index.html) and other similar popular Python Libraries.
+**Pyprez** is heavily inspired by [**PyScript**](https://pyscript.net/), 
+a project recently endorsed by [Anaconda](https://anaconda.cloud/pyscript-python-in-the-browser) (May 2022), 
+which is built on top of Pyodide and attempts to make Pyodide easier to use by providing 
+[custom HTML tags](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements) 
+such as `py-env`, `py-script` and `py-repl` and by allowing users to easily display plots and graphs using 
+[matplotlib](https://matplotlib.org/3.5.0/gallery/index.html) and other similar popular Python Libraries.
 
 ### PyScript drawbacks
-Unfortunately, [**PyScript**](https://pyscript.net/) has more drawbacks than features:
- - very slow load times (10-30s)
- - poor documentation
- -  poorly maintained: As of 5/14/2022, the [Hello World example](https://pyscript.net/examples/hello_world.html) for PyScript does not even work
- - the `pyodide` object which Pyscript is based off of is not easily provided to the user as a `window` variable, `loadPyodide()` does not allow reloading of the `pyodide` object, and no documented interface to `pyodide` is provided, meaning the user loses out on most of pyodide's javascript API and versatility
+I believe that [**PyScript**](https://pyscript.net/) may _eventually_ become the state of the art for Python in the browser. 
+For now though, they have set their sights too high and failured to deliver. As of May 2022, there were many critical issues:
+* very slow load times of (10-30s)
+* poor documentation
+* Their own [Hello World example](https://pyscript.net/examples/hello_world.html) for PyScript did not work
+* the `pyodide` object which Pyscript is based off of is not easily provided to the user as a `window` variable, 
+  `loadPyodide()` does not allow reloading of the `pyodide` object, and no documented interface to `pyodide` is provided, 
+   meaning the user loses out on most of pyodide's javascript API and versatility
 
+PyScript seems to be so focused on making web development "accessible" to Python developers, 
+that they ended up removing most of the Pyodide functionality developers are looking for and 
+instead made a **slow, bulky, buggy, front-end version of a [Jupyter notebook](https://jupyter.org/).**
 
-Pyscript seems to be so focused on making web development "accessible" to Python developers, that they ended up removing most of the Pyodide functionality developers are looking for and instead made a **slow, bulky, buggy, front-end version of a [Jupyter notebook](https://jupyter.org/).**
+PyScript has improved and will continue to get better, and I look forward to a day when it is simple to use, well documented,
+and easy to extend. For now though, I hope you enjoy this alternative!
 
 
 
