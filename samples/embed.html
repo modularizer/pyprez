@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>PyPrez Min</title>
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <script src="../pyprez.js"></script>
+</head>
+<body style="resize:both;overflow:auto">
+
+    <pyprez-editor runonload="true" style="min-width:100%;min-height:100%;margin:-5px;">
+    </pyprez-editor>
+    <script>
+        let el = document.body.children[0];
+        let search = Object.fromEntries(location.search.slice(1).split("&").map(s=>{let vs = s.split('=');let k = vs.shift();let v = decodeURIComponent(vs.join("="));return[k,v]}))
+        console.warn(el, search);
+        if (search.code !== undefined){
+            el.innerHTML = search.code;
+        }
+        for (let k of ["theme","runonload"]){
+            if (search[k]!==undefined){
+                el.setAttribute(k, search[k])
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,11 +1,11 @@
-/*Sun Oct 23 2022 17:13:21 GMT -0700 (Pacific Daylight Time)*/
+/*Sun Oct 23 2022 21:02:42 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Sun Oct 23 2022 17:13:21 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "enable matplotlib patch";
-    var pyprezPrevCommit = "development:commit d91d03acf42c046159fef0e46c896271cafb32fc";
+    var pyprezUpdateDate = new Date("Sun Oct 23 2022 21:02:42 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "add iframe";
+    var pyprezPrevCommit = "development:commit f43b76bb6d8fc6a36cd0452e7a3c2d00d60034d3";
 }
 
 /*
@@ -755,7 +755,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         After code executes, try the runnable console at the bottom!
 
         <b>Add to StackOverflow:</b>
-        Click <b>&lt/&gt</b> to copy markdown, then paste into your answer.
+        Click <b>M&#8595</b> to copy markdown, then paste into your answer.
         `
         _loadEditor(){
             /* first load the editor as though codemirror does not and will not exist*/
@@ -779,7 +779,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     ${gh}
                     <div style="margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
                     <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
-                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def" onclick="this.parentElement.parentElement.copyRunnable()">&lt/&gt</div>
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy iframe#def" onclick="this.parentElement.parentElement.copyEmbeddable()">&lt/&gt</div>
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def" onclick="this.parentElement.parentElement.copyRunnable()">M&#8595</div>
                     <select style="order:2;margin-right:4px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
                         <option>global</option>
                     </select>
@@ -797,7 +798,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     ${gh}
                     <div style="display:none;margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
                     <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
-                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def" onclick="this.parentElement.parentElement.copyRunnable()">&lt/&gt</div>
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy iframe#def" onclick="this.parentElement.parentElement.copyEmbeddable()">&lt/&gt</div>
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def" onclick="this.parentElement.parentElement.copyRunnable()">M&#8595</div>
                     <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
                         <option>global</option>
                     </select>
@@ -823,9 +825,10 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             `
             this.start = this.children[0] // start button
             this.messageBar = this.children[1].children[1] // top message bar to use to print status (Loading, Running, etc.)
-            this.copyRunnableLink = this.children[1].children[3]
-            this.namespaceSelect = this.children[1].children[4]
-            this.themeSelect = this.children[1].children[5]
+            this.copyEmbeddableLink = this.children[1].children[3]
+            this.copyRunnableLink = this.children[1].children[4]
+            this.namespaceSelect = this.children[1].children[5]
+            this.themeSelect = this.children[1].children[6]
             this.textarea = this.children[2] // textarea in case codemirror does not load
             this.endSpace = this.children[3]
 
@@ -1176,6 +1179,17 @@ ${c}
             this.copyRunnableLink.style['background-color'] = 'rgb(149, 255, 162)';
             setTimeout((()=>{
                 this.copyRunnableLink.style['background-color'] = originalColor;
+            }).bind(this),300)
+        }
+        copyEmbeddable(){
+            let c = encodeURIComponent(this.code);
+            let t = this.theme;
+            let s = `<iframe src="./embed.html?code=${c}&theme=${t}" style="resize:both;overflow:auto;min-width:50%;min-height:500px;"></iframe>`
+            navigator.clipboard.writeText(s);
+            let originalColor = this.copyEmbeddableLink.style['background-color'];
+            this.copyEmbeddableLink.style['background-color'] = 'rgb(149, 255, 162)';
+            setTimeout((()=>{
+                this.copyEmbeddableLink.style['background-color'] = originalColor;
             }).bind(this),300)
         }
     }
