@@ -1,11 +1,11 @@
-/*Sun Oct 23 2022 17:00:33 GMT -0700 (Pacific Daylight Time)*/
+/*Sun Oct 23 2022 17:13:21 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Sun Oct 23 2022 17:00:33 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "add but do not enable matplotlib patch";
-    var pyprezPrevCommit = "development:commit 4761528997300406a375a25398ffab4a4ef73ea0";
+    var pyprezUpdateDate = new Date("Sun Oct 23 2022 17:13:21 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "enable matplotlib patch";
+    var pyprezPrevCommit = "development:commit d91d03acf42c046159fef0e46c896271cafb32fc";
 }
 
 /*
@@ -44,7 +44,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         includeGithubLink: true,
         showThemeSelect: true,
         showNamespaceSelect: false,
-        patch: false,
+        patch: true,
     }
     let strConfig = {
         patchSrc: "https://modularizer.github.io/pyprez/patches.py",
