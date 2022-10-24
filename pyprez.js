@@ -1,11 +1,11 @@
-/*Sun Oct 23 2022 21:02:42 GMT -0700 (Pacific Daylight Time)*/
+/*Sun Oct 23 2022 22:17:51 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Sun Oct 23 2022 21:02:42 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "add iframe";
-    var pyprezPrevCommit = "development:commit f43b76bb6d8fc6a36cd0452e7a3c2d00d60034d3";
+    var pyprezUpdateDate = new Date("Sun Oct 23 2022 22:17:51 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "fix copy buttons";
+    var pyprezPrevCommit = "development:commit 9dd11914c861fe3738a874717e49036c8189eff9";
 }
 
 /*
@@ -1658,15 +1658,16 @@ ${this.header}
         }
         this.el.innerHTML = s
       }
-
+      offsetX=5
+      offsetY=5
       show(s, clientY, clientX){
-        this.el.style.top = window.scrollY + clientY + 1 + "px"
+        this.el.style.top = window.scrollY + clientY + this.offsetY + "px"
         let maxLeft = window.innerWidth - this.el.getBoundingClientRect().width - 200
-        this.el.style.left = Math.min(clientX + 1, maxLeft) + "px"
+        this.el.style.left = Math.min(clientX + this.offsetX, maxLeft) + "px"
         this.setInnerHTML(s)
         this.el.style.display = 'block'
         maxLeft = window.innerWidth - this.el.getBoundingClientRect().width
-        this.el.style.left = Math.min(clientX + 1, maxLeft) + "px"
+        this.el.style.left = Math.min(clientX + this.offsetX, maxLeft) + "px"
         this.hold = true
         document.body.addEventListener("keydown", this.keydownToggle)
         setTimeout(()=>{this.hold = false;}, 100 )
