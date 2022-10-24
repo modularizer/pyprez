@@ -16,7 +16,7 @@
         if (search.code !== undefined){
             el.innerHTML = search.code;
         }
-        for (let k of ["theme","runonload"]){
+        for (let k of ["theme","runonload","namespace"]){
             if (search[k]!==undefined){
                 el.setAttribute(k, search[k])
             }

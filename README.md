@@ -58,7 +58,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 
 
 ## Method 1
-Using any `<prprez-editor>` element (such as the one [here](https://modularizer.github.io/pyprez/samples/stackconverter.html)) to modify your code, then click `</>` button on the top bar to convert your python 
+Using any `<prprez-editor>` element (such as the one [here](https://modularizer.github.io/pyprez/samples/stackconverter.html)) to modify your code, then click `M↓` button on the top bar to convert your python 
 into markdown which can be pasted into your StackOverflow answer to create a **runnable and editable snippet**.
 
 **The Question/Answer Editor will look something like this**
