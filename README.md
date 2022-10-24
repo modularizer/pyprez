@@ -36,6 +36,10 @@ Run **client-side python** in your browser to **prez**ent your code.
 - [Limitations](#limitations)  
 - [Tags](#pyprez-tags): [`<pyprez-editor>`](#pyprez-editor) , [`<pyprez-console>`](#pyprez-console), [`<pyprez-import>`](#pyprez-import), [`<pyprez-script>`](#pyprez-script)
 - [Custom Themes](#codemirror-themes)
+- [Feature Development](#feature-development)
+  - [namespaces](#namespaces)
+  - [input](#input)
+  - [matplotlib](#matplotlib)
 - [API](#pyprez-api)
 - [Pyodide](#pyodide)
 - [PyScript](#pyscript)
@@ -324,6 +328,50 @@ see available themes at https://codemirror.net/5/demo/theme.html
 <a href="https://modularizer.github.io/pyprez/#codemirror-themes" class="nonrendered">Try on live page</a>
 <a href="https://modularizer.github.io/pyprez/#codemirror-themes" class="nonrendered">
 <img src="./sample_imgs/editor-dark.png" />
+</a>
+
+
+# Feature Development
+## namespaces
+If you have multiple `pyprez-editor` elements on the same page, namespaces let you set which ones should share variable 
+scopes and which ones should not. Simply set the `namespace` attribute on elements, and if you wish to change them live,
+set the `showNamespaceSelect` attribute on the script which imports `pyprez.js`.
+[Namespace Demo](https://modularizer.github.io/pyprez/samples/namespaces.html)
+
+### Yet To Come
+* import other namespaces
+* relative imports to load other python files based on the `src`
+
+## input
+The input function is tricky. For now, we have gotten it to call the builtin js `prompt` popup.
+
+### Yet To Come
+* imitate the typical inline input
+
+## matplotlib
+We have applied a patch which runs only if `matplotlib` is imported. It overwrites the `plt.plot` function and the `Figure.savefig`
+to save the figure to a temporary png, convert to a base64 dataURI, and set that as the `src` of an img to display the figure.
+
+Making it interactive would be tough (but not impossible). Bokeh and Plotly are supported and may be the easier route.
+
+### Yet To Come
+* interactivity (TBD whether or not this will happen)
+
+```html
+<pyprez-editor>
+    import matplotlib.pyplot as plt
+    import numpy as np
+    
+    p = int(input("how many points?"))
+    fig = plt.figure()
+    plt.plot(np.random.rand(p))
+</pyprez-editor>
+```
+
+<a href="https://modularizer.github.io/pyprez/#matplotlib" class="nonrendered"><img src="./favicon.ico" height="15px"/></a>
+<a href="https://modularizer.github.io/pyprez/#matplotlib" class="nonrendered">Try on live page</a><br/>
+<a href="https://modularizer.github.io/pyprez/#matplotlib" class="nonrendered">
+<img src="./sample_imgs/input-plot.png" />
 </a>
 
 # Pyprez API
