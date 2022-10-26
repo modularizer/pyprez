@@ -1,11 +1,11 @@
-/*Sun Oct 23 2022 22:17:51 GMT -0700 (Pacific Daylight Time)*/
+/*Tue Oct 25 2022 23:11:38 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Sun Oct 23 2022 22:17:51 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "fix copy buttons";
-    var pyprezPrevCommit = "development:commit 9dd11914c861fe3738a874717e49036c8189eff9";
+    var pyprezUpdateDate = new Date("Tue Oct 25 2022 23:11:38 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "add micropip and micropipPromise";
+    var pyprezPrevCommit = "development:commit 2f7be0607ae416f18792e3ba5fe19f58fcf0dba7";
 }
 
 /*
@@ -49,7 +49,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
     let strConfig = {
         patchSrc: "https://modularizer.github.io/pyprez/patches.py",
         codemirrorCDN: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/",
-        pyodideCDN: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
+        pyodideCDN: "https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js",
         consolePrompt: ">>> ",
         consoleOut: "[Out] ",
         consoleEscape: "...",
@@ -112,6 +112,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
     var codemirrorImported = new DeferredPromise();
     var workerReady = new DeferredPromise();
     var pyodidePromise = new DeferredPromise("pyodidePromise");
+    var micropipPromise = new DeferredPromise("micropipPromise");
     var patches = new DeferredPromise();
     if (patch){
         patches = get(patchSrc);
@@ -403,11 +404,19 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                                     console.log("patched")
                                     window.pyodide = pyodide;
                                     pyodidePromise.resolve(true);
+                                    pyodide.loadPackage("micropip").then(micropip =>{
+                                        window.micropip = pyodide.pyimport("micropip");
+                                        micropipPromise.resolve(true);
+                                    })
                                 })
                             })
                         }else{
                             window.pyodide = pyodide;
                             pyodidePromise.resolve(true);
+                            pyodide.loadPackage("micropip").then(micropip =>{
+                                        window.micropip = pyodide.pyimport("micropip");
+                                        micropipPromise.resolve(true);
+                                    })
                         }
 
                     })
