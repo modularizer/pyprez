@@ -1,11 +1,11 @@
-/*Tue Oct 25 2022 23:11:38 GMT -0700 (Pacific Daylight Time)*/
+/*Tue Oct 25 2022 23:28:19 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Tue Oct 25 2022 23:11:38 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "add micropip and micropipPromise";
-    var pyprezPrevCommit = "development:commit 2f7be0607ae416f18792e3ba5fe19f58fcf0dba7";
+    var pyprezUpdateDate = new Date("Tue Oct 25 2022 23:28:19 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "work on scrolling";
+    var pyprezPrevCommit = "development:commit 3f329d16831e14b9fee9e42895c70567f6b7f97a";
 }
 
 /*
@@ -993,8 +993,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 this.editor.doc.setGutterMarker(0, "start", this.start);
 
                 // scroll to bottom of element
-                let si = this.editor.getScrollInfo();
-                this.editor.scrollTo(0, si.height);
+//                let si = this.editor.getScrollInfo();
+//                this.editor.scrollTo(0, si.height);
             }else{
                 this.textarea.value = v;
 
@@ -1005,7 +1005,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             // scroll down on page until bottom of element is in view
             let bb = this.getBoundingClientRect();
             if (bb.bottom > window.innerHeight){
-                window.scrollTo(0, bb.bottom)
+                window.scroll(0, 20 + bb.bottom - window.innerHeight)
             }
         }
 
@@ -1059,6 +1059,9 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             if(this.done){
                 this.consoleRun()
             }else if (this.code){
+                let si = this.editor.getScrollInfo();
+                this.editor.scrollTo(0, si.height);
+
                 this.message = "Running..."
                 let code = this.code.split(this.separator)[0];
                 this.executed = code;
