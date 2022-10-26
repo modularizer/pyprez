@@ -1,11 +1,11 @@
-/*Tue Oct 25 2022 23:28:19 GMT -0700 (Pacific Daylight Time)*/
+/*Tue Oct 25 2022 23:30:43 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Tue Oct 25 2022 23:28:19 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "work on scrolling";
-    var pyprezPrevCommit = "development:commit 3f329d16831e14b9fee9e42895c70567f6b7f97a";
+    var pyprezUpdateDate = new Date("Tue Oct 25 2022 23:30:43 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "disable auto-scrolling";
+    var pyprezPrevCommit = "development:commit c67d3570d5e32c0f9fe4d7fa964a0de97e561501";
 }
 
 /*
@@ -1004,9 +1004,9 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
 
             // scroll down on page until bottom of element is in view
             let bb = this.getBoundingClientRect();
-            if (bb.bottom > window.innerHeight){
-                window.scroll(0, 20 + bb.bottom - window.innerHeight)
-            }
+//            if (bb.bottom > window.innerHeight){
+//                window.scroll(0, 20 + bb.bottom - window.innerHeight)
+//            }
         }
 
         // get/set the codemirror theme, importing from cdn if needed
