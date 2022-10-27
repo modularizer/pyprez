@@ -1,11 +1,11 @@
-/*Wed Oct 26 2022 22:19:41 GMT -0700 (Pacific Daylight Time)*/
+/*Wed Oct 26 2022 22:44:06 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Wed Oct 26 2022 22:19:41 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "add Ctrl+k autopep8.fix_file shortcut";
-    var pyprezPrevCommit = "development:commit 11a909630ed1e71c444d23d9da6ae7112e33cb30";
+    var pyprezUpdateDate = new Date("Wed Oct 26 2022 22:44:06 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "document Ctrl+k autopep8.fix_file shortcut";
+    var pyprezPrevCommit = "development:commit 24ed5fe467aff11aa26b449a27337ffb4b778441";
 }
 
 /*
@@ -785,6 +785,12 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             <li>Shift + Enter</li>
             <li>Double-Click</li>
         </ul>
+
+        <b>To lint:</b>
+        <ul>
+            <li>Ctrl + K to reformat/li>
+        </ul>
+
         <b>To re-run:</b>
         <ul>
             <li>Shift + Enter</li>
