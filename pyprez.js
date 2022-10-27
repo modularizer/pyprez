@@ -1,11 +1,11 @@
-/*Wed Oct 26 2022 21:50:19 GMT -0700 (Pacific Daylight Time)*/
+/*Wed Oct 26 2022 22:19:41 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Wed Oct 26 2022 21:50:19 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "fix  micropip install via comments";
-    var pyprezPrevCommit = "development:commit dd63acc477fb1fe4a861d050ab24f0277473c8b8";
+    var pyprezUpdateDate = new Date("Wed Oct 26 2022 22:19:41 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "add Ctrl+k autopep8.fix_file shortcut";
+    var pyprezPrevCommit = "development:commit 11a909630ed1e71c444d23d9da6ae7112e33cb30";
 }
 
 /*
@@ -45,6 +45,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         showThemeSelect: true,
         showNamespaceSelect: false,
         patch: true,
+        lint: true
     }
     let strConfig = {
         patchSrc: "https://modularizer.github.io/pyprez/patches.py",
@@ -114,6 +115,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
     var pyodidePromise = new DeferredPromise("pyodidePromise");
     var micropipPromise = new DeferredPromise("micropipPromise");
     var patches = new DeferredPromise();
+    var linterPromise = new DeferredPromise();
     if (patch){
         patches = get(patchSrc);
     }
@@ -425,6 +427,36 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         return pyodidePromise
     }
 
+
+    /* linter */
+    if (lint){
+         micropipPromise.then(()=>{
+        micropip.install("autopep8").then(()=>{
+            pyodide.loadPackagesFromImports("autopep8").then(()=>{
+                console.warn("autopep8_fix")
+                pyodide.runPythonAsync(`
+                    def autopep8_fix(s, tmp_fn="autopep8_temp.py"):
+                        # micropip install autopep8
+                        import autopep8
+                        import os
+                        autopep8.detect_encoding = lambda *a, **kw: 'utf-8'
+                        with open(tmp_fn,"w") as f:
+                            f.write(s)
+                        r = autopep8.fix_file(tmp_fn)
+                        os.remove(tmp_fn)
+                        return r
+                `).then(()=>{
+                    window.autopep8Fix = pyodide.globals.get("autopep8_fix");
+                    linterPromise.resolve(true);
+                })
+
+            })
+        })
+    })
+    }
+
+
+
     /* _______________________________________ scopeEval ____________________________________ */
     function scopeEval(script) {
       return Function(( "with(this) { " + script + "}"))();
@@ -635,6 +667,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this.run = this.run.bind(this);
             this.copyRunnable = this.copyRunnable.bind(this);
             this.getRunnable = this.getRunnable.bind(this);
+            this.autopep8Fix = this.autopep8Fix.bind(this);
 
             // set language to python(default), javascript, or html
             let language = this.hasAttribute("language")?this.getAttribute("language").toLowerCase():"python"
@@ -924,6 +957,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         /* ________________________ EVENTS _____________________________*/
         keypressed(e){
             /* Shift + Enter to run, Shift + Backspace to reload */
+            if (e.ctrlKey && e.key == 'k'){this.autopep8Fix();e.preventDefault();}
             if (e.shiftKey && e.key == "Backspace"){this.reload(); e.preventDefault();}
             else if (e.key == "Enter"){
                 if (e.shiftKey && !this.done){this.run(); e.preventDefault();}
@@ -1007,6 +1041,12 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
 //            if (bb.bottom > window.innerHeight){
 //                window.scroll(0, 20 + bb.bottom - window.innerHeight)
 //            }
+        }
+
+        autopep8Fix(){
+            linterPromise.then((()=>{
+                this.code = autopep8Fix(this.code.split(this.separator)[0])
+            }).bind(this))
         }
 
         // get/set the codemirror theme, importing from cdn if needed
