@@ -1,11 +1,11 @@
-/*Wed Oct 26 2022 20:59:06 GMT -0700 (Pacific Daylight Time)*/
+/*Wed Oct 26 2022 21:50:19 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Wed Oct 26 2022 20:59:06 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "allow micropip install via comments";
-    var pyprezPrevCommit = "development:commit 6e4be1c9912d187f4aed5e05a2ad4123785380d5";
+    var pyprezUpdateDate = new Date("Wed Oct 26 2022 21:50:19 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "fix  micropip install via comments";
+    var pyprezPrevCommit = "development:commit dd63acc477fb1fe4a861d050ab24f0277473c8b8";
 }
 
 /*
@@ -572,22 +572,22 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         load(code, requirements="detect"){
             /*load required packages as soon as pyodide is loaded*/
             return this.then(() =>{
-                let requirementsLoaded;
                 if (requirements === "detect"){
                     if (code){
                         console.debug("auto loading packages detected in code")
-                        this.importPackagesFromComments(code);
-                        this.importPackagesFromComments(code).then(()=>{
-                            requirementsLoaded = window.pyodide.loadPackage(requirements);
+                        return this.installPackagesFromComments(code).then(()=>{
+                            console.warn("installed it here")
+                            return window.pyodide.loadPackage(requirements)
                         })
                     }
                 }else{
                     console.debug("loading", requirements)
-                    this.importPackagesFromComments(code).then(()=>{
-                        requirementsLoaded = window.pyodide.loadPackage(requirements);
+                    return this.installPackagesFromComments(code).then(()=>{
+                        console.warn("installed it here2")
+                        return window.pyodide.loadPackage(requirements)
                     })
                 }
-                return requirementsLoaded
+
             })
         }
         installPackagesFromComments(code){
@@ -595,15 +595,15 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             console.warn(m);
             let packageNames = m?m.map(s => s.match(/#\s*(micro)?pip\s*install\s*(\S*)/)[2]):[];
             console.warn("preparing to micropip install", packageNames)
-            return micropipPromise.then(()=>packageNames.map(micropip.install))
+            return micropipPromise.then(()=>{console.warn('installing');return micropip.install(packageNames)})
         }
         loadAndRunAsync(code, namespace="global", requirements="detect"){
             /* run a python script asynchronously as soon as pyodide is loaded and all required packages are imported*/
             let p = this.then((() =>{
                 if (code){
                     return this.load(code, requirements)
-                        .then((r => this._runPythonAsync(code, namespace)).bind(this))
-                        .catch((e => this._runPythonAsync(code, namespace)).bind(this))
+                        .then((r => {console.warn('loaded', r);return this._runPythonAsync(code, namespace)}).bind(this))
+                        .catch((e => {console.error(e); return this._runPythonAsync(code, namespace)}).bind(this))
                 }
             }).bind(this))
             return p
