@@ -1,11 +1,11 @@
-/*Wed Oct 26 2022 20:13:40 GMT -0700 (Pacific Daylight Time)*/
+/*Wed Oct 26 2022 20:59:06 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Wed Oct 26 2022 20:13:40 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "fix auto-run";
-    var pyprezPrevCommit = "development:commit 95aa71b79ad465971748d40ac9b921a81453393f";
+    var pyprezUpdateDate = new Date("Wed Oct 26 2022 20:59:06 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "allow micropip install via comments";
+    var pyprezPrevCommit = "development:commit 6e4be1c9912d187f4aed5e05a2ad4123785380d5";
 }
 
 /*
@@ -287,7 +287,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             return this.proxy
         }
 
-        loadPackagesFromImports(){}
         _id = 0
         get id(){
             let id = this._id
@@ -577,14 +576,26 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 if (requirements === "detect"){
                     if (code){
                         console.debug("auto loading packages detected in code")
-                        requirementsLoaded = window.pyodide.loadPackagesFromImports(code)
+                        this.importPackagesFromComments(code);
+                        this.importPackagesFromComments(code).then(()=>{
+                            requirementsLoaded = window.pyodide.loadPackage(requirements);
+                        })
                     }
                 }else{
                     console.debug("loading", requirements)
-                    requirementsLoaded = window.pyodide.loadPackage(requirements);
+                    this.importPackagesFromComments(code).then(()=>{
+                        requirementsLoaded = window.pyodide.loadPackage(requirements);
+                    })
                 }
                 return requirementsLoaded
             })
+        }
+        installPackagesFromComments(code){
+            let m = code.match(/#\s*(micro)?pip\s*install\s*(\S*)/g);
+            console.warn(m);
+            let packageNames = m?m.map(s => s.match(/#\s*(micro)?pip\s*install\s*(\S*)/)[2]):[];
+            console.warn("preparing to micropip install", packageNames)
+            return micropipPromise.then(()=>packageNames.map(micropip.install))
         }
         loadAndRunAsync(code, namespace="global", requirements="detect"){
             /* run a python script asynchronously as soon as pyodide is loaded and all required packages are imported*/
@@ -725,7 +736,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             }
 
             // now load packages detected in code imports
-            this.loadPackages()
+            pyprez.installPackagesFromComments(this.code);
         }
         loadEditor(){
             /* first load the editor as though codemirror does not and will not exist, then load codemirror*/
@@ -1017,18 +1028,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this._theme = v;
         }
 
-        /* ________________________ PYTHON IMPORTS _____________________________*/
-        numImports = 0; // number of import statements we have already tried to auto-load
-        loadPackages(){
-            /* autodetect if new import statements have been added to code, and if so try to install them*/
-            let code = this.code;
-            let n = code.match(/import/g);
-            if (n && n.length !== this.numImports){
-                this.message = "Loading packages..."
-                this.numImports = n.length;
-                pyprez.load(this.code).then((()=>{this.message = "Ready...(Double-Click to Run)"}).bind(this))
-            }
-        }
 
         /* ________________________ RUN CODE _____________________________*/
         reload(){
