@@ -33,7 +33,8 @@ Run **client-side python** in your browser to **prez**ent your code.
 - [About](#about)
 - [Getting Started](#getting-started)
 - [Use Cases](#use-cases)
-- [Limitations](#limitations)  
+- [Limitations](#limitations)
+- [Micropip](#micropip)
 - [Tags](#pyprez-tags): [`<pyprez-editor>`](#pyprez-editor) , [`<pyprez-console>`](#pyprez-console), [`<pyprez-import>`](#pyprez-import), [`<pyprez-script>`](#pyprez-script)
 - [Custom Themes](#codemirror-themes)
 - [Feature Development](#feature-development)
@@ -188,6 +189,9 @@ Some such limitations are:
 * cannot access the local file system ( but can still read and write temporary files in webassembly)
 * `__builtins__.input` is tricky. Currently it works with the fully blocking `window.prompt` function
 
+# Micropip
+The `micropip` object from pyodide is available at `window.pyodide`. Furthermore, `<pyprez-editor>` will autorecognize 
+comments like `# micropip install package_name` and call `micropip.install('package_name')`before running your code.
 
 # Pyprez Tags
 ## Pyprez-Editor
