@@ -41,6 +41,8 @@ Run **client-side python** in your browser to **prez**ent your code.
   - [namespaces](#namespaces)
   - [input](#input)
   - [matplotlib](#matplotlib)
+  - [linting](#linting)
+- [Keyboard Shortcuts](#keyboard-shortcuts)
 - [API](#pyprez-api)
 - [Pyodide](#pyodide)
 - [PyScript](#pyscript)
@@ -379,6 +381,23 @@ Making it interactive would be tough (but not impossible). Bokeh and Plotly are 
 <a href="https://modularizer.github.io/pyprez/#matplotlib" class="nonrendered">
 <img src="./sample_imgs/input-plot.png" />
 </a>
+
+
+## Linting
+### autopep8
+`Ctrl+k` can be used to auto-format code to pep8 standards. `Ctrl+Z` will undo.
+
+
+# Keyboard Shortcuts
+custom:
+* `Ctrl + k`: autopep8.fix_file
+* `Shift + Enter`: run code
+* `Shift + Backspace`: reset code
+
+builtin to codemirror:
+* `Ctrl + z`
+* `Ctrl + a`
+* `Ctrl + c`
 
 # Pyprez API
 ## elements
