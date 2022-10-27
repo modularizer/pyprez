@@ -486,7 +486,7 @@ such as `py-env`, `py-script` and `py-repl` and by allowing users to easily disp
 
 ### PyScript drawbacks
 I believe that [**PyScript**](https://pyscript.net/) may _eventually_ become the state of the art for Python in the browser. 
-For now though, they have set their sights too high and failured to deliver. As of May 2022, there were many critical issues:
+For now though, they have set their sights too high and failed to deliver. As of May 2022, there were many critical issues:
 * very slow load times of (10-30s)
 * poor documentation
 * Their own [Hello World example](https://pyscript.net/examples/hello_world.html) for PyScript did not work
