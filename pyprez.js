@@ -1,11 +1,11 @@
-/*Tue Oct 25 2022 23:30:43 GMT -0700 (Pacific Daylight Time)*/
+/*Wed Oct 26 2022 20:13:40 GMT -0700 (Pacific Daylight Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Tue Oct 25 2022 23:30:43 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "disable auto-scrolling";
-    var pyprezPrevCommit = "development:commit c67d3570d5e32c0f9fe4d7fa964a0de97e561501";
+    var pyprezUpdateDate = new Date("Wed Oct 26 2022 20:13:40 GMT -0700 (Pacific Daylight Time)");
+    var pyprezCommitMessage = "fix auto-run";
+    var pyprezPrevCommit = "development:commit 95aa71b79ad465971748d40ac9b921a81453393f";
 }
 
 /*
@@ -337,7 +337,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
 
         receiveResponse(data){
             if ( this.pendingRequests[data.id] === undefined){
-                console.error(data.id, data, this, this.pendingRequests);
+                console.error(data.id, data);
                 return
             }
             let [deferredPromise, sentData] = this.pendingRequests[data.id];
@@ -382,9 +382,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             workerReady.then(()=>{
                 pyodide.runPythonAsync("2+2").then(r=>{
                     if (r == 4){
-                        console.error(pyodide)
                         window.pyodide = pyodide;
-                        console.warn(window.pyodidePromise)
                         window.pyodidePromise.resolve(true);
                     }
                 })
@@ -399,7 +397,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     `).then(()=>{
                         if (patch){
                             patches.then(code =>{
-                                console.warn("applying patches", code)
+                                console.warn("applying python patches", code)
                                 pyodide.runPythonAsync(code).then(()=>{
                                     console.log("patched")
                                     window.pyodide = pyodide;
@@ -547,9 +545,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             return this.jsNamespaces[name]
         }
         namespaceEval(code, name){
-            //.replace(/(^|[;\s])(let)\s/gm,'$1var ')
             let [scope, scopedEval] = this.getJSNamespace(name);
-            console.warn(scope)
             return scopedEval(code)
         }
 
@@ -557,7 +553,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         namespaces = {}
         namespaceNames = ['global']
         recordNamespaceName(name){
-            console.log(this, this.namespaceNames)
             if (!this.namespaceNames.includes(name)){
                 this.namespaceNames = this.namespaceNames.concat([name])
             }
@@ -582,7 +577,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 if (requirements === "detect"){
                     if (code){
                         console.debug("auto loading packages detected in code")
-                        console.debug(code)
                         requirementsLoaded = window.pyodide.loadPackagesFromImports(code)
                     }
                 }else{
@@ -594,9 +588,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         }
         loadAndRunAsync(code, namespace="global", requirements="detect"){
             /* run a python script asynchronously as soon as pyodide is loaded and all required packages are imported*/
-            console.warn(pyodidePromise)
             let p = this.then((() =>{
-                console.error("here")
                 if (code){
                     return this.load(code, requirements)
                         .then((r => this._runPythonAsync(code, namespace)).bind(this))
@@ -659,7 +651,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     this.language = "html"
                 }
                 fetch(src).then(r=>r.text()).then(code =>{
-                    console.warn("got", code)
                     this.innerHTML = code;
                     this.loadEl();
                 })
@@ -904,7 +895,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         }
         get namespaces(){return Array.from(this.namespaceSelect.children).map(el=>el.innerHTML)}
         set namespaces(namespaces){
-            console.warn(namespaces)
             let sn = this.selectedNamespace;
             this.namespaceSelect.innerHTML = namespaces.map(name=>`<option>${name}</option>`).join("")
             this.namespaceSelect.value = sn;
@@ -915,7 +905,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         get namespace(){return this.selectedNamespace}
         set namespace(name){
             if (!this.namespaces.includes(name)){
-                console.warn(this.namespaces, name)
                 this.namespaces = this.namespaces.concat([name]);
             }
             this.selectedNamespace = name
@@ -1049,18 +1038,19 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             if (this.language !== "html"){
                 this.code = this.executed;
             }
-            console.warn("Setting code to ", this.executed, this.code)
             this.message = "Ready   (Double-Click to Run)";
             this.executed = false;
             this.done = false
         }
         run(){
-            console.log("run", this.done)
+            console.log("running")
             if(this.done){
                 this.consoleRun()
             }else if (this.code){
-                let si = this.editor.getScrollInfo();
-                this.editor.scrollTo(0, si.height);
+                if (this.editor){
+                    let si = this.editor.getScrollInfo();
+                    this.editor.scrollTo(0, si.height);
+                }
 
                 this.message = "Running..."
                 let code = this.code.split(this.separator)[0];
@@ -1183,7 +1173,6 @@ ${c}
 <!-- end snippet -->`
         }
         copyRunnable(){
-            console.warn("copy runnable")
             let s = this.getRunnable();
             console.log(s);
             navigator.clipboard.writeText(s);
@@ -1197,6 +1186,7 @@ ${c}
             let c = encodeURIComponent(this.code);
             let t = this.theme;
             let s = `<iframe src="./embed.html?code=${c}&theme=${t}" style="resize:both;overflow:auto;min-width:50%;min-height:500px;"></iframe>`
+            console.log(s)
             navigator.clipboard.writeText(s);
             let originalColor = this.copyEmbeddableLink.style['background-color'];
             this.copyEmbeddableLink.style['background-color'] = 'rgb(149, 255, 162)';
@@ -1572,7 +1562,6 @@ ${this.header}
             }).bind(this))
         }
         sync(){
-            console.warn("syncing")
             this.stackOverflow.runnable = this.pyprezEditor.getRunnable();
         }
     }
@@ -1627,7 +1616,6 @@ ${this.header}
         })
 
         let enabled = localStorage.getItem("learningModeEnabled") === "true"
-         console.log("enabled=", enabled)
          if (enabled){
             this.enableLearningMode()
          }else{
@@ -1703,7 +1691,6 @@ ${this.header}
       }
 
       keydownToggle(e){
-      console.log(e.key)
         if (e.key === " "){
             this.toggleLearningMode()
             e.preventDefault();
@@ -1727,7 +1714,6 @@ ${this.header}
         localStorage.setItem("learningModeEnabled", false)
       }
       toggleLearningMode(){
-      console.log(this.attrNames)
         if(this.learningMode){
             this.disableLearningMode()
         }else{
@@ -1742,7 +1728,6 @@ ${this.header}
         }
 
         let p = event.path
-    //    console.log(p.map(el => el.id))
           let i=0;
           let found=false;
           if (p.length>4){
@@ -1751,7 +1736,6 @@ ${this.header}
                for (let attrName of attrNames){
                    if (p[i].hasAttribute){
                     if (p[i].hasAttribute(attrName)){
-    //                  console.log(attrName, p[i], )
                       _found = p[i]
                       this.show(_found.getAttribute(attrName), event.clientY, event.clientX)
                     }
