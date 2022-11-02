@@ -13,6 +13,14 @@
         let el = document.body.children[0];
         let search = Object.fromEntries(location.search.slice(1).split("&").map(s=>{let vs = s.split('=');let k = vs.shift();let v = decodeURIComponent(vs.join("="));return[k,v]}))
         console.warn(el, search);
+        if (search.maxwidth !== undefined){
+            el.style["max-width"] = search.maxwidth;
+            document.body.style["max-width"] = search.maxwidth;
+        }
+        if (search.maxheight !== undefined){
+            el.style["max-height"] = search.maxheight;
+            document.body.style["max-height"] = search.maxheight;
+        }
         if (search.code !== undefined){
             el.innerHTML = search.code;
         }
@@ -21,6 +29,7 @@
                 el.setAttribute(k, search[k])
             }
         }
+
     </script>
 </body>
 </html>
