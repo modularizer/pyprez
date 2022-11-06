@@ -33,13 +33,16 @@ Run **client-side python** in your browser to **prez**ent your code.
 - [About](#about)
 - [Getting Started](#getting-started)
 - [Use Cases](#use-cases)
-- [Limitations](#limitations)  
+- [Limitations](#limitations)
+- [Micropip](#micropip)
 - [Tags](#pyprez-tags): [`<pyprez-editor>`](#pyprez-editor) , [`<pyprez-console>`](#pyprez-console), [`<pyprez-import>`](#pyprez-import), [`<pyprez-script>`](#pyprez-script)
 - [Custom Themes](#codemirror-themes)
 - [Feature Development](#feature-development)
   - [namespaces](#namespaces)
   - [input](#input)
   - [matplotlib](#matplotlib)
+  - [linting](#linting)
+- [Keyboard Shortcuts](#keyboard-shortcuts)
 - [API](#pyprez-api)
 - [Pyodide](#pyodide)
 - [PyScript](#pyscript)
@@ -58,7 +61,7 @@ Run **client-side python** in your browser to **prez**ent your code.
 
 
 ## Method 1
-Using any `<prprez-editor>` element (such as the one [here](https://modularizer.github.io/pyprez/samples/stackconverter.html)) to modify your code, then click `</>` button on the top bar to convert your python 
+Using any `<prprez-editor>` element (such as the one [here](https://modularizer.github.io/pyprez/samples/stackconverter.html)) to modify your code, then click `M↓` button on the top bar to convert your python 
 into markdown which can be pasted into your StackOverflow answer to create a **runnable and editable snippet**.
 
 **The Question/Answer Editor will look something like this**
@@ -188,6 +191,9 @@ Some such limitations are:
 * cannot access the local file system ( but can still read and write temporary files in webassembly)
 * `__builtins__.input` is tricky. Currently it works with the fully blocking `window.prompt` function
 
+# Micropip
+The `micropip` object from pyodide is available at `window.pyodide`. Furthermore, `<pyprez-editor>` will autorecognize 
+comments like `# micropip install package_name` and call `micropip.install('package_name')`before running your code.
 
 # Pyprez Tags
 ## Pyprez-Editor
@@ -375,6 +381,23 @@ Making it interactive would be tough (but not impossible). Bokeh and Plotly are 
 <a href="https://modularizer.github.io/pyprez/#matplotlib" class="nonrendered">
 <img src="./sample_imgs/input-plot.png" />
 </a>
+
+
+## Linting
+### autopep8
+`Ctrl+k` can be used to auto-format code to pep8 standards. `Ctrl+Z` will undo.
+
+
+# Keyboard Shortcuts
+custom:
+* `Ctrl + k`: autopep8.fix_file
+* `Shift + Enter`: run code
+* `Shift + Backspace`: reset code
+
+builtin to codemirror:
+* `Ctrl + z`
+* `Ctrl + a`
+* `Ctrl + c`
 
 # Pyprez API
 ## elements

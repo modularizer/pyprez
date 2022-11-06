@@ -4,13 +4,31 @@ https://modularizer.github.io/pyprez/pyprez.js
 """
 import asyncio
 import sys
+import os
 
 import tornado.web
 import tornado.ioloop
 
+os.chdir(os.path.dirname(os.path.dirname(__file__)))
+print(os.getcwd())
+
+
+class RedirectHandler(tornado.web.RequestHandler):
+    """main handler for requests to the base url"""
+    def initialize(self, homepage) -> None:
+        """function which initializes the handler and sets the homepage"""
+        self.homepage = homepage
+
+    def get(self):
+        """redirects the landing page to the home page"""
+        self.redirect(self.homepage)
+
 
 if __name__ == "__main__":
-    app = tornado.web.Application([(r"/(.*)", tornado.web.StaticFileHandler, {"path": "."})])
+    app = tornado.web.Application([
+        (r"/", RedirectHandler, {"homepage": "/index.html"}),
+        (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./site"})
+    ])
 
     if sys.platform == 'win32':
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())

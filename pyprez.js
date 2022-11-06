@@ -1,11 +1,11 @@
-/*Sun Oct 23 2022 17:13:21 GMT -0700 (Pacific Daylight Time)*/
+/*Sun Nov 06 2022 15:53:57 GMT -0800 (Pacific Standard Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Sun Oct 23 2022 17:13:21 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "enable matplotlib patch";
-    var pyprezPrevCommit = "development:commit d91d03acf42c046159fef0e46c896271cafb32fc";
+    var pyprezUpdateDate = new Date("Sun Nov 06 2022 15:53:57 GMT -0800 (Pacific Standard Time)");
+    var pyprezCommitMessage = "fix imports";
+    var pyprezPrevCommit = "development:commit b49c434f40e62e250ff08c4266e3fb9778947c0d";
 }
 
 /*
@@ -45,11 +45,12 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         showThemeSelect: true,
         showNamespaceSelect: false,
         patch: true,
+        lint: true
     }
     let strConfig = {
         patchSrc: "https://modularizer.github.io/pyprez/patches.py",
         codemirrorCDN: "https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/",
-        pyodideCDN: "https://cdn.jsdelivr.net/pyodide/v0.20.0/full/pyodide.js",
+        pyodideCDN: "https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js",
         consolePrompt: ">>> ",
         consoleOut: "[Out] ",
         consoleEscape: "...",
@@ -112,7 +113,9 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
     var codemirrorImported = new DeferredPromise();
     var workerReady = new DeferredPromise();
     var pyodidePromise = new DeferredPromise("pyodidePromise");
+    var micropipPromise = new DeferredPromise("micropipPromise");
     var patches = new DeferredPromise();
+    var linterPromise = new DeferredPromise();
     if (patch){
         patches = get(patchSrc);
     }
@@ -286,7 +289,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             return this.proxy
         }
 
-        loadPackagesFromImports(){}
         _id = 0
         get id(){
             let id = this._id
@@ -336,7 +338,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
 
         receiveResponse(data){
             if ( this.pendingRequests[data.id] === undefined){
-                console.error(data.id, data, this, this.pendingRequests);
+                console.error(data.id, data);
                 return
             }
             let [deferredPromise, sentData] = this.pendingRequests[data.id];
@@ -381,9 +383,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             workerReady.then(()=>{
                 pyodide.runPythonAsync("2+2").then(r=>{
                     if (r == 4){
-                        console.error(pyodide)
                         window.pyodide = pyodide;
-                        console.warn(window.pyodidePromise)
                         window.pyodidePromise.resolve(true);
                     }
                 })
@@ -398,16 +398,24 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     `).then(()=>{
                         if (patch){
                             patches.then(code =>{
-                                console.warn("applying patches", code)
+                                console.warn("applying python patches", code)
                                 pyodide.runPythonAsync(code).then(()=>{
                                     console.log("patched")
                                     window.pyodide = pyodide;
                                     pyodidePromise.resolve(true);
+                                    pyodide.loadPackage("micropip").then(micropip =>{
+                                        window.micropip = pyodide.pyimport("micropip");
+                                        micropipPromise.resolve(true);
+                                    })
                                 })
                             })
                         }else{
                             window.pyodide = pyodide;
                             pyodidePromise.resolve(true);
+                            pyodide.loadPackage("micropip").then(micropip =>{
+                                        window.micropip = pyodide.pyimport("micropip");
+                                        micropipPromise.resolve(true);
+                                    })
                         }
 
                     })
@@ -418,6 +426,36 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         }
         return pyodidePromise
     }
+
+
+    /* linter */
+    if (lint){
+         micropipPromise.then(()=>{
+        micropip.install("autopep8").then(()=>{
+            pyodide.loadPackagesFromImports("autopep8").then(()=>{
+                console.warn("autopep8_fix")
+                pyodide.runPythonAsync(`
+                    def autopep8_fix(s, tmp_fn="autopep8_temp.py"):
+                        # micropip install autopep8
+                        import autopep8
+                        import os
+                        autopep8.detect_encoding = lambda *a, **kw: 'utf-8'
+                        with open(tmp_fn,"w") as f:
+                            f.write(s)
+                        r = autopep8.fix_file(tmp_fn)
+                        os.remove(tmp_fn)
+                        return r
+                `).then(()=>{
+                    window.autopep8Fix = pyodide.globals.get("autopep8_fix");
+                    linterPromise.resolve(true);
+                })
+
+            })
+        })
+    })
+    }
+
+
 
     /* _______________________________________ scopeEval ____________________________________ */
     function scopeEval(script) {
@@ -538,9 +576,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             return this.jsNamespaces[name]
         }
         namespaceEval(code, name){
-            //.replace(/(^|[;\s])(let)\s/gm,'$1var ')
             let [scope, scopedEval] = this.getJSNamespace(name);
-            console.warn(scope)
             return scopedEval(code)
         }
 
@@ -548,7 +584,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         namespaces = {}
         namespaceNames = ['global']
         recordNamespaceName(name){
-            console.log(this, this.namespaceNames)
             if (!this.namespaceNames.includes(name)){
                 this.namespaceNames = this.namespaceNames.concat([name])
             }
@@ -569,29 +604,43 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         load(code, requirements="detect"){
             /*load required packages as soon as pyodide is loaded*/
             return this.then(() =>{
-                let requirementsLoaded;
                 if (requirements === "detect"){
                     if (code){
                         console.debug("auto loading packages detected in code")
-                        console.debug(code)
-                        requirementsLoaded = window.pyodide.loadPackagesFromImports(code)
+                        return this.installPackagesFromComments(code).then(()=>{
+                            console.warn("installed it here")
+                            return window.pyodide.loadPackagesFromImports(code)
+                        })
                     }
                 }else{
                     console.debug("loading", requirements)
-                    requirementsLoaded = window.pyodide.loadPackage(requirements);
+                    return this.installPackagesFromComments(code).then(()=>{
+                        console.warn("installed it here2")
+                        return window.pyodide.loadPackagesFromImports(code)
+                    })
                 }
-                return requirementsLoaded
+
             })
+        }
+        installPackagesFromComments(code){
+//            let m = code.match(/#\s*(micro)?pip\s*install\s*(\S*)/g);
+//            console.warn(m);
+//            let packageNames = m?m.map(s => s.match(/#\s*(micro)?pip\s*install\s*(\S*)/)[2]):[];
+//            if (packageNames.length){
+//                console.warn("preparing to micropip install", packageNames)
+//                return micropipPromise.then(()=>{console.warn('installing');return micropip.install(packageNames)})
+//            }else{
+                return new Promise((res, rej)=>{res(true)})
+//            }
+
         }
         loadAndRunAsync(code, namespace="global", requirements="detect"){
             /* run a python script asynchronously as soon as pyodide is loaded and all required packages are imported*/
-            console.warn(pyodidePromise)
             let p = this.then((() =>{
-                console.error("here")
                 if (code){
                     return this.load(code, requirements)
-                        .then((r => this._runPythonAsync(code, namespace)).bind(this))
-                        .catch((e => this._runPythonAsync(code, namespace)).bind(this))
+                        .then((r => {console.warn('loaded', r);return this._runPythonAsync(code, namespace)}).bind(this))
+                        .catch((e => {console.error(e); return this._runPythonAsync(code, namespace)}).bind(this))
                 }
             }).bind(this))
             return p
@@ -623,6 +672,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this.run = this.run.bind(this);
             this.copyRunnable = this.copyRunnable.bind(this);
             this.getRunnable = this.getRunnable.bind(this);
+            this.autopep8Fix = this.autopep8Fix.bind(this);
 
             // set language to python(default), javascript, or html
             let language = this.hasAttribute("language")?this.getAttribute("language").toLowerCase():"python"
@@ -650,7 +700,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     this.language = "html"
                 }
                 fetch(src).then(r=>r.text()).then(code =>{
-                    console.warn("got", code)
                     this.innerHTML = code;
                     this.loadEl();
                 })
@@ -725,7 +774,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             }
 
             // now load packages detected in code imports
-            this.loadPackages()
+//            pyprez.installPackagesFromComments(this.code);
         }
         loadEditor(){
             /* first load the editor as though codemirror does not and will not exist, then load codemirror*/
@@ -741,6 +790,12 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             <li>Shift + Enter</li>
             <li>Double-Click</li>
         </ul>
+
+        <b>To lint:</b>
+        <ul>
+            <li>Ctrl + K to reformat/li>
+        </ul>
+
         <b>To re-run:</b>
         <ul>
             <li>Shift + Enter</li>
@@ -755,7 +810,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         After code executes, try the runnable console at the bottom!
 
         <b>Add to StackOverflow:</b>
-        Click <b>&lt/&gt</b> to copy markdown, then paste into your answer.
+        Click <b>M&#8595</b> to copy markdown, then paste into your answer.
         `
         _loadEditor(){
             /* first load the editor as though codemirror does not and will not exist*/
@@ -779,7 +834,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     ${gh}
                     <div style="margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
                     <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
-                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def" onclick="this.parentElement.parentElement.copyRunnable()">&lt/&gt</div>
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy iframe#def" onclick="this.parentElement.parentElement.copyEmbeddable()">&lt/&gt</div>
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def" onclick="this.parentElement.parentElement.copyRunnable()">M&#8595</div>
                     <select style="order:2;margin-right:4px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
                         <option>global</option>
                     </select>
@@ -797,7 +853,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                     ${gh}
                     <div style="display:none;margin-left:10px;overflow:hidden;white-space: nowrap;"></div>
                     <div style="order:2;margin-left:auto;cursor:help;" clicktooltip="${this.helpInfo}#def">&#9432</div>
-                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def" onclick="this.parentElement.parentElement.copyRunnable()">&lt/&gt</div>
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy iframe#def" onclick="this.parentElement.parentElement.copyEmbeddable()">&lt/&gt</div>
+                    <div style="background-color:#f0f0f0;border-radius:5px;margin:2px;order:2;margin-right:5px;cursor:help;" tooltip="copy runnable markdown#def" onclick="this.parentElement.parentElement.copyRunnable()">M&#8595</div>
                     <select style="order:2;margin-right:5px;background-color:#f0f0f0;border-radius:3px;display:${snss};">
                         <option>global</option>
                     </select>
@@ -823,9 +880,10 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             `
             this.start = this.children[0] // start button
             this.messageBar = this.children[1].children[1] // top message bar to use to print status (Loading, Running, etc.)
-            this.copyRunnableLink = this.children[1].children[3]
-            this.namespaceSelect = this.children[1].children[4]
-            this.themeSelect = this.children[1].children[5]
+            this.copyEmbeddableLink = this.children[1].children[3]
+            this.copyRunnableLink = this.children[1].children[4]
+            this.namespaceSelect = this.children[1].children[5]
+            this.themeSelect = this.children[1].children[6]
             this.textarea = this.children[2] // textarea in case codemirror does not load
             this.endSpace = this.children[3]
 
@@ -892,7 +950,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         }
         get namespaces(){return Array.from(this.namespaceSelect.children).map(el=>el.innerHTML)}
         set namespaces(namespaces){
-            console.warn(namespaces)
             let sn = this.selectedNamespace;
             this.namespaceSelect.innerHTML = namespaces.map(name=>`<option>${name}</option>`).join("")
             this.namespaceSelect.value = sn;
@@ -903,7 +960,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         get namespace(){return this.selectedNamespace}
         set namespace(name){
             if (!this.namespaces.includes(name)){
-                console.warn(this.namespaces, name)
                 this.namespaces = this.namespaces.concat([name]);
             }
             this.selectedNamespace = name
@@ -912,6 +968,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         /* ________________________ EVENTS _____________________________*/
         keypressed(e){
             /* Shift + Enter to run, Shift + Backspace to reload */
+            if (e.ctrlKey && e.key == 'k'){this.autopep8Fix();e.preventDefault();}
             if (e.shiftKey && e.key == "Backspace"){this.reload(); e.preventDefault();}
             else if (e.key == "Enter"){
                 if (e.shiftKey && !this.done){this.run(); e.preventDefault();}
@@ -981,8 +1038,8 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
                 this.editor.doc.setGutterMarker(0, "start", this.start);
 
                 // scroll to bottom of element
-                let si = this.editor.getScrollInfo();
-                this.editor.scrollTo(0, si.height);
+//                let si = this.editor.getScrollInfo();
+//                this.editor.scrollTo(0, si.height);
             }else{
                 this.textarea.value = v;
 
@@ -992,9 +1049,15 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
 
             // scroll down on page until bottom of element is in view
             let bb = this.getBoundingClientRect();
-            if (bb.bottom > window.innerHeight){
-                window.scrollTo(0, bb.bottom)
-            }
+//            if (bb.bottom > window.innerHeight){
+//                window.scroll(0, 20 + bb.bottom - window.innerHeight)
+//            }
+        }
+
+        autopep8Fix(){
+            linterPromise.then((()=>{
+                this.code = autopep8Fix(this.code.split(this.separator)[0])
+            }).bind(this))
         }
 
         // get/set the codemirror theme, importing from cdn if needed
@@ -1016,18 +1079,6 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             this._theme = v;
         }
 
-        /* ________________________ PYTHON IMPORTS _____________________________*/
-        numImports = 0; // number of import statements we have already tried to auto-load
-        loadPackages(){
-            /* autodetect if new import statements have been added to code, and if so try to install them*/
-            let code = this.code;
-            let n = code.match(/import/g);
-            if (n && n.length !== this.numImports){
-                this.message = "Loading packages..."
-                this.numImports = n.length;
-                pyprez.load(this.code).then((()=>{this.message = "Ready...(Double-Click to Run)"}).bind(this))
-            }
-        }
 
         /* ________________________ RUN CODE _____________________________*/
         reload(){
@@ -1037,16 +1088,20 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
             if (this.language !== "html"){
                 this.code = this.executed;
             }
-            console.warn("Setting code to ", this.executed, this.code)
             this.message = "Ready   (Double-Click to Run)";
             this.executed = false;
             this.done = false
         }
         run(){
-            console.log("run", this.done)
+            console.log("running")
             if(this.done){
                 this.consoleRun()
             }else if (this.code){
+                if (this.editor){
+                    let si = this.editor.getScrollInfo();
+                    this.editor.scrollTo(0, si.height);
+                }
+
                 this.message = "Running..."
                 let code = this.code.split(this.separator)[0];
                 this.executed = code;
@@ -1168,7 +1223,6 @@ ${c}
 <!-- end snippet -->`
         }
         copyRunnable(){
-            console.warn("copy runnable")
             let s = this.getRunnable();
             console.log(s);
             navigator.clipboard.writeText(s);
@@ -1176,6 +1230,18 @@ ${c}
             this.copyRunnableLink.style['background-color'] = 'rgb(149, 255, 162)';
             setTimeout((()=>{
                 this.copyRunnableLink.style['background-color'] = originalColor;
+            }).bind(this),300)
+        }
+        copyEmbeddable(){
+            let c = encodeURIComponent(this.code);
+            let t = this.theme;
+            let s = `<iframe src="./embed.html?code=${c}&theme=${t}" style="resize:both;overflow:auto;min-width:50%;min-height:500px;"></iframe>`
+            console.log(s)
+            navigator.clipboard.writeText(s);
+            let originalColor = this.copyEmbeddableLink.style['background-color'];
+            this.copyEmbeddableLink.style['background-color'] = 'rgb(149, 255, 162)';
+            setTimeout((()=>{
+                this.copyEmbeddableLink.style['background-color'] = originalColor;
             }).bind(this),300)
         }
     }
@@ -1546,7 +1612,6 @@ ${this.header}
             }).bind(this))
         }
         sync(){
-            console.warn("syncing")
             this.stackOverflow.runnable = this.pyprezEditor.getRunnable();
         }
     }
@@ -1601,7 +1666,6 @@ ${this.header}
         })
 
         let enabled = localStorage.getItem("learningModeEnabled") === "true"
-         console.log("enabled=", enabled)
          if (enabled){
             this.enableLearningMode()
          }else{
@@ -1644,15 +1708,16 @@ ${this.header}
         }
         this.el.innerHTML = s
       }
-
+      offsetX=5
+      offsetY=5
       show(s, clientY, clientX){
-        this.el.style.top = window.scrollY + clientY + 1 + "px"
+        this.el.style.top = window.scrollY + clientY + this.offsetY + "px"
         let maxLeft = window.innerWidth - this.el.getBoundingClientRect().width - 200
-        this.el.style.left = Math.min(clientX + 1, maxLeft) + "px"
+        this.el.style.left = Math.min(clientX + this.offsetX, maxLeft) + "px"
         this.setInnerHTML(s)
         this.el.style.display = 'block'
         maxLeft = window.innerWidth - this.el.getBoundingClientRect().width
-        this.el.style.left = Math.min(clientX + 1, maxLeft) + "px"
+        this.el.style.left = Math.min(clientX + this.offsetX, maxLeft) + "px"
         this.hold = true
         document.body.addEventListener("keydown", this.keydownToggle)
         setTimeout(()=>{this.hold = false;}, 100 )
@@ -1676,7 +1741,6 @@ ${this.header}
       }
 
       keydownToggle(e){
-      console.log(e.key)
         if (e.key === " "){
             this.toggleLearningMode()
             e.preventDefault();
@@ -1700,7 +1764,6 @@ ${this.header}
         localStorage.setItem("learningModeEnabled", false)
       }
       toggleLearningMode(){
-      console.log(this.attrNames)
         if(this.learningMode){
             this.disableLearningMode()
         }else{
@@ -1715,7 +1778,6 @@ ${this.header}
         }
 
         let p = event.path
-    //    console.log(p.map(el => el.id))
           let i=0;
           let found=false;
           if (p.length>4){
@@ -1724,7 +1786,6 @@ ${this.header}
                for (let attrName of attrNames){
                    if (p[i].hasAttribute){
                     if (p[i].hasAttribute(attrName)){
-    //                  console.log(attrName, p[i], )
                       _found = p[i]
                       this.show(_found.getAttribute(attrName), event.clientY, event.clientX)
                     }
