@@ -1,11 +1,11 @@
-/*Wed Oct 26 2022 22:44:06 GMT -0700 (Pacific Daylight Time)*/
+/*Sun Nov 06 2022 15:37:14 GMT -0800 (Pacific Standard Time)*/
 
 if (!window.pyprezUpdateDate){
 /* github pages can only serve one branch and takes a few minutes to update, this will help identify which version
 of code we are on */
-    var pyprezUpdateDate = new Date("Wed Oct 26 2022 22:44:06 GMT -0700 (Pacific Daylight Time)");
-    var pyprezCommitMessage = "document Ctrl+k autopep8.fix_file shortcut";
-    var pyprezPrevCommit = "development:commit 24ed5fe467aff11aa26b449a27337ffb4b778441";
+    var pyprezUpdateDate = new Date("Sun Nov 06 2022 15:37:14 GMT -0800 (Pacific Standard Time)");
+    var pyprezCommitMessage = "disable linting default";
+    var pyprezPrevCommit = "development:commit 00821134b665ac2a1b3c9de7d9ae3c08a6e9f8fe";
 }
 
 /*
@@ -45,7 +45,7 @@ if (!window.pyprezInitStarted){// allow importing this script multiple times wit
         showThemeSelect: true,
         showNamespaceSelect: false,
         patch: true,
-        lint: true
+        lint: false
     }
     let strConfig = {
         patchSrc: "https://modularizer.github.io/pyprez/patches.py",
