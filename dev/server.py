@@ -27,7 +27,8 @@ class RedirectHandler(tornado.web.RequestHandler):
 if __name__ == "__main__":
     app = tornado.web.Application([
         (r"/", RedirectHandler, {"homepage": "/index.html"}),
-        (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./site"})
+        (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./site"}),
+        (r"/sample_imgs/(.*)", tornado.web.StaticFileHandler, {"path": "./sample_imgs"})
     ])
 
     if sys.platform == 'win32':

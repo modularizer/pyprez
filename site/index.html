@@ -15,11 +15,11 @@
   </head>
   <body>
     <nav>
-      <div class="logo"></div>
+      <img href="./imgs/logo.png"/>
       <ul class="menu">
         <div class="menu__item toggle"><span></span></div>
         <li class="menu__item"><a href="doc.html" class="link link--dark"><i class="fa fa-book"></i> Documentation</a></li>
-        <li class="menu__item"><a href="" class="link link--dark"><i class="fa fa-github"></i> Github</a></li>
+        <li class="menu__item"><a href="https://github.com/modularizer/pyprez" class="link link--dark"><i class="fa fa-github"></i> Github</a></li>
       </ul>
     </nav>
     <div class="hero">
@@ -86,13 +86,10 @@ if __name__ == "__main__":
         </ul>
         <ul class="keybinding__detail">
           <h3 class="keybinding__title">Special Keybindings</h3>
+          <li><span class="keybinding__label">Shift+K</span> AutoPep8 Linter</li>
           <li><span class="keybinding__label">Shift+Enter</span> Run Code</li>
-          <li><span class="keybinding__label">Shift + Backspace</span> Reset Code</li>
+          <li><span class="keybinding__label">Shift+Backspace</span> Reset Code</li>
         </ul>
-      </div>
-      <div class="callout">
-        <p>Read our documentation for advanced keybindings and customization</p>
-        <a href="doc.html" class="button--primary">Documentation</a>
       </div>
     </div>
     <div class="changelog">
@@ -100,49 +97,53 @@ if __name__ == "__main__":
         <h3 class="section__title">Changelog</h3>
         <div class="changelog__item">
           <div class="changelog__meta">
-            <h4 class="changelog__title">v0.7</h4>
-            <small class="changelog__date">10/12/2017</small>
+            <h4 class="changelog__title">v1.1.0</h4>
+            <small class="changelog__date">11/6/2022</small>
           </div>
           <div class="changelog__detail">
             <ul>
-              <li>Improving the writing workflow with better key bindings</li>
-              <li>Design updates</li>
-              <li>SSL Verification for web hooks</li>
-              <li>Render Emoji</li>
+              <li>micropip support</li>
+              <li>autopep8 linting</li>
+              <li>iframe copy button</li>
             </ul>
           </div>
         </div>
         <div class="changelog__item">
           <div class="changelog__meta">
-            <h4 class="changelog__title">v0.6</h4>
-            <small class="changelog__date">7/30/2017</small>
+            <h4 class="changelog__title">v1.0.3</h4>
+            <small class="changelog__date">10/23/2022</small>
           </div>
           <div class="changelog__detail">
             <ul>
-              <li>Adding Unicode support</li>
-              <li>Basic text highlighting</li>
-              <li>Fresh Design</li>
+              <li>matlotlib patch</li>
             </ul>
           </div>
         </div>
         <div class="changelog__item">
           <div class="changelog__meta">
-            <h4 class="changelog__title">v0.5</h4>
-            <small class="changelog__date">5/10/2017</small>
+            <h4 class="changelog__title">v1.0.2</h4>
+            <small class="changelog__date">10/22/2022</small>
           </div>
           <div class="changelog__detail">
             <ul>
-              <li>Save default md file in new folders</li>
-              <li>Ability to quick search on existing notes</li>
+              <li>add namespaces</li>
             </ul>
           </div>
         </div>
-        <div class="changelog__callout">
-          <a href="#" class="button--secondary">Checkout Full Log</a>
+        <div class="changelog__item">
+          <div class="changelog__meta">
+            <h4 class="changelog__title">v1.0.1</h4>
+            <small class="changelog__date">10/16/2022</small>
+          </div>
+          <div class="changelog__detail">
+            <ul>
+              <li>stack overflow compatibility</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-    <footer class="footer">Scribbler is a free HTML template created exclusively for <a href="https://tympanus.net/codrops/" target="_blank" class="link link--light">Codrops</a>.</footer>
+    <footer class="footer">PyPrez is an open source project intended to make it easier to teach and learn Python</footer>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
     <script src="scribbler.js"></script>
