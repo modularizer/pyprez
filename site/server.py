@@ -29,7 +29,7 @@ if __name__ == "__main__":
         (r"/", RedirectHandler, {"homepage": "/index.html"}),
         (r"/(.*)", tornado.web.StaticFileHandler, {"path": "./site"}),
         (r"/sample_imgs/(.*)", tornado.web.StaticFileHandler, {"path": "./sample_imgs"})
-    ])
+    ], default_host="0.0.0.0")
 
     if sys.platform == 'win32':
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
