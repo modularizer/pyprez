@@ -1,7 +1,10 @@
 <script src="https://modularizer.github.io/pyprez/pyprez.js"></script>
 
+
 # Welcome to **pyprez!**
 Run **client-side python** in your browser to **prez**ent your code.
+
+<a href="https://chat.openai.com/g/g-RjJ0Sbboo-pyprez"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/180px-ChatGPT_logo.svg.png" height="30px"/>Try it with ChatGPT!</a>
 
 <a href="https://github.com/modularizer/pyprez"><img src="https://github.com/favicon.ico" height="30px"/></a>
 [GitHub Project](https://github.com/modularizer/pyprez) (go to project)<br/>
